@@ -47,7 +47,34 @@ function sendError(req, res, statusCode, message) {
   return res.redirect(303, "/?signup=error");
 }
 
-async function deliverLead(lead) {
+async function storeLeadInSupabase(lead) {
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const supabaseTable = process.env.SUPABASE_SIGNUPS_TABLE || "signups";
+
+  if (!supabaseUrl || !supabaseServiceRoleKey) {
+    throw new Error("Supabase storage is not configured.");
+  }
+
+  const trimmedUrl = supabaseUrl.replace(/\/$/, "");
+  const response = await fetch(`${trimmedUrl}/rest/v1/${encodeURIComponent(supabaseTable)}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "apikey": supabaseServiceRoleKey,
+      "Authorization": `Bearer ${supabaseServiceRoleKey}`,
+      "Prefer": "return=minimal"
+    },
+    body: JSON.stringify([lead])
+  });
+
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(`Supabase insert failed: ${text}`);
+  }
+}
+
+async function notifyLead(lead) {
   const webhookUrl = process.env.SIGNUP_WEBHOOK_URL;
   const resendApiKey = process.env.RESEND_API_KEY;
   const resendFrom = process.env.RESEND_FROM_EMAIL;
@@ -107,8 +134,6 @@ async function deliverLead(lead) {
 
     return;
   }
-
-  throw new Error("No signup delivery service is configured.");
 }
 
 module.exports = async function handler(req, res) {
@@ -136,13 +161,14 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    await deliverLead(lead);
+    await storeLeadInSupabase(lead);
+    await notifyLead(lead);
     if (wantsJson(req)) {
       return res.status(200).json({ ok: true });
     }
     return res.redirect(303, "/thank-you");
   } catch (error) {
     console.error("Signup delivery failed", error);
-    return sendError(req, res, 500, "Signup is not configured yet. Add the required Vercel environment variables.");
+    return sendError(req, res, 500, "Signup is not configured yet. Add the required Supabase environment variables.");
   }
 };
