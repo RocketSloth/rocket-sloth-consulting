@@ -53,10 +53,21 @@ async function storeLeadInSupabase(lead) {
   const supabaseTable = process.env.SUPABASE_SIGNUPS_TABLE || "signups";
 
   if (!supabaseUrl || !supabaseServiceRoleKey) {
-    throw new Error("Supabase storage is not configured.");
+    const missing = [
+      !supabaseUrl ? "SUPABASE_URL" : "",
+      !supabaseServiceRoleKey ? "SUPABASE_SERVICE_ROLE_KEY" : ""
+    ].filter(Boolean);
+    throw new Error(`Missing required environment variables: ${missing.join(", ")}`);
   }
 
   const trimmedUrl = supabaseUrl.replace(/\/$/, "");
+  const record = {
+    name: lead.name,
+    email: lead.email,
+    company: lead.company,
+    interest: lead.interest,
+    submitted_at: lead.submittedAt
+  };
   const response = await fetch(`${trimmedUrl}/rest/v1/${encodeURIComponent(supabaseTable)}`, {
     method: "POST",
     headers: {
@@ -65,7 +76,7 @@ async function storeLeadInSupabase(lead) {
       "Authorization": `Bearer ${supabaseServiceRoleKey}`,
       "Prefer": "return=minimal"
     },
-    body: JSON.stringify([lead])
+    body: JSON.stringify([record])
   });
 
   if (!response.ok) {
@@ -169,6 +180,9 @@ module.exports = async function handler(req, res) {
     return res.redirect(303, "/thank-you");
   } catch (error) {
     console.error("Signup delivery failed", error);
-    return sendError(req, res, 500, "Signup is not configured yet. Add the required Supabase environment variables.");
+    const message = error instanceof Error && error.message
+      ? error.message
+      : "Signup could not be processed right now.";
+    return sendError(req, res, 500, message);
   }
 };
