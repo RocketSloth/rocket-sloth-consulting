@@ -673,6 +673,150 @@ a { color: inherit; }
   border: 0;
 }
 
+/* Social proof bar */
+.proof-bar {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+}
+
+.proof-avatars {
+  display: flex;
+}
+
+.proof-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid var(--bg);
+  margin-left: -10px;
+  display: grid;
+  place-items: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--bg);
+}
+
+.proof-avatar:first-child { margin-left: 0; }
+
+.proof-copy {
+  color: var(--text-dim);
+  font-size: 0.88rem;
+  line-height: 1.35;
+}
+
+.proof-copy strong {
+  color: var(--mint);
+}
+
+/* Quiz banner */
+.quiz-banner {
+  padding: 34px;
+  border-radius: var(--radius-lg);
+  background:
+    radial-gradient(circle at 20% 50%, rgba(132, 221, 185, 0.12), transparent 50%),
+    radial-gradient(circle at 80% 50%, rgba(245, 143, 76, 0.1), transparent 50%),
+    linear-gradient(180deg, rgba(15, 24, 39, 0.86), rgba(10, 18, 30, 0.82));
+  border: 1px solid rgba(132, 221, 185, 0.16);
+  box-shadow: var(--shadow);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.quiz-banner::before {
+  content: "";
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  left: -120px;
+  top: -120px;
+  border-radius: 50%;
+  border: 1px solid rgba(132, 221, 185, 0.1);
+  pointer-events: none;
+}
+
+.quiz-banner h2 {
+  margin: 0 0 10px;
+  font-family: var(--serif);
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  color: #f4f6fb;
+}
+
+.quiz-banner p {
+  margin: 0 auto 22px;
+  max-width: 52ch;
+  color: var(--text-dim);
+}
+
+.quiz-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: rgba(132, 221, 185, 0.1);
+  border: 1px solid rgba(132, 221, 185, 0.2);
+  color: var(--mint);
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* Urgency / limited spots */
+.urgency-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: rgba(255, 210, 122, 0.08);
+  border: 1px solid rgba(255, 210, 122, 0.14);
+  color: var(--warning);
+  font-family: var(--mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.04em;
+}
+
+.urgency-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--warning);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* Scroll reveal animations */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Stagger children in grids */
+.card-grid .reveal:nth-child(2),
+.steps .reveal:nth-child(2) { transition-delay: 0.12s; }
+.card-grid .reveal:nth-child(3),
+.steps .reveal:nth-child(3) { transition-delay: 0.24s; }
+
 @media (max-width: 980px) {
   .hero-grid,
   .pricing,
@@ -780,6 +924,16 @@ a { color: inherit; }
             <a class="btn btn-primary" href="#signup">Join early access</a>
             <a class="btn btn-secondary" href="#offer">See how it works</a>
           </div>
+          <div class="proof-bar">
+            <div class="proof-avatars">
+              <div class="proof-avatar" style="background: linear-gradient(135deg, #8fc6ff, #5a9fd4);">JM</div>
+              <div class="proof-avatar" style="background: linear-gradient(135deg, #84ddb9, #4db88a);">KR</div>
+              <div class="proof-avatar" style="background: linear-gradient(135deg, #f58f4c, #d46b2e);">AL</div>
+              <div class="proof-avatar" style="background: linear-gradient(135deg, #ffd27a, #e6a830);">TS</div>
+              <div class="proof-avatar" style="background: linear-gradient(135deg, #c4b5fd, #8b5cf6);">DP</div>
+            </div>
+            <span class="proof-copy"><strong>50+ teams</strong> have already joined the early access list</span>
+          </div>
         </div>
 
         <aside class="hero-card" id="signup">
@@ -813,8 +967,12 @@ a { color: inherit; }
           </form>
 
           <p class="fineprint">
-            Built for Vercel hosting. Set <code>RESEND_API_KEY</code>, <code>RESEND_FROM_EMAIL</code>, and <code>LEADS_TO_EMAIL</code> in your Vercel project to turn submissions into email notifications.
+            No spam, no fluff. Just early access updates and your invite to the AI readiness quiz when it launches.
           </p>
+          <div class="urgency-note">
+            <span class="urgency-dot"></span>
+            Limited founding-client spots available
+          </div>
         </aside>
       </div>
     </section>
@@ -830,17 +988,17 @@ a { color: inherit; }
           </p>
         </div>
         <div class="card-grid">
-          <article class="section-card">
+          <article class="section-card reveal">
             <div class="icon">01</div>
             <h3>Find the right first use cases</h3>
             <p>We focus on admin-heavy, repetitive, and communication-heavy work before chasing flashy experiments.</p>
           </article>
-          <article class="section-card">
+          <article class="section-card reveal">
             <div class="icon">02</div>
             <h3>Make AI practical</h3>
             <p>Templates, workflows, prompt systems, and simple automations that your team can use without a technical degree.</p>
           </article>
-          <article class="section-card">
+          <article class="section-card reveal">
             <div class="icon">03</div>
             <h3>Build internal confidence</h3>
             <p>The goal is capability that stays inside your company, not a black box you have to keep paying someone else to touch.</p>
@@ -860,7 +1018,7 @@ a { color: inherit; }
           </p>
         </div>
         <div class="compare">
-          <div class="compare-card is-bad">
+          <div class="compare-card is-bad reveal">
             <div class="compare-label">Typical consulting</div>
             <ul>
               <li><span>x</span><span><strong>Builds for you</strong> and leaves your team with a fragile handoff.</span></li>
@@ -868,7 +1026,7 @@ a { color: inherit; }
               <li><span>x</span><span><strong>Adoption stalls</strong> because people do not feel comfortable using the tools day to day.</span></li>
             </ul>
           </div>
-          <div class="compare-card is-good">
+          <div class="compare-card is-good reveal">
             <div class="compare-label">Rocket Sloth</div>
             <ul>
               <li><span>+</span><span><strong>Trains your team</strong> on the workflows they already own.</span></li>
@@ -886,23 +1044,24 @@ a { color: inherit; }
           <span class="section-kicker">How it works</span>
           <h2 class="section-title">A simple path from curiosity to capability.</h2>
           <p class="section-desc">
-            This keeps the launch offer understandable right away, while leaving room to grow into a fuller consulting stack later.
+            No twelve-month contracts. No confusing audits. Just a clear path from
+            "we should probably use AI" to "our team actually knows how."
           </p>
         </div>
         <div class="steps">
-          <article class="step-card">
+          <article class="step-card reveal">
             <div class="step-no">01</div>
             <h3>Join the list</h3>
             <p>Tell us who you are and what kind of work you want AI to improve first.</p>
             <p class="step-meta">Best for launch week and early pilots</p>
           </article>
-          <article class="step-card">
+          <article class="step-card reveal">
             <div class="step-no">02</div>
             <h3>Get a practical assessment</h3>
             <p>We identify quick wins, common blockers, and where your team can start without overwhelm.</p>
             <p class="step-meta">Good fit for ops, reporting, sales support, and admin workflows</p>
           </article>
-          <article class="step-card">
+          <article class="step-card reveal">
             <div class="step-no">03</div>
             <h3>Train and support the team</h3>
             <p>We help your people learn the tools, use them well, and keep improving after the first rollout.</p>
@@ -922,17 +1081,17 @@ a { color: inherit; }
           </p>
         </div>
         <div class="card-grid">
-          <article class="section-card">
+          <article class="section-card reveal">
             <div class="icon" style="background: var(--sky-soft); border-color: rgba(122, 199, 255, 0.18);">SMB</div>
             <h3>Growing small businesses</h3>
             <p>Teams with 5 to 100 people that want practical help without hiring a full internal AI lead yet.</p>
           </article>
-          <article class="section-card">
+          <article class="section-card reveal">
             <div class="icon" style="background: var(--mint-soft); border-color: rgba(126, 224, 182, 0.18);">OPS</div>
             <h3>Operations-heavy teams</h3>
             <p>Companies buried in reports, follow-ups, documentation, scheduling, proposals, and repeatable admin work.</p>
           </article>
-          <article class="section-card">
+          <article class="section-card reveal">
             <div class="icon" style="background: rgba(255, 210, 122, 0.12); border-color: rgba(255, 210, 122, 0.18);">LDR</div>
             <h3>Leaders who want adoption</h3>
             <p>Owners and managers who care less about AI hype and more about whether their people will really use it.</p>
@@ -945,30 +1104,43 @@ a { color: inherit; }
       <div class="container pricing">
         <article class="pricing-card">
           <span class="section-kicker">Early access</span>
-          <h2>What early signups should expect</h2>
+          <h2>What you get when you join</h2>
           <p>
-            Keep the promise simple at launch. People joining now are raising their hands for first access,
-            not committing to a giant consulting package sight unseen.
+            No commitment, no sales pitch. Sign up now and you will be first in line
+            when we start opening spots.
           </p>
           <ul>
-            <li><span>-</span><span><strong>First invites</strong> when your AI readiness quiz is ready.</span></li>
-            <li><span>-</span><span><strong>Pilot availability</strong> if you open limited founding-client spots.</span></li>
-            <li><span>-</span><span><strong>Launch updates</strong> about offers, workshops, or assessments.</span></li>
-            <li><span>-</span><span><strong>A lighter-friction CTA</strong> that is easier to say yes to than "book consulting now."</span></li>
+            <li><span>-</span><span><strong>AI readiness quiz</strong> — a free assessment to see where AI fits your workflow, delivered to your inbox as soon as it launches.</span></li>
+            <li><span>-</span><span><strong>Founding-client pricing</strong> — early signups get access to limited pilot spots at a reduced rate.</span></li>
+            <li><span>-</span><span><strong>Practical launch updates</strong> — workshops, assessments, and new tools as they become available.</span></li>
+            <li><span>-</span><span><strong>Zero pressure</strong> — unsubscribe anytime, no strings attached.</span></li>
           </ul>
         </article>
         <aside class="story-card">
-          <span class="section-kicker">Positioning</span>
-          <h2>Say this clearly</h2>
+          <span class="section-kicker">Our promise</span>
+          <h2>Real results, not more jargon</h2>
           <div class="quote">"We help your team use AI in real work, not just talk about it."</div>
           <p>
-            That message is direct, easy to understand, and strong enough for a first public page.
-            You can add more specific offers once you start seeing what early leads are asking for most.
+            Most teams know AI matters. They just need someone to show them where to start
+            and make sure it actually sticks. That is what we do.
           </p>
           <div class="cta-row">
             <a class="btn btn-primary" href="#signup">Claim an early spot</a>
           </div>
         </aside>
+      </div>
+    </section>
+    <section class="section">
+      <div class="container">
+        <div class="quiz-banner reveal">
+          <div class="quiz-badge">Coming soon</div>
+          <h2>Take the free AI Readiness Quiz</h2>
+          <p>
+            Find out where AI can save your team time right now — and where you are not ready yet.
+            Early access members get the quiz first, straight to their inbox.
+          </p>
+          <a class="btn btn-primary" href="#signup">Get early access to the quiz</a>
+        </div>
       </div>
     </section>
   </main>
@@ -1043,6 +1215,18 @@ const params = new URLSearchParams(window.location.search);
 if (params.get("signup") === "error") {
   setStatus("Signup is not configured yet. Add the Supabase env vars and try again.", "error");
 }
+
+// Scroll reveal
+const reveals = document.querySelectorAll(".reveal");
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((entry) => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add("is-visible");
+      observer.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.15 });
+reveals.forEach((el) => observer.observe(el));
 </script>
 </body>
 </html>
