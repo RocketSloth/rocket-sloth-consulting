@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rocket Sloth Consulting | Practical AI for Growing Teams</title>
+<meta name="description" content="Rocket Sloth Consulting helps small and midsize teams turn AI into real workflow wins. Join the early access list to get first invites, pilot spots, and launch updates.">
+<meta name="theme-color" content="#0b0d12">
+<meta property="og:title" content="Rocket Sloth Consulting">
+<meta property="og:description" content="Practical AI consulting for operations-heavy teams. Join the early access list.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; }
+
+:root {
+  --bg: #0b0d12;
+  --bg-soft: #121722;
+  --panel: rgba(16, 22, 34, 0.9);
+  --panel-strong: #171f2f;
+  --line: rgba(141, 164, 214, 0.16);
+  --line-strong: rgba(141, 164, 214, 0.28);
+  --text: #d8deed;
+  --text-dim: #a2abc2;
+  --text-faint: #6f7894;
+  --brand: #ff7a3d;
+  --brand-deep: #c85624;
+  --brand-soft: rgba(255, 122, 61, 0.12);
+  --mint: #7ee0b6;
+  --mint-soft: rgba(126, 224, 182, 0.12);
+  --sky: #7ac7ff;
+  --sky-soft: rgba(122, 199, 255, 0.12);
+  --warning: #ffd27a;
+  --shadow: 0 18px 60px rgba(0, 0, 0, 0.35);
+  --radius-lg: 26px;
+  --radius-md: 18px;
+  --radius-sm: 12px;
+  --serif: "Instrument Serif", Georgia, serif;
+  --sans: "Manrope", system-ui, sans-serif;
+  --mono: "JetBrains Mono", monospace;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top right, rgba(255, 122, 61, 0.12), transparent 30%),
+    radial-gradient(circle at 15% 20%, rgba(122, 199, 255, 0.1), transparent 22%),
+    linear-gradient(180deg, #0b0d12 0%, #0d1119 42%, #0b0d12 100%);
+  color: var(--text);
+  font-family: var(--sans);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 20% 30%, rgba(255,255,255,0.08) 0 1px, transparent 1px),
+    radial-gradient(circle at 72% 14%, rgba(255,255,255,0.12) 0 1.2px, transparent 1.2px),
+    radial-gradient(circle at 36% 70%, rgba(255,255,255,0.08) 0 1px, transparent 1px),
+    radial-gradient(circle at 80% 60%, rgba(255,255,255,0.08) 0 1.1px, transparent 1.1px);
+  background-size: 280px 280px, 360px 360px, 320px 320px, 420px 420px;
+  opacity: 0.45;
+}
+
+a { color: inherit; }
+
+.shell {
+  position: relative;
+  z-index: 1;
+}
+
+.container {
+  width: min(1120px, calc(100% - 40px));
+  margin: 0 auto;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  backdrop-filter: blur(18px);
+  background: rgba(11, 13, 18, 0.72);
+  border-bottom: 1px solid rgba(141, 164, 214, 0.08);
+}
+
+.topbar-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  min-height: 72px;
+}
+
+.brandmark {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+}
+
+.brandmark-badge {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 0.9rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  background: radial-gradient(circle at 35% 35%, var(--brand), var(--brand-deep));
+  box-shadow: 0 0 26px rgba(255, 122, 61, 0.24);
+}
+
+.brandmark-copy strong {
+  display: block;
+  color: var(--text);
+  font-size: 0.95rem;
+  letter-spacing: -0.02em;
+}
+
+.brandmark-copy span {
+  display: block;
+  color: var(--text-faint);
+  font-size: 0.74rem;
+  font-family: var(--mono);
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+}
+
+.nav a {
+  color: var(--text-dim);
+  text-decoration: none;
+  font-size: 0.92rem;
+}
+
+.nav a:hover { color: var(--text); }
+
+.nav-cta {
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: var(--brand);
+  color: #17110d;
+  font-weight: 800;
+  box-shadow: 0 10px 30px rgba(255, 122, 61, 0.28);
+}
+
+.hero {
+  padding: 72px 0 40px;
+}
+
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 28px;
+  align-items: stretch;
+}
+
+.hero-copy,
+.hero-card,
+.section-card,
+.pricing-card,
+.story-card {
+  background: linear-gradient(180deg, rgba(22, 29, 43, 0.94), rgba(13, 18, 28, 0.92));
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+}
+
+.hero-copy {
+  border-radius: var(--radius-lg);
+  padding: 48px;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-copy::after {
+  content: "";
+  position: absolute;
+  width: 340px;
+  height: 340px;
+  right: -120px;
+  top: -120px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 122, 61, 0.22), transparent 68%);
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: var(--brand-soft);
+  border: 1px solid rgba(255, 122, 61, 0.2);
+  color: #ffc3a7;
+  font-size: 0.75rem;
+  font-family: var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.hero h1 {
+  margin: 20px 0 16px;
+  font-family: var(--serif);
+  font-size: clamp(2.8rem, 7vw, 5.2rem);
+  line-height: 0.96;
+  font-weight: 400;
+  letter-spacing: -0.045em;
+  color: #f4f6fb;
+  max-width: 11ch;
+}
+
+.hero h1 em {
+  font-style: italic;
+  background: linear-gradient(135deg, #ffd38d, var(--brand));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-lead {
+  max-width: 54ch;
+  margin: 0 0 28px;
+  color: var(--text-dim);
+  font-size: 1.05rem;
+}
+
+.hero-points {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0 0 34px;
+}
+
+.hero-point {
+  padding: 14px 14px 15px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(141, 164, 214, 0.1);
+}
+
+.hero-point strong {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--text);
+  font-size: 0.88rem;
+}
+
+.hero-point span {
+  display: block;
+  color: var(--text-faint);
+  font-size: 0.8rem;
+}
+
+.cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: center;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 52px;
+  padding: 0 22px;
+  border-radius: 999px;
+  border: 0;
+  font: inherit;
+  font-weight: 800;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.btn:hover { transform: translateY(-1px); }
+
+.btn-primary {
+  background: var(--brand);
+  color: #1d130e;
+  box-shadow: 0 12px 28px rgba(255, 122, 61, 0.26);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--line-strong);
+}
+
+.hero-card {
+  border-radius: var(--radius-lg);
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 22px;
+}
+
+.hero-card h2,
+.section-title,
+.pricing-card h2,
+.story-card h2 {
+  margin: 0;
+  font-family: var(--serif);
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  color: #f4f6fb;
+}
+
+.hero-card h2 {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.hero-card p {
+  margin: 8px 0 0;
+  color: var(--text-dim);
+}
+
+.signup-form {
+  display: grid;
+  gap: 12px;
+}
+
+.field {
+  display: grid;
+  gap: 6px;
+}
+
+.field label {
+  color: var(--text-faint);
+  font-size: 0.76rem;
+  font-family: var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.field input,
+.field textarea {
+  width: 100%;
+  border: 1px solid rgba(141, 164, 214, 0.16);
+  background: rgba(7, 10, 17, 0.7);
+  color: var(--text);
+  border-radius: 14px;
+  padding: 14px 15px;
+  font: inherit;
+  outline: none;
+}
+
+.field textarea {
+  min-height: 104px;
+  resize: vertical;
+}
+
+.field input:focus,
+.field textarea:focus {
+  border-color: rgba(255, 122, 61, 0.8);
+  box-shadow: 0 0 0 3px rgba(255, 122, 61, 0.12);
+}
+
+.fineprint {
+  color: var(--text-faint);
+  font-size: 0.8rem;
+}
+
+.form-status {
+  min-height: 1.4em;
+  margin: 2px 0 0;
+  color: var(--text-dim);
+  font-size: 0.86rem;
+}
+
+.form-status[data-tone="error"] {
+  color: #ffb0a2;
+}
+
+.form-status[data-tone="success"] {
+  color: #b7ffd7;
+}
+
+.stack {
+  display: grid;
+  gap: 18px;
+}
+
+.section {
+  padding: 34px 0;
+}
+
+.section-head {
+  max-width: 700px;
+  margin-bottom: 22px;
+}
+
+.section-kicker {
+  display: inline-block;
+  margin-bottom: 10px;
+  color: #ffc3a7;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.section-title {
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 0.98;
+}
+
+.section-desc {
+  margin: 12px 0 0;
+  color: var(--text-dim);
+  max-width: 58ch;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.section-card {
+  border-radius: var(--radius-md);
+  padding: 24px;
+}
+
+.section-card .icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 16px;
+  font-size: 1.2rem;
+  background: var(--brand-soft);
+  border: 1px solid rgba(255, 122, 61, 0.18);
+}
+
+.section-card h3 {
+  margin: 0 0 8px;
+  color: #f4f6fb;
+  font-size: 1rem;
+}
+
+.section-card p {
+  margin: 0;
+  color: var(--text-dim);
+  font-size: 0.92rem;
+}
+
+.compare {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.compare-card {
+  border-radius: var(--radius-md);
+  padding: 28px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.compare-card.is-bad {
+  background: rgba(255, 210, 122, 0.05);
+  border-color: rgba(255, 210, 122, 0.12);
+}
+
+.compare-card.is-good {
+  background: var(--mint-soft);
+  border-color: rgba(126, 224, 182, 0.16);
+}
+
+.compare-label {
+  margin-bottom: 14px;
+  color: var(--text-faint);
+  font-family: var(--mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.compare-card ul,
+.pricing-card ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.compare-card li,
+.pricing-card li {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin: 0;
+  padding: 8px 0;
+  color: var(--text-dim);
+}
+
+.compare-card li strong,
+.pricing-card li strong {
+  color: var(--text);
+}
+
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.step-card {
+  padding: 26px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--line);
+  background: linear-gradient(180deg, rgba(16, 22, 34, 0.95), rgba(11, 15, 24, 0.88));
+  box-shadow: var(--shadow);
+}
+
+.step-no {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  margin-bottom: 14px;
+  border-radius: 50%;
+  background: var(--brand-soft);
+  border: 1px solid rgba(255, 122, 61, 0.18);
+  color: #ffd4bc;
+  font-family: var(--mono);
+  font-size: 0.88rem;
+}
+
+.step-card h3 {
+  margin: 0 0 8px;
+  color: #f4f6fb;
+  font-size: 1rem;
+}
+
+.step-card p,
+.step-meta {
+  margin: 0;
+  color: var(--text-dim);
+}
+
+.step-meta {
+  margin-top: 12px;
+  color: var(--text-faint);
+  font-family: var(--mono);
+  font-size: 0.74rem;
+}
+
+.pricing {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 16px;
+}
+
+.pricing-card,
+.story-card {
+  border-radius: var(--radius-lg);
+  padding: 30px;
+}
+
+.pricing-card p,
+.story-card p {
+  color: var(--text-dim);
+}
+
+.story-card {
+  background:
+    radial-gradient(circle at top right, rgba(122, 199, 255, 0.16), transparent 42%),
+    linear-gradient(180deg, rgba(15, 23, 36, 0.96), rgba(12, 17, 28, 0.94));
+}
+
+.quote {
+  margin: 18px 0;
+  padding-left: 18px;
+  border-left: 2px solid rgba(122, 199, 255, 0.26);
+  color: #eef5ff;
+  font-family: var(--serif);
+  font-size: 1.45rem;
+  line-height: 1.15;
+}
+
+.footer {
+  padding: 34px 0 56px;
+  color: var(--text-faint);
+}
+
+.footer-inner {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: center;
+  padding-top: 26px;
+  border-top: 1px solid rgba(141, 164, 214, 0.1);
+}
+
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.footer-links a {
+  text-decoration: none;
+}
+
+.footer-links a:hover {
+  color: var(--text);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 980px) {
+  .hero-grid,
+  .pricing,
+  .card-grid,
+  .steps,
+  .compare {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-points {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .container { width: min(1120px, calc(100% - 24px)); }
+
+  .topbar-inner,
+  .footer-inner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .nav {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .hero {
+    padding-top: 42px;
+  }
+
+  .hero-copy,
+  .hero-card,
+  .pricing-card,
+  .story-card {
+    padding: 24px;
+  }
+
+  .hero h1 {
+    max-width: 100%;
+  }
+
+  .cta-row {
+    align-items: stretch;
+  }
+
+  .cta-row .btn {
+    width: 100%;
+  }
+}
+</style>
+</head>
+<body>
+<div class="shell">
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <a class="brandmark" href="#top">
+        <span class="brandmark-badge" aria-hidden="true">RS</span>
+        <span class="brandmark-copy">
+          <strong>Rocket Sloth Consulting</strong>
+          <span>Practical AI, taught clearly</span>
+        </span>
+      </a>
+      <nav class="nav" aria-label="Primary">
+        <a href="#offer">What we do</a>
+        <a href="#process">How it works</a>
+        <a href="#fit">Who it's for</a>
+        <a class="nav-cta" href="#signup">Join early access</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <div class="eyebrow">Launching now for early adopters</div>
+          <h1>AI consulting your team can <em>actually use.</em></h1>
+          <p class="hero-lead">
+            Rocket Sloth helps small and midsize businesses find practical AI wins, train their people,
+            and build in-house confidence instead of permanent consultant dependence.
+          </p>
+          <div class="hero-points" aria-label="Highlights">
+            <div class="hero-point">
+              <strong>No jargon</strong>
+              <span>Clear help for real business workflows.</span>
+            </div>
+            <div class="hero-point">
+              <strong>Hands-on training</strong>
+              <span>Your team learns how to keep using it.</span>
+            </div>
+            <div class="hero-point">
+              <strong>Early access list</strong>
+              <span>Get first pilot spots and launch updates.</span>
+            </div>
+          </div>
+          <div class="cta-row">
+            <a class="btn btn-primary" href="#signup">Join early access</a>
+            <a class="btn btn-secondary" href="#offer">See how it works</a>
+          </div>
+        </div>
+
+        <aside class="hero-card" id="signup">
+          <div>
+            <h2>Get on the list</h2>
+            <p>
+              Sign up to hear when pilot spots open, when the AI readiness quiz goes live,
+              and when founding-client offers are available.
+            </p>
+          </div>
+
+          <form class="signup-form" id="signup-form" method="POST" action="/api/signup" novalidate>
+            <div class="field">
+              <label for="name">Name</label>
+              <input id="name" name="name" type="text" autocomplete="name" placeholder="Your name" required>
+            </div>
+            <div class="field">
+              <label for="email">Work email</label>
+              <input id="email" name="email" type="email" autocomplete="email" placeholder="you@company.com" required>
+            </div>
+            <div class="field">
+              <label for="company">Company</label>
+              <input id="company" name="company" type="text" autocomplete="organization" placeholder="Company name" required>
+            </div>
+            <div class="field">
+              <label for="interest">What are you hoping AI helps with first?</label>
+              <textarea id="interest" name="interest" placeholder="Examples: reporting, proposals, admin work, training the team, customer support"></textarea>
+            </div>
+            <button class="btn btn-primary" id="signup-button" type="submit">Join the early access list</button>
+            <p class="form-status" id="form-status" aria-live="polite"></p>
+          </form>
+
+          <p class="fineprint">
+            Built for Vercel hosting. Set <code>RESEND_API_KEY</code>, <code>RESEND_FROM_EMAIL</code>, and <code>LEADS_TO_EMAIL</code> in your Vercel project to turn submissions into email notifications.
+          </p>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section" id="offer">
+      <div class="container">
+        <div class="section-head">
+          <span class="section-kicker">What we do</span>
+          <h2 class="section-title">Start with useful wins, then teach your team to keep going.</h2>
+          <p class="section-desc">
+            The idea is simple: find where AI saves time in your real workflow, implement the right level of support,
+            and make sure your team understands what they are using.
+          </p>
+        </div>
+        <div class="card-grid">
+          <article class="section-card">
+            <div class="icon">01</div>
+            <h3>Find the right first use cases</h3>
+            <p>We focus on admin-heavy, repetitive, and communication-heavy work before chasing flashy experiments.</p>
+          </article>
+          <article class="section-card">
+            <div class="icon">02</div>
+            <h3>Make AI practical</h3>
+            <p>Templates, workflows, prompt systems, and simple automations that your team can use without a technical degree.</p>
+          </article>
+          <article class="section-card">
+            <div class="icon">03</div>
+            <h3>Build internal confidence</h3>
+            <p>The goal is capability that stays inside your company, not a black box you have to keep paying someone else to touch.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-head">
+          <span class="section-kicker">Why this is different</span>
+          <h2 class="section-title">You should not need a consultant forever.</h2>
+          <p class="section-desc">
+            We focus on helping your team understand the tools, own the workflows,
+            and stay capable after the first implementation.
+          </p>
+        </div>
+        <div class="compare">
+          <div class="compare-card is-bad">
+            <div class="compare-label">Typical consulting</div>
+            <ul>
+              <li><span>x</span><span><strong>Builds for you</strong> and leaves your team with a fragile handoff.</span></li>
+              <li><span>x</span><span><strong>Knowledge stays external</strong> so every new request becomes another billable event.</span></li>
+              <li><span>x</span><span><strong>Adoption stalls</strong> because people do not feel comfortable using the tools day to day.</span></li>
+            </ul>
+          </div>
+          <div class="compare-card is-good">
+            <div class="compare-label">Rocket Sloth</div>
+            <ul>
+              <li><span>+</span><span><strong>Trains your team</strong> on the workflows they already own.</span></li>
+              <li><span>+</span><span><strong>Builds practical habits</strong> so AI becomes part of normal operations.</span></li>
+              <li><span>+</span><span><strong>Stays available for support</strong> without becoming permanent gatekeepers.</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="process">
+      <div class="container">
+        <div class="section-head">
+          <span class="section-kicker">How it works</span>
+          <h2 class="section-title">A simple path from curiosity to capability.</h2>
+          <p class="section-desc">
+            This keeps the launch offer understandable right away, while leaving room to grow into a fuller consulting stack later.
+          </p>
+        </div>
+        <div class="steps">
+          <article class="step-card">
+            <div class="step-no">01</div>
+            <h3>Join the list</h3>
+            <p>Tell us who you are and what kind of work you want AI to improve first.</p>
+            <p class="step-meta">Best for launch week and early pilots</p>
+          </article>
+          <article class="step-card">
+            <div class="step-no">02</div>
+            <h3>Get a practical assessment</h3>
+            <p>We identify quick wins, common blockers, and where your team can start without overwhelm.</p>
+            <p class="step-meta">Good fit for ops, reporting, sales support, and admin workflows</p>
+          </article>
+          <article class="step-card">
+            <div class="step-no">03</div>
+            <h3>Train and support the team</h3>
+            <p>We help your people learn the tools, use them well, and keep improving after the first rollout.</p>
+            <p class="step-meta">Designed for long-term confidence, not just a one-off setup</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="fit">
+      <div class="container">
+        <div class="section-head">
+          <span class="section-kicker">Who it's for</span>
+          <h2 class="section-title">Best for teams that know AI matters but need a sane starting point.</h2>
+          <p class="section-desc">
+            You do not need to be technical. You just need real work that could be faster, clearer, or less repetitive.
+          </p>
+        </div>
+        <div class="card-grid">
+          <article class="section-card">
+            <div class="icon" style="background: var(--sky-soft); border-color: rgba(122, 199, 255, 0.18);">SMB</div>
+            <h3>Growing small businesses</h3>
+            <p>Teams with 5 to 100 people that want practical help without hiring a full internal AI lead yet.</p>
+          </article>
+          <article class="section-card">
+            <div class="icon" style="background: var(--mint-soft); border-color: rgba(126, 224, 182, 0.18);">OPS</div>
+            <h3>Operations-heavy teams</h3>
+            <p>Companies buried in reports, follow-ups, documentation, scheduling, proposals, and repeatable admin work.</p>
+          </article>
+          <article class="section-card">
+            <div class="icon" style="background: rgba(255, 210, 122, 0.12); border-color: rgba(255, 210, 122, 0.18);">LDR</div>
+            <h3>Leaders who want adoption</h3>
+            <p>Owners and managers who care less about AI hype and more about whether their people will really use it.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container pricing">
+        <article class="pricing-card">
+          <span class="section-kicker">Early access</span>
+          <h2>What early signups should expect</h2>
+          <p>
+            Keep the promise simple at launch. People joining now are raising their hands for first access,
+            not committing to a giant consulting package sight unseen.
+          </p>
+          <ul>
+            <li><span>-</span><span><strong>First invites</strong> when your AI readiness quiz is ready.</span></li>
+            <li><span>-</span><span><strong>Pilot availability</strong> if you open limited founding-client spots.</span></li>
+            <li><span>-</span><span><strong>Launch updates</strong> about offers, workshops, or assessments.</span></li>
+            <li><span>-</span><span><strong>A lighter-friction CTA</strong> that is easier to say yes to than "book consulting now."</span></li>
+          </ul>
+        </article>
+        <aside class="story-card">
+          <span class="section-kicker">Positioning</span>
+          <h2>Say this clearly</h2>
+          <div class="quote">"We help your team use AI in real work, not just talk about it."</div>
+          <p>
+            That message is direct, easy to understand, and strong enough for a first public page.
+            You can add more specific offers once you start seeing what early leads are asking for most.
+          </p>
+          <div class="cta-row">
+            <a class="btn btn-primary" href="#signup">Claim an early spot</a>
+          </div>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div>
+        <strong style="display:block; color: var(--text);">Rocket Sloth Consulting</strong>
+        <span>Launch-ready AI support for real teams.</span>
+      </div>
+      <div class="footer-links">
+        <a href="#offer">Offer</a>
+        <a href="#process">Process</a>
+        <a href="#signup">Early access</a>
+        <a href="mailto:hello@rocketsloth.space">hello@rocketsloth.space</a>
+      </div>
+    </div>
+  </footer>
+</div>
+<script>
+const form = document.getElementById("signup-form");
+const button = document.getElementById("signup-button");
+const statusEl = document.getElementById("form-status");
+
+function setStatus(message, tone) {
+  statusEl.textContent = message;
+  if (tone) {
+    statusEl.dataset.tone = tone;
+  } else {
+    delete statusEl.dataset.tone;
+  }
+}
+
+form.addEventListener("submit", async (event) => {
+  event.preventDefault();
+
+  if (!form.reportValidity()) {
+    return;
+  }
+
+  const originalLabel = button.textContent;
+  button.disabled = true;
+  button.textContent = "Submitting...";
+  setStatus("Sending your request...", "");
+
+  try {
+    const response = await fetch(form.action, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      body: JSON.stringify(Object.fromEntries(new FormData(form).entries()))
+    });
+
+    const data = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      throw new Error(data.error || "Something went wrong. Please try again.");
+    }
+
+    setStatus("Thanks. Redirecting...", "success");
+    window.location.href = "/thank-you";
+  } catch (error) {
+    setStatus(error.message || "Something went wrong. Please try again.", "error");
+    button.disabled = false;
+    button.textContent = originalLabel;
+  }
+});
+
+const params = new URLSearchParams(window.location.search);
+if (params.get("signup") === "error") {
+  setStatus("Signup is not configured yet. Add the Vercel email env vars and try again.", "error");
+}
+</script>
+</body>
+</html>
