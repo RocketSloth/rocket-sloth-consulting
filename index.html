@@ -16,27 +16,28 @@
 *, *::before, *::after { box-sizing: border-box; }
 
 :root {
-  --bg: #0b0d12;
-  --bg-soft: #121722;
-  --panel: rgba(16, 22, 34, 0.9);
-  --panel-strong: #171f2f;
-  --line: rgba(141, 164, 214, 0.16);
-  --line-strong: rgba(141, 164, 214, 0.28);
-  --text: #d8deed;
-  --text-dim: #a2abc2;
-  --text-faint: #6f7894;
-  --brand: #ff7a3d;
-  --brand-deep: #c85624;
-  --brand-soft: rgba(255, 122, 61, 0.12);
-  --mint: #7ee0b6;
-  --mint-soft: rgba(126, 224, 182, 0.12);
-  --sky: #7ac7ff;
-  --sky-soft: rgba(122, 199, 255, 0.12);
+  --bg: #07111f;
+  --bg-soft: #0f1a2b;
+  --panel: rgba(14, 24, 39, 0.74);
+  --panel-strong: rgba(19, 31, 49, 0.9);
+  --line: rgba(150, 180, 219, 0.12);
+  --line-strong: rgba(150, 180, 219, 0.22);
+  --text: #ebf2ff;
+  --text-dim: #afbdd5;
+  --text-faint: #7f90ad;
+  --brand: #f58f4c;
+  --brand-deep: #d46b2e;
+  --brand-soft: rgba(245, 143, 76, 0.12);
+  --mint: #84ddb9;
+  --mint-soft: rgba(132, 221, 185, 0.08);
+  --sky: #8fc6ff;
+  --sky-soft: rgba(143, 198, 255, 0.1);
   --warning: #ffd27a;
-  --shadow: 0 18px 60px rgba(0, 0, 0, 0.35);
-  --radius-lg: 26px;
-  --radius-md: 18px;
-  --radius-sm: 12px;
+  --shadow: 0 24px 70px rgba(0, 0, 0, 0.24);
+  --radius-xl: 34px;
+  --radius-lg: 28px;
+  --radius-md: 20px;
+  --radius-sm: 14px;
   --serif: "Instrument Serif", Georgia, serif;
   --sans: "Manrope", system-ui, sans-serif;
   --mono: "JetBrains Mono", monospace;
@@ -48,9 +49,10 @@ body {
   margin: 0;
   min-height: 100vh;
   background:
-    radial-gradient(circle at top right, rgba(255, 122, 61, 0.12), transparent 30%),
-    radial-gradient(circle at 15% 20%, rgba(122, 199, 255, 0.1), transparent 22%),
-    linear-gradient(180deg, #0b0d12 0%, #0d1119 42%, #0b0d12 100%);
+    radial-gradient(circle at 18% 12%, rgba(143, 198, 255, 0.16), transparent 24%),
+    radial-gradient(circle at 82% 8%, rgba(245, 143, 76, 0.12), transparent 20%),
+    radial-gradient(circle at 50% 120%, rgba(132, 221, 185, 0.07), transparent 28%),
+    linear-gradient(180deg, #07111f 0%, #091423 42%, #07111f 100%);
   color: var(--text);
   font-family: var(--sans);
   line-height: 1.6;
@@ -65,11 +67,11 @@ body::before {
   pointer-events: none;
   background:
     radial-gradient(circle at 20% 30%, rgba(255,255,255,0.08) 0 1px, transparent 1px),
-    radial-gradient(circle at 72% 14%, rgba(255,255,255,0.12) 0 1.2px, transparent 1.2px),
-    radial-gradient(circle at 36% 70%, rgba(255,255,255,0.08) 0 1px, transparent 1px),
-    radial-gradient(circle at 80% 60%, rgba(255,255,255,0.08) 0 1.1px, transparent 1.1px);
-  background-size: 280px 280px, 360px 360px, 320px 320px, 420px 420px;
-  opacity: 0.45;
+    radial-gradient(circle at 72% 14%, rgba(255,255,255,0.12) 0 1.3px, transparent 1.3px),
+    radial-gradient(circle at 36% 70%, rgba(255,255,255,0.07) 0 1px, transparent 1px),
+    radial-gradient(circle at 80% 60%, rgba(255,255,255,0.06) 0 1.1px, transparent 1.1px);
+  background-size: 300px 300px, 420px 420px, 360px 360px, 500px 500px;
+  opacity: 0.3;
 }
 
 a { color: inherit; }
@@ -89,8 +91,8 @@ a { color: inherit; }
   top: 0;
   z-index: 20;
   backdrop-filter: blur(18px);
-  background: rgba(11, 13, 18, 0.72);
-  border-bottom: 1px solid rgba(141, 164, 214, 0.08);
+  background: rgba(7, 17, 31, 0.64);
+  border-bottom: 1px solid rgba(150, 180, 219, 0.08);
 }
 
 .topbar-inner {
@@ -117,8 +119,10 @@ a { color: inherit; }
   font-size: 0.9rem;
   font-weight: 800;
   letter-spacing: 0.06em;
-  background: radial-gradient(circle at 35% 35%, var(--brand), var(--brand-deep));
-  box-shadow: 0 0 26px rgba(255, 122, 61, 0.24);
+  background:
+    radial-gradient(circle at 35% 35%, #ffd2b1, transparent 24%),
+    radial-gradient(circle at 35% 35%, var(--brand), var(--brand-deep));
+  box-shadow: 0 0 30px rgba(245, 143, 76, 0.22);
 }
 
 .brandmark-copy strong {
@@ -152,20 +156,21 @@ a { color: inherit; }
 .nav-cta {
   padding: 10px 16px;
   border-radius: 999px;
-  background: var(--brand);
-  color: #17110d;
+  background: rgba(245, 143, 76, 0.16);
+  color: #ffd8bf;
   font-weight: 800;
-  box-shadow: 0 10px 30px rgba(255, 122, 61, 0.28);
+  border: 1px solid rgba(245, 143, 76, 0.22);
+  box-shadow: none;
 }
 
 .hero {
-  padding: 72px 0 40px;
+  padding: 84px 0 56px;
 }
 
 .hero-grid {
   display: grid;
-  grid-template-columns: 1.15fr 0.85fr;
-  gap: 28px;
+  grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
+  gap: 34px;
   align-items: stretch;
 }
 
@@ -174,14 +179,14 @@ a { color: inherit; }
 .section-card,
 .pricing-card,
 .story-card {
-  background: linear-gradient(180deg, rgba(22, 29, 43, 0.94), rgba(13, 18, 28, 0.92));
+  background: linear-gradient(180deg, rgba(15, 24, 39, 0.82), rgba(10, 18, 30, 0.78));
   border: 1px solid var(--line);
   box-shadow: var(--shadow);
 }
 
 .hero-copy {
-  border-radius: var(--radius-lg);
-  padding: 48px;
+  border-radius: var(--radius-xl);
+  padding: 58px;
   position: relative;
   overflow: hidden;
 }
@@ -189,12 +194,25 @@ a { color: inherit; }
 .hero-copy::after {
   content: "";
   position: absolute;
-  width: 340px;
-  height: 340px;
-  right: -120px;
-  top: -120px;
+  width: 460px;
+  height: 460px;
+  right: -210px;
+  top: -170px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 122, 61, 0.22), transparent 68%);
+  border: 1px solid rgba(143, 198, 255, 0.12);
+  background: radial-gradient(circle, rgba(143, 198, 255, 0.1), transparent 70%);
+}
+
+.hero-copy::before {
+  content: "";
+  position: absolute;
+  width: 220px;
+  height: 220px;
+  right: 80px;
+  bottom: -120px;
+  border-radius: 50%;
+  border: 1px solid rgba(245, 143, 76, 0.16);
+  opacity: 0.9;
 }
 
 .eyebrow {
@@ -203,9 +221,9 @@ a { color: inherit; }
   gap: 10px;
   padding: 8px 14px;
   border-radius: 999px;
-  background: var(--brand-soft);
-  border: 1px solid rgba(255, 122, 61, 0.2);
-  color: #ffc3a7;
+  background: rgba(143, 198, 255, 0.08);
+  border: 1px solid rgba(143, 198, 255, 0.18);
+  color: #c7dcfb;
   font-size: 0.75rem;
   font-family: var(--mono);
   text-transform: uppercase;
@@ -216,40 +234,42 @@ a { color: inherit; }
   margin: 20px 0 16px;
   font-family: var(--serif);
   font-size: clamp(2.8rem, 7vw, 5.2rem);
-  line-height: 0.96;
+  line-height: 0.92;
   font-weight: 400;
   letter-spacing: -0.045em;
   color: #f4f6fb;
-  max-width: 11ch;
+  max-width: 9.5ch;
 }
 
 .hero h1 em {
   font-style: italic;
-  background: linear-gradient(135deg, #ffd38d, var(--brand));
+  background: linear-gradient(135deg, #ffe0a6, var(--brand));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .hero-lead {
-  max-width: 54ch;
-  margin: 0 0 28px;
+  max-width: 50ch;
+  margin: 0 0 30px;
   color: var(--text-dim);
-  font-size: 1.05rem;
+  font-size: 1.08rem;
 }
 
 .hero-points {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
+  gap: 14px;
   margin: 0 0 34px;
 }
 
 .hero-point {
-  padding: 14px 14px 15px;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(141, 164, 214, 0.1);
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  border: 0;
+  border-top: 1px solid rgba(150, 180, 219, 0.14);
+  padding-top: 14px;
 }
 
 .hero-point strong {
@@ -293,22 +313,35 @@ a { color: inherit; }
 .btn-primary {
   background: var(--brand);
   color: #1d130e;
-  box-shadow: 0 12px 28px rgba(255, 122, 61, 0.26);
+  box-shadow: 0 12px 30px rgba(245, 143, 76, 0.22);
 }
 
 .btn-secondary {
-  background: transparent;
+  background: rgba(255, 255, 255, 0.02);
   color: var(--text);
-  border: 1px solid var(--line-strong);
+  border: 1px solid var(--line);
 }
 
 .hero-card {
-  border-radius: var(--radius-lg);
-  padding: 30px;
+  border-radius: var(--radius-xl);
+  padding: 34px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   gap: 22px;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-card::after {
+  content: "";
+  position: absolute;
+  inset: auto -40px -60px auto;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(245, 143, 76, 0.14), transparent 68%);
+  pointer-events: none;
 }
 
 .hero-card h2,
@@ -353,8 +386,8 @@ a { color: inherit; }
 .field input,
 .field textarea {
   width: 100%;
-  border: 1px solid rgba(141, 164, 214, 0.16);
-  background: rgba(7, 10, 17, 0.7);
+  border: 1px solid rgba(150, 180, 219, 0.14);
+  background: rgba(6, 12, 20, 0.5);
   color: var(--text);
   border-radius: 14px;
   padding: 14px 15px;
@@ -399,12 +432,12 @@ a { color: inherit; }
 }
 
 .section {
-  padding: 34px 0;
+  padding: 44px 0;
 }
 
 .section-head {
   max-width: 700px;
-  margin-bottom: 22px;
+  margin-bottom: 26px;
 }
 
 .section-kicker {
@@ -431,12 +464,14 @@ a { color: inherit; }
 .card-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 16px;
+  gap: 18px;
 }
 
 .section-card {
   border-radius: var(--radius-md);
-  padding: 24px;
+  padding: 28px;
+  background: rgba(255, 255, 255, 0.025);
+  box-shadow: none;
 }
 
 .section-card .icon {
@@ -473,7 +508,7 @@ a { color: inherit; }
   border-radius: var(--radius-md);
   padding: 28px;
   border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(255, 255, 255, 0.025);
 }
 
 .compare-card.is-bad {
@@ -527,8 +562,8 @@ a { color: inherit; }
   padding: 26px;
   border-radius: var(--radius-md);
   border: 1px solid var(--line);
-  background: linear-gradient(180deg, rgba(16, 22, 34, 0.95), rgba(11, 15, 24, 0.88));
-  box-shadow: var(--shadow);
+  background: rgba(255, 255, 255, 0.025);
+  box-shadow: none;
 }
 
 .step-no {
@@ -573,8 +608,8 @@ a { color: inherit; }
 
 .pricing-card,
 .story-card {
-  border-radius: var(--radius-lg);
-  padding: 30px;
+  border-radius: var(--radius-xl);
+  padding: 34px;
 }
 
 .pricing-card p,
@@ -584,8 +619,8 @@ a { color: inherit; }
 
 .story-card {
   background:
-    radial-gradient(circle at top right, rgba(122, 199, 255, 0.16), transparent 42%),
-    linear-gradient(180deg, rgba(15, 23, 36, 0.96), rgba(12, 17, 28, 0.94));
+    radial-gradient(circle at top right, rgba(143, 198, 255, 0.14), transparent 38%),
+    linear-gradient(180deg, rgba(13, 21, 34, 0.84), rgba(10, 18, 30, 0.8));
 }
 
 .quote {
@@ -599,7 +634,7 @@ a { color: inherit; }
 }
 
 .footer {
-  padding: 34px 0 56px;
+  padding: 44px 0 56px;
   color: var(--text-faint);
 }
 
@@ -677,6 +712,12 @@ a { color: inherit; }
     padding: 24px;
   }
 
+  .hero-copy::before,
+  .hero-copy::after,
+  .hero-card::after {
+    display: none;
+  }
+
   .hero h1 {
     max-width: 100%;
   }
@@ -715,24 +756,24 @@ a { color: inherit; }
     <section class="hero">
       <div class="container hero-grid">
         <div class="hero-copy">
-          <div class="eyebrow">Launching now for early adopters</div>
-          <h1>AI consulting your team can <em>actually use.</em></h1>
+          <div class="eyebrow">Quietly capable AI for real-world teams</div>
+          <h1>Bring a little <em>outer space calm</em> to your AI rollout.</h1>
           <p class="hero-lead">
             Rocket Sloth helps small and midsize businesses find practical AI wins, train their people,
-            and build in-house confidence instead of permanent consultant dependence.
+            and build in-house confidence without making the whole process feel overwhelming.
           </p>
           <div class="hero-points" aria-label="Highlights">
             <div class="hero-point">
-              <strong>No jargon</strong>
-              <span>Clear help for real business workflows.</span>
+              <strong>Calm guidance</strong>
+              <span>Clear recommendations instead of hype and jargon.</span>
             </div>
             <div class="hero-point">
-              <strong>Hands-on training</strong>
-              <span>Your team learns how to keep using it.</span>
+              <strong>Practical rollout</strong>
+              <span>Training and workflows your team can actually keep using.</span>
             </div>
             <div class="hero-point">
-              <strong>Early access list</strong>
-              <span>Get first pilot spots and launch updates.</span>
+              <strong>Early access</strong>
+              <span>Get first notice when pilot spots and launch offers open up.</span>
             </div>
           </div>
           <div class="cta-row">
@@ -743,10 +784,10 @@ a { color: inherit; }
 
         <aside class="hero-card" id="signup">
           <div>
-            <h2>Get on the list</h2>
+            <h2>Reserve a spot in orbit</h2>
             <p>
-              Sign up to hear when pilot spots open, when the AI readiness quiz goes live,
-              and when founding-client offers are available.
+              Join the list to hear when pilot spots open, when the AI readiness quiz goes live,
+              and when founding-client offers become available.
             </p>
           </div>
 
