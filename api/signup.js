@@ -107,7 +107,7 @@ async function notifyLead(lead) {
 
   if (resendApiKey && resendFrom && leadsTo) {
     const html = [
-      "<h1>New Rocket Sloth lead</h1>",
+      "<h1>New Future AI News signup</h1>",
       `<p><strong>Name:</strong> ${escapeHtml(lead.name)}</p>`,
       `<p><strong>Email:</strong> ${escapeHtml(lead.email)}</p>`,
       `<p><strong>Company:</strong> ${escapeHtml(lead.company)}</p>`,
@@ -125,10 +125,10 @@ async function notifyLead(lead) {
         from: resendFrom,
         to: [leadsTo],
         reply_to: lead.email,
-        subject: `New Rocket Sloth early-access signup: ${lead.company}`,
+        subject: `New Future AI News signup: ${lead.email}`,
         html,
         text: [
-          "New Rocket Sloth lead",
+          "New Future AI News signup",
           `Name: ${lead.name}`,
           `Email: ${lead.email}`,
           `Company: ${lead.company}`,
@@ -155,15 +155,15 @@ module.exports = async function handler(req, res) {
 
   const body = parseBody(req);
   const lead = {
-    name: normalize(body.name, 120),
+    name: normalize(body.name, 120) || "Future AI News Reader",
     email: normalize(body.email, 200).toLowerCase(),
-    company: normalize(body.company, 200),
-    interest: normalize(body.interest, 2000),
+    company: normalize(body.company, 200) || "Future AI News",
+    interest: normalize(body.interest, 2000) || "Future AI News signup",
     submittedAt: new Date().toISOString()
   };
 
-  if (!lead.name || !lead.email || !lead.company) {
-    return sendError(req, res, 400, "Name, email, and company are required.");
+  if (!lead.email) {
+    return sendError(req, res, 400, "Email is required.");
   }
 
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
