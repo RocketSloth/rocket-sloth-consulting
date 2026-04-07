@@ -20,6 +20,20 @@ function sanitize(body, tenantId) {
   return out;
 }
 
+const SEARCH_QUERY_MAX_LENGTH = 80;
+
+function normalizeSearchQuery(value) {
+  const source = Array.isArray(value) ? value[0] : value;
+  return String(source || "").trim().slice(0, SEARCH_QUERY_MAX_LENGTH);
+}
+
+function escapePostgrestLikePattern(value) {
+  // PostgREST OR filters parse commas/parentheses as grammar tokens, and LIKE/ILIKE
+  // treats wildcard/meta characters specially. Escaping here prevents user input from
+  // breaking the expression or widening the query in unexpected ways.
+  return String(value).replace(/[\\"(),*%_]/g, "\\$&");
+}
+
 module.exports = async function handler(req, res) {
   if (!methodGuard(req, res, ["GET", "POST", "PATCH", "DELETE"])) return;
   try {
@@ -36,7 +50,7 @@ module.exports = async function handler(req, res) {
         if (!rows[0]) return json(res, 404, { error: "Not found" });
         return json(res, 200, rows[0]);
       }
-      const search = (req.query && req.query.q) || "";
+      const search = normalizeSearchQuery(req.query && req.query.q);
       const query = {
         tenant_id: `eq.${tenantId}`,
         select: "*",
@@ -44,7 +58,18 @@ module.exports = async function handler(req, res) {
         limit: "200"
       };
       if (search) {
-        query.or = `(first_name.ilike.*${search}*,last_name.ilike.*${search}*,email.ilike.*${search}*,company.ilike.*${search}*)`;
+        const escapedSearch = escapePostgrestLikePattern(search);
+        const safeLikePattern = `"*${escapedSearch}*"`;
+        // Do not directly interpolate req.query.q into `or=(...)`: unescaped values can
+        // inject extra filter clauses because PostgREST parses the full expression string.
+        query.or = `(
+          first_name.ilike.${safeLikePattern},
+          last_name.ilike.${safeLikePattern},
+          email.ilike.${safeLikePattern},
+          company.ilike.${safeLikePattern}
+        )`.replace(/\s+/g, "");
+        // If escaping semantics become hard to reason about, prefer a DB RPC endpoint
+        // (or another server-side query path) instead of string-building `or` filters.
       }
       const rows = await sbSelect("crm_contacts", query);
       return json(res, 200, { contacts: rows });
