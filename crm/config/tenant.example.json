@@ -1,0 +1,33 @@
+{
+  "branding": {
+    "productName": "Acme CRM",
+    "accentColor": "#e11d48",
+    "logoUrl": "https://example.com/acme-logo.svg"
+  },
+  "pipeline": {
+    "stages": [
+      { "id": "new", "label": "New Lead", "probability": 10 },
+      { "id": "qualified", "label": "Qualified", "probability": 25 },
+      { "id": "demo", "label": "Demo Scheduled", "probability": 40 },
+      { "id": "proposal", "label": "Proposal Sent", "probability": 60 },
+      { "id": "negotiation", "label": "Negotiation", "probability": 80 },
+      { "id": "won", "label": "Closed Won", "probability": 100 },
+      { "id": "lost", "label": "Closed Lost", "probability": 0 }
+    ]
+  },
+  "contactStatuses": ["lead", "prospect", "customer", "churned", "archived"],
+  "customFields": {
+    "contact": [
+      { "id": "linkedin", "label": "LinkedIn URL", "type": "text" },
+      { "id": "industry", "label": "Industry", "type": "text" }
+    ],
+    "deal": [
+      { "id": "source", "label": "Lead source", "type": "text" }
+    ]
+  },
+  "modules": {
+    "contacts": true,
+    "deals": true,
+    "activities": true
+  }
+}

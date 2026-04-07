@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>CRM Sign in</title>
+    <link rel="stylesheet" href="/crm/assets/crm.css" />
+  </head>
+  <body class="auth-body">
+    <main class="auth-card">
+      <h1 id="auth-title">Sign in</h1>
+      <p class="auth-sub">Access your CRM workspace.</p>
+      <form id="login-form" class="auth-form">
+        <label>
+          Workspace
+          <input name="tenant" id="tenant" required autocomplete="organization" placeholder="acme" />
+        </label>
+        <label>
+          Email
+          <input name="email" type="email" required autocomplete="email" />
+        </label>
+        <label>
+          Password
+          <input name="password" type="password" required autocomplete="current-password" />
+        </label>
+        <button type="submit">Sign in</button>
+        <p id="auth-error" class="auth-error" hidden></p>
+      </form>
+    </main>
+    <script src="/crm/assets/crm.js"></script>
+    <script>
+      CRM.initLogin();
+    </script>
+  </body>
+</html>

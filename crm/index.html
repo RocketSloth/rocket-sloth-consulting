@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>CRM</title>
+    <link rel="stylesheet" href="/crm/assets/crm.css" />
+  </head>
+  <body class="app-body">
+    <header class="app-header">
+      <div class="brand">
+        <img id="brand-logo" alt="" hidden />
+        <span id="brand-name">CRM</span>
+      </div>
+      <nav class="app-nav">
+        <button data-view="dashboard" class="nav-btn active">Dashboard</button>
+        <button data-view="contacts" class="nav-btn">Contacts</button>
+        <button data-view="deals" class="nav-btn">Pipeline</button>
+        <button data-view="activities" class="nav-btn">Activities</button>
+      </nav>
+      <div class="user-area">
+        <span id="user-label"></span>
+        <button id="logout-btn" class="ghost-btn">Sign out</button>
+      </div>
+    </header>
+
+    <main class="app-main">
+      <section id="view-dashboard" class="view">
+        <h1>Dashboard</h1>
+        <div class="stat-grid">
+          <div class="stat"><span class="stat-label">Contacts</span><span id="stat-contacts" class="stat-value">—</span></div>
+          <div class="stat"><span class="stat-label">Open deals</span><span id="stat-open" class="stat-value">—</span></div>
+          <div class="stat"><span class="stat-label">Pipeline value</span><span id="stat-value" class="stat-value">—</span></div>
+          <div class="stat"><span class="stat-label">Won this month</span><span id="stat-won" class="stat-value">—</span></div>
+        </div>
+        <h2>Recent activity</h2>
+        <ul id="recent-activities" class="timeline"></ul>
+      </section>
+
+      <section id="view-contacts" class="view" hidden>
+        <div class="view-header">
+          <h1>Contacts</h1>
+          <div class="view-actions">
+            <input id="contact-search" type="search" placeholder="Search contacts…" />
+            <button id="new-contact-btn" class="primary-btn">New contact</button>
+          </div>
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr><th>Name</th><th>Email</th><th>Company</th><th>Status</th><th></th></tr>
+          </thead>
+          <tbody id="contacts-tbody"></tbody>
+        </table>
+      </section>
+
+      <section id="view-deals" class="view" hidden>
+        <div class="view-header">
+          <h1>Pipeline</h1>
+          <div class="view-actions">
+            <button id="new-deal-btn" class="primary-btn">New deal</button>
+          </div>
+        </div>
+        <div id="pipeline-board" class="pipeline-board"></div>
+      </section>
+
+      <section id="view-activities" class="view" hidden>
+        <div class="view-header">
+          <h1>Activities</h1>
+          <div class="view-actions">
+            <button id="new-activity-btn" class="primary-btn">Log activity</button>
+          </div>
+        </div>
+        <ul id="activities-list" class="timeline"></ul>
+      </section>
+    </main>
+
+    <div id="modal-root" class="modal-root" hidden></div>
+
+    <script src="/crm/assets/crm.js"></script>
+    <script>
+      CRM.initApp();
+    </script>
+  </body>
+</html>
