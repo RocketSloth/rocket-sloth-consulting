@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="RocketSloth.Space AI and BI consulting share image">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#07111f"/>
+      <stop offset="100%" stop-color="#0b1320"/>
+    </linearGradient>
+    <radialGradient id="glowA" cx="0.18" cy="0.15" r="0.5">
+      <stop offset="0%" stop-color="#8fc6ff" stop-opacity="0.28"/>
+      <stop offset="100%" stop-color="#8fc6ff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glowB" cx="0.85" cy="0.15" r="0.45">
+      <stop offset="0%" stop-color="#f58f4c" stop-opacity="0.26"/>
+      <stop offset="100%" stop-color="#f58f4c" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#glowA)"/>
+  <rect width="1200" height="630" fill="url(#glowB)"/>
+
+  <rect x="52" y="52" width="1096" height="526" rx="28" fill="none" stroke="#f58f4c" stroke-opacity="0.4" stroke-width="2"/>
+
+  <g transform="translate(110 135)">
+    <circle cx="42" cy="42" r="42" fill="#f58f4c"/>
+    <text x="42" y="51" text-anchor="middle" fill="#16100c" font-size="30" font-weight="700" font-family="Inter, Arial, sans-serif">RS</text>
+
+    <text x="0" y="170" fill="#ebf2ff" font-size="72" font-weight="700" font-family="Inter, Arial, sans-serif">RocketSloth.Space</text>
+    <text x="0" y="235" fill="#84ddb9" font-size="42" font-weight="600" font-family="Inter, Arial, sans-serif">AI + BI Consulting for Operators</text>
+    <text x="0" y="295" fill="#afbdd5" font-size="30" font-weight="500" font-family="Inter, Arial, sans-serif">Custom CRMs • BI Dashboards • Workflow Automation</text>
+  </g>
+</svg>
