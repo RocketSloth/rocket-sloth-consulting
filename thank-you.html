@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Thanks | Discovery Call Request Received</title>
-<meta name="description" content="Thanks for reaching out to RocketSloth.Space about a discovery call and workflow assessment.">
+<title>Thanks | RocketSloth.Space</title>
+<meta name="description" content="Thanks for your request. Access the RocketSloth demo credentials.">
 <meta name="theme-color" content="#0a0a0f">
 <link rel="canonical" href="https://rocketsloth.space/thank-you">
-<meta property="og:title" content="Thanks | Discovery Call Request Received">
-<meta property="og:description" content="Thanks for reaching out to RocketSloth.Space about a discovery call and workflow assessment.">
+<meta property="og:title" content="Thanks | RocketSloth.Space">
+<meta property="og:description" content="Thanks for your request. Access the RocketSloth demo credentials.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://rocketsloth.space/thank-you">
 <meta property="og:image" content="https://rocketsloth.space/assets/og-share-card.svg">
@@ -26,19 +26,41 @@ p{margin:0 0 12px;color:#a8aec0;line-height:1.7}
 a{min-height:50px;padding:0 20px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;text-decoration:none;font-weight:700}
 .primary{background:#ff6b2b;color:#1c120d}
 .secondary{border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.03);color:#edf0fa}
+.demo-card{margin-top:16px;padding:16px;border-radius:16px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.03)}
+.demo-card strong{display:block;font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;color:#a8aec0}
+.demo-card code{display:block;margin-top:6px;padding:10px 12px;border-radius:10px;background:rgba(0,0,0,.26);color:#f6d2bf;font:700 .95rem "JetBrains Mono",monospace}
 </style>
 </head>
 <body>
   <main class="card">
     <div class="badge" aria-hidden="true">RS</div>
-    <h1>Request received.</h1>
-    <p>Thanks for reaching out to RocketSloth.Space about a discovery call.</p>
-    <p>We will review your notes and follow up with next steps for a workflow assessment focused on highest-impact automation opportunities.</p>
+    <h1 id="thanks-title">Request received.</h1>
+    <p id="thanks-copy">Thanks for reaching out to RocketSloth.Space about a discovery call.</p>
+    <p id="thanks-subcopy">We will review your notes and follow up with next steps for a workflow assessment focused on highest-impact automation opportunities.</p>
+    <section class="demo-card" id="demo-access-card" hidden>
+      <strong>Demo login URL</strong>
+      <code>https://rocketsloth.space/crm/login?tenant=demo</code>
+      <strong style="margin-top:10px;">Demo email</strong>
+      <code>demo@rocketsloth.space</code>
+      <strong style="margin-top:10px;">Demo password</strong>
+      <code>demo-rocketsloth-2026</code>
+    </section>
     <div class="row">
       <a class="primary" href="/">Back to the homepage</a>
-      <a class="secondary" href="/#contact">Book another discovery call</a>
+      <a class="secondary" href="/crm/login?tenant=demo">Open the CRM demo</a>
     </div>
     <p>If you want to see our thought-leadership style analysis, you can still read <a href="/reports/claude-code-leak">the Claude Code leak report</a>.</p>
   </main>
+  <script>
+    (function () {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("demo") !== "1") return;
+
+      document.getElementById("thanks-title").textContent = "Demo access unlocked.";
+      document.getElementById("thanks-copy").textContent = "Thanks — your demo request was saved.";
+      document.getElementById("thanks-subcopy").textContent = "Use the credentials below to explore the live CRM with sample data.";
+      document.getElementById("demo-access-card").hidden = false;
+    })();
+  </script>
 </body>
 </html>
