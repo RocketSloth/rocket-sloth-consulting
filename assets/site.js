@@ -119,8 +119,8 @@
       const payload = {
         name: String(rawEntries.name || "").trim(),
         email: String(rawEntries.email || "").trim(),
-        company: String(rawEntries.company || "").trim() || "Future AI News",
-        interest: String(rawEntries.interest || "").trim() || "Future AI News signup"
+        company: String(rawEntries.company || "").trim() || "Discovery call lead",
+        interest: String(rawEntries.interest || "").trim() || "Workflow assessment request"
       };
 
       if (button) {
