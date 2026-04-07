@@ -1,11 +1,12 @@
 // Minimal session auth for the CRM API.
-// Sessions are random opaque tokens stored in crm_sessions and passed
-// via the Authorization: Bearer header from the frontend.
+// Sessions are random opaque tokens stored in crm_sessions and sent
+// via a secure HttpOnly cookie (with optional Bearer support for migration).
 
 const crypto = require("crypto");
 const { sbSelect, sbInsert, sbDelete, sbUpdate } = require("./supabase");
 
 const SESSION_TTL_MS = 1000 * 60 * 60 * 24 * 14; // 14 days
+const SESSION_COOKIE_NAME = "rs_crm_session";
 
 function hashPassword(password, salt) {
   const useSalt = salt || crypto.randomBytes(16).toString("hex");
@@ -45,9 +46,66 @@ async function createSession(user) {
 }
 
 function extractToken(req) {
+  const cookieToken = extractTokenFromCookie(req);
+  if (cookieToken) return cookieToken;
+
   const header = req.headers.authorization || req.headers.Authorization || "";
   const match = /^Bearer\s+(.+)$/i.exec(String(header));
   return match ? match[1].trim() : null;
+}
+
+function parseCookies(req) {
+  const raw = req.headers.cookie || "";
+  if (!raw) return {};
+  return String(raw)
+    .split(";")
+    .map((part) => part.trim())
+    .filter(Boolean)
+    .reduce((acc, part) => {
+      const idx = part.indexOf("=");
+      if (idx < 0) return acc;
+      const key = part.slice(0, idx).trim();
+      const value = part.slice(idx + 1).trim();
+      try {
+        acc[key] = decodeURIComponent(value);
+      } catch {
+        acc[key] = value;
+      }
+      return acc;
+    }, {});
+}
+
+function extractTokenFromCookie(req) {
+  const cookies = parseCookies(req);
+  return cookies[SESSION_COOKIE_NAME] || null;
+}
+
+function serializeSessionCookie(token, expiresAt) {
+  const attrs = [
+    `${SESSION_COOKIE_NAME}=${encodeURIComponent(token)}`,
+    "Path=/",
+    "HttpOnly",
+    "Secure",
+    "SameSite=Lax"
+  ];
+  if (expiresAt) attrs.push(`Expires=${new Date(expiresAt).toUTCString()}`);
+  return attrs.join("; ");
+}
+
+function setSessionCookie(res, token, expiresAt) {
+  res.setHeader("Set-Cookie", serializeSessionCookie(token, expiresAt));
+}
+
+function clearSessionCookie(res) {
+  res.setHeader("Set-Cookie", [
+    `${SESSION_COOKIE_NAME}=`,
+    "Path=/",
+    "HttpOnly",
+    "Secure",
+    "SameSite=Lax",
+    "Expires=Thu, 01 Jan 1970 00:00:00 GMT",
+    "Max-Age=0"
+  ].join("; "));
 }
 
 async function requireSession(req) {
@@ -91,5 +149,8 @@ module.exports = {
   createSession,
   requireSession,
   destroySession,
-  extractToken
+  extractToken,
+  setSessionCookie,
+  clearSessionCookie,
+  SESSION_COOKIE_NAME
 };
