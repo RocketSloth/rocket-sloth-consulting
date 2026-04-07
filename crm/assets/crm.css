@@ -153,3 +153,38 @@ html, body {
 .status-pill.archived { background: #f3f4f6; color: var(--muted); }
 
 .empty { color: var(--muted); font-size: 14px; text-align: center; padding: 24px; }
+
+.ai-panel {
+  margin-top: 8px;
+  padding: 12px;
+  border: 1px dashed var(--border);
+  border-radius: 10px;
+  background: linear-gradient(180deg, rgba(79, 70, 229, 0.04), rgba(79, 70, 229, 0.01));
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ai-result {
+  font-size: 13px;
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ai-summary-text { line-height: 1.5; }
+.ai-risk { color: var(--muted); font-size: 12px; }
+.ai-risk strong { color: var(--accent); font-size: 14px; }
+.ai-actions-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); margin-top: 4px; }
+.ai-actions { padding-left: 18px; margin: 0; }
+.ai-actions li { margin: 4px 0; }
+.ai-error { color: var(--danger); }
+.ai-stub-warning {
+  font-size: 11px;
+  padding: 6px 8px;
+  background: #fff7ed;
+  color: #9a3412;
+  border-radius: 6px;
+  border: 1px solid #fed7aa;
+}

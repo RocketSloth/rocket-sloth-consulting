@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Future AI News | RocketSloth.Space</title>
-<meta name="description" content="Future AI News from RocketSloth.Space brings calm, useful analysis on the AI stories that actually matter.">
+<title>RocketSloth.Space | AI &amp; BI Consulting</title>
+<meta name="description" content="RocketSloth.Space designs custom AI-powered CRMs, BI dashboards, and intelligent workflow automation for companies that want smarter operations, not bigger spreadsheets.">
 <meta name="theme-color" content="#07111f">
-<meta property="og:title" content="Future AI News | RocketSloth.Space">
-<meta property="og:description" content="Useful AI reporting for builders, operators, and curious teams. Read the featured Claude Code leak report and subscribe for what comes next.">
+<meta property="og:title" content="RocketSloth.Space | AI &amp; BI Consulting">
+<meta property="og:description" content="Custom AI + BI builds for operators. Try our live CRM demo, then talk to us about a build for your business.">
 <meta property="og:type" content="website">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -695,15 +695,16 @@ a { color: inherit; }
         <span class="brandmark-badge" aria-hidden="true">RS</span>
         <span class="brandmark-copy">
           <strong>RocketSloth.Space</strong>
-          <span>Future AI News</span>
+          <span>AI &amp; BI Consulting</span>
         </span>
       </a>
 
       <nav class="nav" aria-label="Primary">
-        <a href="#why">Why Subscribe</a>
-        <a href="#featured-report">Research</a>
-        <a href="/reports/claude-code-leak">Claude Leak Report</a>
-        <a class="nav-cta" href="#future-ai-news">Subscribe</a>
+        <a href="#services">What We Build</a>
+        <a href="#how">How We Work</a>
+        <a href="#pricing">Pricing</a>
+        <a href="/crm/login?tenant=demo">Live Demo</a>
+        <a class="nav-cta" href="#contact">Book a call</a>
       </nav>
     </div>
   </header>
@@ -712,146 +713,226 @@ a { color: inherit; }
     <section class="hero">
       <div class="container hero-grid">
         <article class="hero-copy reveal">
-          <div class="eyebrow">Build Slow. Ship Fast.</div>
-          <h1>Future AI News for people who want the <em>why</em>, not just the headline.</h1>
+          <div class="eyebrow">AI + BI Consulting</div>
+          <h1>Custom AI builds for companies that want <em>smarter ops</em>, not bigger spreadsheets.</h1>
           <p class="hero-sub">
-            RocketSloth.Space turns major AI stories into calm, useful briefings for builders, operators, and teams trying
-            to make better decisions. The goal is signal you can actually use.
+            We design and ship AI-powered CRMs, BI dashboards, and workflow automation for operators.
+            One discovery call, a working prototype in days, your team trained in weeks.
           </p>
 
           <div class="cta-row">
-            <a class="btn btn-primary" href="#future-ai-news">Join Future AI News</a>
-            <a class="btn btn-secondary" href="/reports/claude-code-leak">Read the featured report</a>
+            <a class="btn btn-primary" href="/crm/login?tenant=demo">See a live demo →</a>
+            <a class="btn btn-secondary" href="#contact">Book a discovery call</a>
           </div>
 
-          <div class="hero-stats" aria-label="What to expect">
+          <div class="hero-stats" aria-label="What we ship">
             <div class="stat">
-              <strong>Long-form reporting</strong>
-              <span>Big stories unpacked clearly</span>
+              <strong>AI-native CRMs</strong>
+              <span>Pipelines + Claude-powered insight</span>
             </div>
             <div class="stat">
-              <strong>Useful signal</strong>
-              <span>Product, security, and ops implications</span>
+              <strong>BI dashboards</strong>
+              <span>Forecasts, cohorts, ask-your-data</span>
             </div>
             <div class="stat">
-              <strong>RocketSloth tone</strong>
-              <span>Smarter tools. Calmer work.</span>
+              <strong>Workflow automation</strong>
+              <span>Enrichment, drafting, routing</span>
             </div>
           </div>
         </article>
 
-        <aside class="signup-card reveal" id="future-ai-news">
+        <aside class="signup-card reveal" id="contact">
           <div>
-            <h2>Get the next report before it gets flattened into recycled hot takes.</h2>
+            <h2>Tell us what's slow, manual, or guesswork. We'll show you the AI-shaped fix.</h2>
             <p>
-              Join Future AI News for sharp breakdowns on the AI launches, leaks, product shifts, and architecture stories
-              that are actually worth your attention.
+              Drop your email and a one-line description of what you'd want intelligent.
+              We reply within one business day with a free recommendation and a demo built around your use case.
             </p>
           </div>
 
           <form class="signup-form" data-signup-form method="POST" action="/api/signup" novalidate>
-            <input type="hidden" name="company" value="Future AI News">
-            <input type="hidden" name="interest" value="Homepage hero signup">
+            <input type="hidden" name="company" value="RocketSloth Discovery">
+            <input type="hidden" name="interest" value="Homepage hero - discovery call">
 
             <div class="field">
-              <label for="home-name">First name</label>
+              <label for="home-name">Your name</label>
               <input id="home-name" name="name" type="text" autocomplete="given-name" placeholder="Optional">
             </div>
 
             <div class="field">
-              <label for="home-email">Email</label>
-              <input id="home-email" name="email" type="email" autocomplete="email" placeholder="you@example.com" required>
+              <label for="home-email">Work email</label>
+              <input id="home-email" name="email" type="email" autocomplete="email" placeholder="you@yourcompany.com" required>
             </div>
 
-            <button class="btn btn-primary" data-submit-button type="submit">Join Future AI News</button>
+            <div class="field">
+              <label for="home-company">Company</label>
+              <input id="home-company" name="company" type="text" autocomplete="organization" placeholder="Acme Inc">
+            </div>
+
+            <button class="btn btn-primary" data-submit-button type="submit">Request a discovery call</button>
             <p class="form-status" data-form-status aria-live="polite"></p>
           </form>
 
-          <p class="fineprint">Email-first signup. No consulting intake form. Just the newsletter.</p>
+          <p class="fineprint">No spam. We only use this to schedule a call.</p>
         </aside>
       </div>
     </section>
 
-    <section class="section" id="featured-report">
+    <section class="section" id="services">
       <div class="container">
         <div class="section-head reveal">
-          <span class="section-kicker">Featured Research</span>
-          <h2 class="section-title">The Claude Code leak is the first flagship report.</h2>
+          <span class="section-kicker">What We Build</span>
+          <h2 class="section-title">Three things, done well, wired together.</h2>
           <p class="section-desc">
-            This is the shape of the site now: report-style analysis on the homepage, a full deep-dive on its own route,
-            and a newsletter built around readers who want the full picture.
-          </p>
-        </div>
-
-        <article class="featured-card reveal">
-          <div>
-            <div class="report-meta">Security report - March 31, 2026</div>
-            <h3>The Claude Code Leak</h3>
-            <p>
-              Anthropic accidentally shipped a massive source map containing a large slice of Claude Code to the public npm registry.
-              The report covers what leaked, why it mattered immediately, and what the industry learned from it.
-            </p>
-
-            <ul class="featured-bullets" style="margin-top: 18px;">
-              <li><span>-</span><span><strong>What happened</strong> from the original publish window through mirrors, takedowns, and fallout.</span></li>
-              <li><span>-</span><span><strong>What it exposed</strong> about roadmap direction, memory systems, telemetry, and access controls.</span></li>
-              <li><span>-</span><span><strong>What to do next</strong> if you installed Claude Code during the risky npm window or want to study the architecture safely.</span></li>
-            </ul>
-
-            <div class="cta-row" style="margin-top: 22px; margin-bottom: 0;">
-              <a class="btn btn-primary" href="/reports/claude-code-leak">Read the full report</a>
-            </div>
-          </div>
-
-          <aside class="report-side" aria-label="Report stats">
-            <div class="report-side-card">
-              <strong>512K</strong>
-              <span>Lines of code</span>
-            </div>
-            <div class="report-side-card">
-              <strong>1,906</strong>
-              <span>Files exposed</span>
-            </div>
-            <div class="report-side-card">
-              <strong>44+</strong>
-              <span>Feature flags</span>
-            </div>
-            <div class="report-side-card">
-              <strong>28.8M</strong>
-              <span>Views on the original X post</span>
-            </div>
-          </aside>
-        </article>
-      </div>
-    </section>
-
-    <section class="section" id="why">
-      <div class="container">
-        <div class="section-head reveal">
-          <span class="section-kicker">Why Subscribe</span>
-          <h2 class="section-title">A calmer way to keep up with AI.</h2>
-          <p class="section-desc">
-            Future AI News is written for readers who care about what happened, why it matters, and what they should do with that information.
+            Every engagement combines a custom CRM, a BI layer, and AI workflows that fit the way your team actually works.
+            You can hire us for one piece or all three.
           </p>
         </div>
 
         <div class="card-grid">
           <article class="section-card reveal">
             <div class="card-icon">01</div>
-            <h3>Readable by default</h3>
-            <p>Big technical stories are broken down clearly without sanding off the useful parts.</p>
+            <h3>AI-native CRMs</h3>
+            <p>White-labeled, fully branded customer + pipeline platforms with Claude-powered deal summaries, drafted outreach, and natural-language search.</p>
           </article>
 
           <article class="section-card reveal">
             <div class="card-icon" style="background: var(--sky-soft); border-color: rgba(122, 199, 255, 0.18); color: #d8ebff;">02</div>
-            <h3>Signal over hype</h3>
-            <p>Launches, leaks, benchmarks, and architecture tells matter more than recycled surface-level takes.</p>
+            <h3>BI dashboards</h3>
+            <p>Pipeline velocity, win-rate trends, revenue forecasts, cohort retention, and an "ask your data" box that turns plain English into queries and charts.</p>
           </article>
 
           <article class="section-card reveal">
             <div class="card-icon" style="background: var(--mint-soft); border-color: rgba(126, 224, 182, 0.18); color: #d6fff0;">03</div>
-            <h3>Useful for builders</h3>
-            <p>The coverage stays biased toward practical implications for security, product, operations, and adoption.</p>
+            <h3>AI workflow automation</h3>
+            <p>Lead enrichment, auto-tagging, follow-up draft generation, intake routing, and the unglamorous internal-tool glue that quietly recovers hours per week.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="featured-report">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="section-kicker">Live Demo</span>
+          <h2 class="section-title">Click into a working CRM we built — with AI inside.</h2>
+          <p class="section-desc">
+            Instead of screenshots, we run a real sandbox tenant of our CRM platform. Branding, pipeline stages,
+            custom fields, and AI deal summaries are all live. This is what every customer engagement starts from.
+          </p>
+        </div>
+
+        <article class="featured-card reveal">
+          <div>
+            <div class="report-meta">Sandbox tenant - updated continuously</div>
+            <h3>The RocketSloth CRM Demo</h3>
+            <p>
+              A multi-tenant CRM platform with contacts, a kanban pipeline, an activity timeline, and a Claude-powered
+              "summarize this deal" button on every opportunity. We white-label and customize one of these for each customer
+              we build for.
+            </p>
+
+            <ul class="featured-bullets" style="margin-top: 18px;">
+              <li><span>-</span><span><strong>Per-tenant branding</strong> — product name, accent color, logo, pipeline stages, and custom fields are all config-driven.</span></li>
+              <li><span>-</span><span><strong>AI deal summaries</strong> — one click sends the deal + activity history to Claude and returns next-best-action recommendations.</span></li>
+              <li><span>-</span><span><strong>Built to extend</strong> — every customer build adds the BI dashboards, automations, and integrations specific to their business.</span></li>
+            </ul>
+
+            <div class="cta-row" style="margin-top: 22px; margin-bottom: 0;">
+              <a class="btn btn-primary" href="/crm/login?tenant=demo">Open the live demo →</a>
+              <a class="btn btn-secondary" href="#contact">Talk to us about your build</a>
+            </div>
+          </div>
+
+          <aside class="report-side" aria-label="Demo highlights">
+            <div class="report-side-card">
+              <strong>1 codebase</strong>
+              <span>Many customer CRMs</span>
+            </div>
+            <div class="report-side-card">
+              <strong>100% white-label</strong>
+              <span>Your brand, your domain</span>
+            </div>
+            <div class="report-side-card">
+              <strong>Claude inside</strong>
+              <span>Summaries + drafts + search</span>
+            </div>
+            <div class="report-side-card">
+              <strong>Days, not months</strong>
+              <span>From discovery to live</span>
+            </div>
+          </aside>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="how">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="section-kicker">How We Work</span>
+          <h2 class="section-title">A short, predictable path from "this is slow" to "this is automated."</h2>
+          <p class="section-desc">
+            Every engagement follows the same four phases. No 12-week discovery decks, no surprise scope creep, no abandoned dashboards.
+          </p>
+        </div>
+
+        <div class="card-grid">
+          <article class="section-card reveal">
+            <div class="card-icon">01</div>
+            <h3>Discovery (1 week)</h3>
+            <p>We map your real workflow, the data you already have, and where AI actually saves time. You get a written plan and a fixed scope.</p>
+          </article>
+
+          <article class="section-card reveal">
+            <div class="card-icon" style="background: var(--sky-soft); border-color: rgba(122, 199, 255, 0.18); color: #d8ebff;">02</div>
+            <h3>Build (1–3 weeks)</h3>
+            <p>We white-label the CRM platform, wire your pipeline + custom fields, build the BI views, and turn on the AI features that matter for your team.</p>
+          </article>
+
+          <article class="section-card reveal">
+            <div class="card-icon" style="background: var(--mint-soft); border-color: rgba(126, 224, 182, 0.18); color: #d6fff0;">03</div>
+            <h3>Train &amp; launch</h3>
+            <p>Your team gets onboarded in a single working session. We migrate data, connect integrations, and stay on a Slack channel during launch week.</p>
+          </article>
+        </div>
+
+        <div class="card-grid" style="margin-top: 16px;">
+          <article class="section-card reveal" style="grid-column: 1 / -1;">
+            <div class="card-icon">04</div>
+            <h3>Monthly support &amp; iteration</h3>
+            <p>You pay a flat monthly fee for hosting, updates, new AI features, and direct access to us when you want changes. No new SOWs to add a column.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="pricing">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="section-kicker">Pricing</span>
+          <h2 class="section-title">Flat monthly fees. No surprise invoices.</h2>
+          <p class="section-desc">
+            Build cost is rolled into the first three months. After that you're paying for hosting, updates, and us — not licenses per seat.
+          </p>
+        </div>
+
+        <div class="card-grid">
+          <article class="section-card reveal">
+            <div class="card-icon">S</div>
+            <h3>Starter — $499/mo</h3>
+            <p>White-labeled CRM, your branding, your pipeline, contacts + deals + activities. Hosted, backed up, supported. Perfect for small teams replacing a spreadsheet.</p>
+          </article>
+
+          <article class="section-card reveal">
+            <div class="card-icon" style="background: var(--sky-soft); border-color: rgba(122, 199, 255, 0.18); color: #d8ebff;">G</div>
+            <h3>Growth — $1,499/mo</h3>
+            <p>Everything in Starter plus Claude-powered deal summaries, draft generation, natural-language search, and a BI dashboard tailored to your KPIs.</p>
+          </article>
+
+          <article class="section-card reveal">
+            <div class="card-icon" style="background: var(--mint-soft); border-color: rgba(126, 224, 182, 0.18); color: #d6fff0;">E</div>
+            <h3>Enterprise — let's talk</h3>
+            <p>Bespoke AI workflows, integrations with your existing stack, custom data models, on-call support, and roadmap input. Quoted per engagement.</p>
           </article>
         </div>
       </div>
@@ -861,29 +942,28 @@ a { color: inherit; }
       <div class="container">
         <div class="cta-card reveal">
           <div>
-            <span class="section-kicker">Stay in Orbit</span>
-            <h2>Subscribe once and let the next important AI story come to you.</h2>
+            <span class="section-kicker">Ready to start?</span>
+            <h2>Show us one workflow you wish was smarter. We'll show you what it looks like fixed.</h2>
             <p>
-              Future AI News is the main call to action now. The homepage introduces the voice, the report proves the quality,
-              and the signup stays simple.
+              Drop your email, tell us what's slow, and we'll come back with a recommendation and a working prototype tailored to your business — usually within a week.
             </p>
           </div>
 
           <form class="signup-form" data-signup-form method="POST" action="/api/signup" novalidate>
-            <input type="hidden" name="company" value="Future AI News">
-            <input type="hidden" name="interest" value="Homepage footer signup">
+            <input type="hidden" name="company" value="RocketSloth Discovery">
+            <input type="hidden" name="interest" value="Homepage footer - discovery call">
 
             <div class="field">
-              <label for="footer-name">First name</label>
+              <label for="footer-name">Your name</label>
               <input id="footer-name" name="name" type="text" autocomplete="given-name" placeholder="Optional">
             </div>
 
             <div class="field">
-              <label for="footer-email">Email</label>
-              <input id="footer-email" name="email" type="email" autocomplete="email" placeholder="you@example.com" required>
+              <label for="footer-email">Work email</label>
+              <input id="footer-email" name="email" type="email" autocomplete="email" placeholder="you@yourcompany.com" required>
             </div>
 
-            <button class="btn btn-primary" data-submit-button type="submit">Subscribe now</button>
+            <button class="btn btn-primary" data-submit-button type="submit">Request a discovery call</button>
             <p class="form-status" data-form-status aria-live="polite"></p>
           </form>
         </div>
@@ -896,15 +976,17 @@ a { color: inherit; }
       <div class="footer-shell reveal">
         <div class="footer-copy">
           <strong>ROCKETSLOTH.SPACE</strong>
-          <h2>Build Slow. Ship Fast. Smarter Tools. Calmer Work.</h2>
-          <p>Newsletter-first homepage. Dedicated report route. One clean path for readers who want useful AI analysis.</p>
+          <h2>Smarter Tools. Calmer Work.</h2>
+          <p>AI &amp; BI consulting that ships in days. Custom CRMs, dashboards, and automation built around your team.</p>
         </div>
 
         <div>
           <div class="footer-links">
-            <a href="#why">Why Subscribe</a>
-            <a href="/reports/claude-code-leak">Claude Leak Report</a>
-            <a href="#future-ai-news">Subscribe</a>
+            <a href="#services">What We Build</a>
+            <a href="#how">How We Work</a>
+            <a href="#pricing">Pricing</a>
+            <a href="/crm/login?tenant=demo">Live Demo</a>
+            <a href="/reports/claude-code-leak">Research</a>
             <a href="mailto:hello@rocketsloth.space">hello@rocketsloth.space</a>
           </div>
         </div>
