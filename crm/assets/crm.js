@@ -342,6 +342,12 @@
       <label>Amount<input name="amount" type="number" step="0.01" value="${escapeAttr(d.amount || 0)}"/></label>
       <label>Currency<input name="currency" value="${escapeAttr(d.currency || "USD")}"/></label>
       <label>Expected close<input name="expected_close_date" type="date" value="${escapeAttr(d.expected_close_date || "")}"/></label>
+      ${isEdit ? `
+        <div class="ai-panel">
+          <button type="button" class="primary-btn" data-action="ai-summary">✨ Summarize with AI</button>
+          <div class="ai-result" id="ai-result" hidden></div>
+        </div>
+      ` : ""}
       <div class="modal-actions">
         ${isEdit ? '<button type="button" class="ghost-btn" data-action="delete">Delete</button>' : ""}
         <button type="button" class="ghost-btn" data-action="cancel">Cancel</button>
@@ -354,6 +360,26 @@
         await loadDeals();
         renderDashboard();
         return true;
+      }
+      if (action === "ai-summary" && isEdit) {
+        const result = modal.querySelector("#ai-result");
+        result.hidden = false;
+        result.innerHTML = '<em>Asking Claude…</em>';
+        try {
+          const data = await api(`/api/crm/ai-summary?deal_id=${d.id}`, { method: "POST" });
+          const actions = (data.nextActions || []).map((a) => `<li>${escapeHtml(a)}</li>`).join("");
+          const stub = data.stub ? '<div class="ai-stub-warning">Demo mode — set ANTHROPIC_API_KEY for live AI.</div>' : "";
+          result.innerHTML = `
+            ${stub}
+            <div class="ai-summary-text">${escapeHtml(data.summary || "(no summary)")}</div>
+            <div class="ai-risk">Risk score: <strong>${data.riskScore || 0}</strong>/100</div>
+            <div class="ai-actions-label">Suggested next actions</div>
+            <ul class="ai-actions">${actions}</ul>
+          `;
+        } catch (err) {
+          result.innerHTML = `<div class="ai-error">${escapeHtml(err.message)}</div>`;
+        }
+        return false;
       }
       if (action === "save") {
         const body = collectForm(modal);

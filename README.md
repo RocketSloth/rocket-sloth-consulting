@@ -1,4 +1,6 @@
-Rocket Sloth Consulting landing page, optimized for Vercel hosting.
+RocketSloth.Space — AI &amp; BI consulting site, with a built-in multi-tenant
+CRM platform that doubles as both the live demo on the landing page and the
+product we sell to customers.
 
 Vercel setup:
 - Static pages: `index.html` and `thank-you.html`
@@ -68,7 +70,51 @@ Fields:
 - `GET/POST/PATCH/DELETE /api/crm/deals`
 - `GET/POST/PATCH/DELETE /api/crm/activities`
 - `POST /api/crm/provision` — admin-only tenant bootstrap
+- `POST /api/crm/ai-summary?deal_id=<uuid>` — Claude-powered deal summary, next actions, risk score
 
 All CRM endpoints require `Authorization: Bearer <sessionToken>` except
 `login` and `provision`. All data access is automatically scoped to the
 authenticated user's tenant.
+
+### AI features
+
+The deal modal includes a **"✨ Summarize with AI"** button that calls
+`/api/crm/ai-summary`. This loads the deal + linked contact + recent activities
+and asks Claude for a 2-3 sentence status, three concrete next actions, and a
+0-100 risk score.
+
+Set `ANTHROPIC_API_KEY` in Vercel env vars to enable live Claude responses.
+Without the key the endpoint returns a deterministic stub so the demo still
+works without leaking errors.
+
+### Live demo tenant
+
+The landing page CTA "See a live demo →" links to `/crm/login?tenant=demo`.
+To populate it, run:
+
+```bash
+SUPABASE_URL=... \
+SUPABASE_SERVICE_ROLE_KEY=... \
+CRM_ADMIN_TOKEN=... \
+CRM_BASE_URL=https://rocketsloth.space \
+node scripts/seed-demo.js
+```
+
+This creates (or refreshes) tenant slug `demo` with branded config, ~30 sample
+contacts, ~15 deals across all pipeline stages, and a few activities per deal.
+Default credentials are printed at the end of the run.
+
+### Helper scripts
+
+- `scripts/apply-schema.sh` — pipes `supabase/crm-schema.sql` into Postgres via `psql`. Needs `SUPABASE_DB_URL`.
+- `scripts/provision-tenant.sh` — one-line provisioning of a new customer tenant. Needs `CRM_BASE_URL` and `CRM_ADMIN_TOKEN`.
+- `scripts/seed-demo.js` — populates the public `demo` tenant with sample data.
+
+### Going live checklist
+
+1. `psql` or paste `supabase/crm-schema.sql` into Supabase SQL editor.
+2. In Vercel env vars, add `CRM_ADMIN_TOKEN` (random 32-byte hex) and `ANTHROPIC_API_KEY`.
+3. Redeploy.
+4. Run `node scripts/seed-demo.js` to populate the demo tenant.
+5. Visit `/crm/login?tenant=demo` and click "✨ Summarize with AI" on a deal to verify the Claude integration.
+6. Use `scripts/provision-tenant.sh` to onboard each real customer.
