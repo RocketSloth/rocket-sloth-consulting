@@ -5,37 +5,46 @@
 
 (function () {
   const STORAGE_KEY = "rs_crm_session";
+  const MIGRATION_FLAG_KEY = "rs_crm_cookie_auth_migrated_v1";
+  const state = {
+    session: null,
+    contacts: [],
+    deals: [],
+    activities: []
+  };
+
+  function runSessionMigrationGuard() {
+    try {
+      if (!localStorage.getItem(MIGRATION_FLAG_KEY)) {
+        localStorage.removeItem(STORAGE_KEY);
+        localStorage.setItem(MIGRATION_FLAG_KEY, "1");
+      }
+    } catch {}
+  }
 
   function getSession() {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      return raw ? JSON.parse(raw) : null;
-    } catch {
-      return null;
-    }
+    return state.session;
   }
 
   function setSession(data) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    state.session = data || null;
   }
 
   function clearSession() {
-    localStorage.removeItem(STORAGE_KEY);
+    state.session = null;
+    try { localStorage.removeItem(STORAGE_KEY); } catch {}
   }
 
   async function api(path, options = {}) {
-    const session = getSession();
     const headers = Object.assign(
       { "Content-Type": "application/json" },
       options.headers || {}
     );
-    if (session && session.token) {
-      headers.Authorization = `Bearer ${session.token}`;
-    }
     const response = await fetch(path, {
       method: options.method || "GET",
       headers,
-      body: options.body ? JSON.stringify(options.body) : undefined
+      body: options.body ? JSON.stringify(options.body) : undefined,
+      credentials: "same-origin"
     });
     const text = await response.text();
     const data = text ? JSON.parse(text) : null;
@@ -79,16 +88,16 @@
   // ---------- Login page ----------
 
   function initLogin() {
+    runSessionMigrationGuard();
     const form = document.getElementById("login-form");
     const errorEl = document.getElementById("auth-error");
     const params = new URLSearchParams(window.location.search);
     const tenantInput = document.getElementById("tenant");
     if (params.get("tenant")) tenantInput.value = params.get("tenant");
 
-    if (getSession()) {
-      window.location.href = "/crm";
-      return;
-    }
+    api("/api/crm/me")
+      .then(() => { window.location.href = "/crm"; })
+      .catch(() => {});
 
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -114,20 +123,24 @@
 
   // ---------- App shell ----------
 
-  const state = {
-    session: null,
-    contacts: [],
-    deals: [],
-    activities: []
-  };
-
-  function initApp() {
-    const session = getSession();
+  async function initApp() {
+    runSessionMigrationGuard();
+    let session = getSession();
     if (!session) {
+      try {
+        session = await api("/api/crm/me");
+      } catch {
+        clearSession();
+        window.location.href = "/crm/login";
+        return;
+      }
+    }
+    if (!session || !session.user || !session.tenant) {
+      clearSession();
       window.location.href = "/crm/login";
       return;
     }
-    state.session = session;
+    setSession(session);
 
     applyBranding(session.tenant && session.tenant.config);
     document.getElementById("user-label").textContent = session.user.fullName || session.user.email;
