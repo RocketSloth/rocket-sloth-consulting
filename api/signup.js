@@ -107,7 +107,7 @@ async function notifyLead(lead) {
 
   if (resendApiKey && resendFrom && leadsTo) {
     const html = [
-      "<h1>New Future AI News signup</h1>",
+      "<h1>New discovery call request</h1>",
       `<p><strong>Name:</strong> ${escapeHtml(lead.name)}</p>`,
       `<p><strong>Email:</strong> ${escapeHtml(lead.email)}</p>`,
       `<p><strong>Company:</strong> ${escapeHtml(lead.company)}</p>`,
@@ -125,10 +125,10 @@ async function notifyLead(lead) {
         from: resendFrom,
         to: [leadsTo],
         reply_to: lead.email,
-        subject: `New Future AI News signup: ${lead.email}`,
+        subject: `New workflow assessment lead: ${lead.email}`,
         html,
         text: [
-          "New Future AI News signup",
+          "New discovery call request",
           `Name: ${lead.name}`,
           `Email: ${lead.email}`,
           `Company: ${lead.company}`,
@@ -155,10 +155,10 @@ module.exports = async function handler(req, res) {
 
   const body = parseBody(req);
   const lead = {
-    name: normalize(body.name, 120) || "Future AI News Reader",
+    name: normalize(body.name, 120) || "Discovery Call Lead",
     email: normalize(body.email, 200).toLowerCase(),
-    company: normalize(body.company, 200) || "Future AI News",
-    interest: normalize(body.interest, 2000) || "Future AI News signup",
+    company: normalize(body.company, 200) || "Discovery call lead",
+    interest: normalize(body.interest, 2000) || "Workflow assessment request",
     submittedAt: new Date().toISOString()
   };
 
