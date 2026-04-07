@@ -180,9 +180,6 @@ module.exports = async function handler(req, res) {
     return res.redirect(303, "/thank-you");
   } catch (error) {
     console.error("Signup delivery failed", error);
-    const message = error instanceof Error && error.message
-      ? error.message
-      : "Signup could not be processed right now.";
-    return sendError(req, res, 500, message);
+    return sendError(req, res, 500, "Signup could not be processed right now.");
   }
 };
