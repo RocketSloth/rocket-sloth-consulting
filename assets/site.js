@@ -107,6 +107,7 @@
   forms.forEach(function (form) {
     const button = form.querySelector("[data-submit-button]");
     const originalLabel = button ? button.textContent : "";
+    const redirectTarget = form.dataset.redirect || "/thank-you";
 
     form.addEventListener("submit", async function (event) {
       event.preventDefault();
@@ -149,7 +150,7 @@
         }
 
         setStatus(form, "You are in. Redirecting...", "success");
-        window.location.href = "/thank-you";
+        window.location.href = redirectTarget;
       } catch (error) {
         setStatus(form, error.message || "Something went wrong. Please try again.", "error");
 

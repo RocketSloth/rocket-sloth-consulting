@@ -872,7 +872,7 @@ a { color: inherit; }
 
             <div class="cta-row" style="margin-top: 22px; margin-bottom: 0;">
               <a class="btn btn-primary" href="/crm/login?tenant=demo">Open the live demo →</a>
-              <a class="btn btn-secondary" href="#contact">Talk to us about your build</a>
+              <a class="btn btn-secondary" href="#demo-access">Get demo login details</a>
             </div>
           </div>
 
@@ -895,6 +895,39 @@ a { color: inherit; }
             </div>
           </aside>
         </article>
+      </div>
+    </section>
+
+    <section class="section" id="demo-access">
+      <div class="container">
+        <div class="cta-card reveal">
+          <div>
+            <span class="section-kicker">Demo Access</span>
+            <h2>Want demo credentials? We’ll give you instant access to sample data.</h2>
+            <p>
+              Enter your email and we’ll log your request in our CRM pipeline, then show
+              you the demo tenant login details right away.
+            </p>
+          </div>
+
+          <form class="signup-form" data-signup-form data-redirect="/thank-you?demo=1" method="POST" action="/api/signup" novalidate>
+            <input type="hidden" name="company" value="RocketSloth Demo Access">
+            <input type="hidden" name="interest" value="Requested CRM demo login">
+
+            <div class="field">
+              <label for="demo-name">Your name</label>
+              <input id="demo-name" name="name" type="text" autocomplete="given-name" placeholder="Optional">
+            </div>
+
+            <div class="field">
+              <label for="demo-email">Work email</label>
+              <input id="demo-email" name="email" type="email" autocomplete="email" placeholder="you@yourcompany.com" required>
+            </div>
+
+            <button class="btn btn-primary" data-submit-button type="submit">Show demo login details</button>
+            <p class="form-status" data-form-status aria-live="polite"></p>
+          </form>
+        </div>
       </div>
     </section>
 
