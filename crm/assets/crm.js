@@ -38,9 +38,21 @@
       body: options.body ? JSON.stringify(options.body) : undefined
     });
     const text = await response.text();
-    const data = text ? JSON.parse(text) : null;
+    const contentType = response.headers.get("content-type") || "";
+    const isJson = contentType.toLowerCase().includes("application/json");
+    let data = text;
+    if (text && isJson) {
+      try {
+        data = JSON.parse(text);
+      } catch {
+        data = text;
+      }
+    } else if (!text) {
+      data = null;
+    }
     if (!response.ok) {
-      const err = new Error((data && data.error) || "Request failed");
+      const fallbackMessage = `Request failed (HTTP ${response.status})`;
+      const err = new Error((data && data.error) || fallbackMessage);
       err.status = response.status;
       throw err;
     }
