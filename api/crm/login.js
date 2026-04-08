@@ -18,7 +18,30 @@ module.exports = async function handler(req, res) {
       slug: `eq.${tenantSlug}`,
       select: "id,slug,name,plan,status,config"
     });
-    const tenant = tenants && tenants[0];
+    let tenant = tenants && tenants[0];
+    if (!tenant && tenantSlug === "demo") {
+      tenant = await sbInsert("crm_tenants", {
+        slug: "demo",
+        name: "RocketSloth Demo",
+        plan: "demo",
+        status: "active",
+        config: {
+          branding: {
+            productName: "RocketSloth Demo CRM",
+            accentColor: "#f58f4c",
+            logoUrl: ""
+          }
+        }
+      });
+    }
+    if (tenant && tenantSlug === "demo" && tenant.status !== "active") {
+      const updatedTenants = await sbUpdate(
+        "crm_tenants",
+        { id: `eq.${tenant.id}` },
+        { status: "active" }
+      );
+      tenant = updatedTenants && updatedTenants[0] ? updatedTenants[0] : tenant;
+    }
     if (!tenant || tenant.status !== "active") {
       return json(res, 401, { error: "Invalid credentials" });
     }

@@ -17,6 +17,9 @@ Optional environment variables:
 - `RESEND_FROM_EMAIL`
 - `LEADS_TO_EMAIL`
 - `SIGNUP_WEBHOOK_URL`
+- `DEMO_LOGIN_EMAIL`
+- `DEMO_LOGIN_PASSWORD`
+- `DEMO_LOGIN_TENANT`
 
 The API always stores signups in Supabase first.
 
