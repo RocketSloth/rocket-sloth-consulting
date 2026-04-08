@@ -175,12 +175,15 @@ html, body {
 .deal-card { background: var(--bg); padding: 10px 12px; border-radius: 8px; font-size: 13px; cursor: pointer; }
 .deal-card:hover { background: #eef0f7; }
 .deal-card .deal-title { font-weight: 600; }
+.deal-card .deal-meta { color: var(--muted); font-size: 12px; margin-top: 4px; line-height: 1.4; }
 .deal-card .deal-amount { color: var(--muted); font-size: 12px; margin-top: 2px; }
 
 .timeline { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; }
 .timeline li { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
 .timeline .t-head { display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); margin-bottom: 4px; }
 .timeline .t-subject { font-weight: 600; }
+.timeline .t-meta { color: var(--muted); font-size: 12px; margin-bottom: 6px; }
+.timeline.compact li { background: #fafbfc; }
 
 .modal-root {
   position: fixed; inset: 0; background: rgba(15, 17, 26, 0.45);
@@ -193,6 +196,97 @@ html, body {
 .modal h2 { margin: 0; font-size: 18px; }
 .modal label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--muted); }
 .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 8px; }
+.modal-section {
+  margin-top: 6px;
+  padding-top: 2px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.modal-section h3 {
+  margin: 0;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+.section-head-inline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.detail-card {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: #fafbfc;
+}
+.detail-label {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.detail-value {
+  display: block;
+  margin-top: 4px;
+  font-size: 13px;
+  line-height: 1.4;
+}
+.linked-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.linked-item,
+.link-btn {
+  appearance: none;
+  border: 1px solid var(--border);
+  background: #fafbfc;
+  border-radius: 8px;
+  color: var(--text);
+  cursor: pointer;
+  font: inherit;
+}
+.linked-item {
+  padding: 10px 12px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.linked-item:hover,
+.link-btn:hover {
+  background: #f0f4f8;
+}
+.linked-main {
+  font-weight: 600;
+}
+.linked-meta {
+  color: var(--muted);
+  font-size: 12px;
+}
+.link-btn {
+  padding: 8px 10px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.section-empty {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px dashed var(--border);
+  color: var(--muted);
+  background: #fafbfc;
+  font-size: 13px;
+}
 .readonly-note {
   padding: 10px 12px;
   border-radius: 8px;
@@ -209,6 +303,8 @@ html, body {
 }
 .status-pill.customer { background: #dcfce7; color: var(--success); }
 .status-pill.lead { background: #eef2ff; color: var(--accent); }
+.status-pill.quoted { background: #eff6ff; color: #2563eb; }
+.status-pill.seasonal { background: #fff7ed; color: #c2410c; }
 .status-pill.archived { background: #f3f4f6; color: var(--muted); }
 
 .empty { color: var(--muted); font-size: 14px; text-align: center; padding: 24px; }
@@ -246,4 +342,15 @@ html, body {
   color: #9a3412;
   border-radius: 6px;
   border: 1px solid #fed7aa;
+}
+
+@media (max-width: 700px) {
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .section-head-inline {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
