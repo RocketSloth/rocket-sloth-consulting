@@ -17,8 +17,6 @@ Optional environment variables:
 - `RESEND_FROM_EMAIL`
 - `LEADS_TO_EMAIL`
 - `SIGNUP_WEBHOOK_URL`
-- `DEMO_LOGIN_EMAIL`
-- `DEMO_LOGIN_PASSWORD`
 - `DEMO_LOGIN_TENANT`
 
 The API always stores signups in Supabase first.
@@ -68,6 +66,7 @@ Fields:
 ### CRM API endpoints
 
 - `POST /api/crm/login` — tenant + email + password → session token
+- `POST /api/crm/demo-view` — email-only instant demo session bootstrap
 - `GET/DELETE /api/crm/me` — current session / logout
 - `GET/POST/PATCH/DELETE /api/crm/contacts`
 - `GET/POST/PATCH/DELETE /api/crm/deals`
@@ -92,7 +91,7 @@ works without leaking errors.
 
 ### Live demo tenant
 
-The landing page CTA "See a live demo →" links to `/crm/login?tenant=demo`.
+The landing page CTA "See a live demo →" links to `/#demo-access`.
 The instant demo-access flow (`POST /api/crm/demo-view`) also auto-populates
 the demo tenant with pool-service sample contacts/deals/activities on first use.
 To populate it, run:
@@ -107,7 +106,6 @@ node scripts/seed-demo.js
 
 This creates (or refreshes) tenant slug `demo` with branded config, ~30 sample
 contacts, ~15 deals across all pipeline stages, and a few activities per deal.
-Default credentials are printed at the end of the run.
 
 ### Helper scripts
 
@@ -121,5 +119,5 @@ Default credentials are printed at the end of the run.
 2. In Vercel env vars, add `CRM_ADMIN_TOKEN` (random 32-byte hex) and `ANTHROPIC_API_KEY`.
 3. Redeploy.
 4. Run `node scripts/seed-demo.js` to populate the demo tenant.
-5. Visit `/crm/login?tenant=demo` and click "✨ Summarize with AI" on a deal to verify the Claude integration.
+5. Submit the demo access form on the homepage and verify you land in `/crm` with seeded demo data and working AI summary button.
 6. Use `scripts/provision-tenant.sh` to onboard each real customer.
