@@ -30,7 +30,19 @@ module.exports = async function handler(req, res) {
             productName: "RocketSloth Demo CRM",
             accentColor: "#f58f4c",
             logoUrl: ""
-          }
+          },
+          pipeline: {
+            stages: [
+              { id: "new", label: "New", probability: 10 },
+              { id: "qualified", label: "Qualified", probability: 25 },
+              { id: "demo", label: "Site Visit", probability: 40 },
+              { id: "proposal", label: "Proposal", probability: 60 },
+              { id: "negotiation", label: "Negotiation", probability: 80 },
+              { id: "won", label: "Won", probability: 100 },
+              { id: "lost", label: "Lost", probability: 0 }
+            ]
+          },
+          contactStatuses: ["lead", "prospect", "customer", "archived"]
         }
       });
     }

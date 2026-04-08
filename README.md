@@ -93,6 +93,8 @@ works without leaking errors.
 ### Live demo tenant
 
 The landing page CTA "See a live demo →" links to `/crm/login?tenant=demo`.
+The instant demo-access flow (`POST /api/crm/demo-view`) also auto-populates
+the demo tenant with pool-service sample contacts/deals/activities on first use.
 To populate it, run:
 
 ```bash
