@@ -1,6 +1,6 @@
 const { parseBody, json, handleError, methodGuard } = require("../_lib/http");
-const { sbSelect } = require("../_lib/supabase");
-const { verifyPassword, createSession, setSessionCookie } = require("../_lib/auth");
+const { sbSelect, sbInsert, sbUpdate } = require("../_lib/supabase");
+const { verifyPassword, createSession, setSessionCookie, hashPassword } = require("../_lib/auth");
 
 module.exports = async function handler(req, res) {
   if (!methodGuard(req, res, ["POST"])) return;
@@ -23,12 +23,36 @@ module.exports = async function handler(req, res) {
       return json(res, 401, { error: "Invalid credentials" });
     }
 
-    const users = await sbSelect("crm_users", {
+    let users = await sbSelect("crm_users", {
       tenant_id: `eq.${tenant.id}`,
       email: `eq.${email}`,
       select: "*"
     });
-    const user = users && users[0];
+    let user = users && users[0];
+
+    const demoEmail = String(process.env.DEMO_LOGIN_EMAIL || "demo@rocketsloth.space").trim().toLowerCase();
+    const demoPassword = String(process.env.DEMO_LOGIN_PASSWORD || "demo-rocketsloth-2026");
+    const isDemoCredentialPair = tenantSlug === "demo" && email === demoEmail && password === demoPassword;
+
+    if (isDemoCredentialPair) {
+      if (!user) {
+        user = await sbInsert("crm_users", {
+          tenant_id: tenant.id,
+          email: demoEmail,
+          full_name: "Demo User",
+          role: "owner",
+          password_hash: hashPassword(demoPassword)
+        });
+      } else if (!verifyPassword(demoPassword, user.password_hash)) {
+        const updated = await sbUpdate(
+          "crm_users",
+          { tenant_id: `eq.${tenant.id}`, id: `eq.${user.id}` },
+          { password_hash: hashPassword(demoPassword) }
+        );
+        user = updated && updated[0] ? updated[0] : user;
+      }
+    }
+
     if (!user || !verifyPassword(password, user.password_hash)) {
       return json(res, 401, { error: "Invalid credentials" });
     }
