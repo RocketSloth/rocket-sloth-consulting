@@ -81,13 +81,14 @@ function extractTokenFromCookie(req) {
 }
 
 function serializeSessionCookie(token, expiresAt) {
+  const useSecureCookie = process.env.NODE_ENV === "production";
   const attrs = [
     `${SESSION_COOKIE_NAME}=${encodeURIComponent(token)}`,
     "Path=/",
     "HttpOnly",
-    "Secure",
     "SameSite=Lax"
   ];
+  if (useSecureCookie) attrs.push("Secure");
   if (expiresAt) attrs.push(`Expires=${new Date(expiresAt).toUTCString()}`);
   return attrs.join("; ");
 }
@@ -97,14 +98,18 @@ function setSessionCookie(res, token, expiresAt) {
 }
 
 function clearSessionCookie(res) {
-  res.setHeader("Set-Cookie", [
+  const useSecureCookie = process.env.NODE_ENV === "production";
+  const attrs = [
     `${SESSION_COOKIE_NAME}=`,
     "Path=/",
     "HttpOnly",
-    "Secure",
     "SameSite=Lax",
     "Expires=Thu, 01 Jan 1970 00:00:00 GMT",
     "Max-Age=0"
+  ];
+  if (useSecureCookie) attrs.splice(3, 0, "Secure");
+  res.setHeader("Set-Cookie", [
+    ...attrs
   ].join("; "));
 }
 
