@@ -173,7 +173,11 @@ module.exports = async function handler(req, res) {
 
   try {
     await storeLeadInSupabase(lead);
-    await notifyLead(lead);
+    try {
+      await notifyLead(lead);
+    } catch (notifyError) {
+      console.warn("Signup notification failed (lead already saved to Supabase)", notifyError);
+    }
     if (wantsJson(req)) {
       return res.status(200).json({ ok: true });
     }

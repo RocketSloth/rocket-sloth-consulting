@@ -107,6 +107,7 @@
   forms.forEach(function (form) {
     const button = form.querySelector("[data-submit-button]");
     const originalLabel = button ? button.textContent : "";
+    const redirectTarget = form.dataset.redirect || "/thank-you";
 
     form.addEventListener("submit", async function (event) {
       event.preventDefault();
@@ -116,11 +117,12 @@
       }
 
       const rawEntries = Object.fromEntries(new FormData(form).entries());
+      const interestMessage = String(rawEntries.message || rawEntries.interest || "").trim();
       const payload = {
         name: String(rawEntries.name || "").trim(),
         email: String(rawEntries.email || "").trim(),
         company: String(rawEntries.company || "").trim() || "Discovery call lead",
-        interest: String(rawEntries.interest || "").trim() || "Workflow assessment request"
+        interest: interestMessage || "Workflow assessment request"
       };
 
       if (button) {
@@ -149,7 +151,7 @@
         }
 
         setStatus(form, "You are in. Redirecting...", "success");
-        window.location.href = "/thank-you";
+        window.location.href = redirectTarget;
       } catch (error) {
         setStatus(form, error.message || "Something went wrong. Please try again.", "error");
 

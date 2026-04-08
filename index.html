@@ -441,7 +441,25 @@ a { color: inherit; }
   outline: none;
 }
 
+.field textarea {
+  width: 100%;
+  min-height: 110px;
+  padding: 12px 15px;
+  border: 1px solid rgba(150, 180, 219, 0.14);
+  background: rgba(6, 12, 20, 0.55);
+  color: var(--text);
+  border-radius: 14px;
+  font: inherit;
+  resize: vertical;
+  outline: none;
+}
+
 .field input:focus {
+  border-color: rgba(255, 122, 61, 0.8);
+  box-shadow: 0 0 0 3px rgba(255, 122, 61, 0.12);
+}
+
+.field textarea:focus {
   border-color: rgba(255, 122, 61, 0.8);
   box-shadow: 0 0 0 3px rgba(255, 122, 61, 0.12);
 }
@@ -784,7 +802,6 @@ a { color: inherit; }
 
           <form class="signup-form" data-signup-form method="POST" action="/api/signup" novalidate>
             <input type="hidden" name="company" value="RocketSloth Discovery">
-            <input type="hidden" name="interest" value="Homepage hero - discovery call">
 
             <div class="field">
               <label for="home-name">Your name</label>
@@ -799,6 +816,11 @@ a { color: inherit; }
             <div class="field">
               <label for="home-company">Company</label>
               <input id="home-company" name="company" type="text" autocomplete="organization" placeholder="Acme Inc">
+            </div>
+
+            <div class="field">
+              <label for="home-message">What should we improve?</label>
+              <textarea id="home-message" name="message" placeholder="Example: Our sales follow-up is manual and inconsistent."></textarea>
             </div>
 
             <button class="btn btn-primary" data-submit-button type="submit">Request a discovery call</button>
@@ -872,7 +894,7 @@ a { color: inherit; }
 
             <div class="cta-row" style="margin-top: 22px; margin-bottom: 0;">
               <a class="btn btn-primary" href="/crm/login?tenant=demo">Open the live demo →</a>
-              <a class="btn btn-secondary" href="#contact">Talk to us about your build</a>
+              <a class="btn btn-secondary" href="#demo-access">Get demo login details</a>
             </div>
           </div>
 
@@ -895,6 +917,39 @@ a { color: inherit; }
             </div>
           </aside>
         </article>
+      </div>
+    </section>
+
+    <section class="section" id="demo-access">
+      <div class="container">
+        <div class="cta-card reveal">
+          <div>
+            <span class="section-kicker">Demo Access</span>
+            <h2>Want demo credentials? We’ll give you instant access to sample data.</h2>
+            <p>
+              Enter your email and we’ll log your request in our CRM pipeline, then show
+              you the demo tenant login details right away.
+            </p>
+          </div>
+
+          <form class="signup-form" data-signup-form data-redirect="/thank-you?demo=1" method="POST" action="/api/signup" novalidate>
+            <input type="hidden" name="company" value="RocketSloth Demo Access">
+            <input type="hidden" name="interest" value="Requested CRM demo login">
+
+            <div class="field">
+              <label for="demo-name">Your name</label>
+              <input id="demo-name" name="name" type="text" autocomplete="given-name" placeholder="Optional">
+            </div>
+
+            <div class="field">
+              <label for="demo-email">Work email</label>
+              <input id="demo-email" name="email" type="email" autocomplete="email" placeholder="you@yourcompany.com" required>
+            </div>
+
+            <button class="btn btn-primary" data-submit-button type="submit">Show demo login details</button>
+            <p class="form-status" data-form-status aria-live="polite"></p>
+          </form>
+        </div>
       </div>
     </section>
 
@@ -983,7 +1038,6 @@ a { color: inherit; }
 
           <form class="signup-form" data-signup-form method="POST" action="/api/signup" novalidate>
             <input type="hidden" name="company" value="RocketSloth Discovery">
-            <input type="hidden" name="interest" value="Homepage footer - discovery call">
 
             <div class="field">
               <label for="footer-name">Your name</label>
@@ -993,6 +1047,11 @@ a { color: inherit; }
             <div class="field">
               <label for="footer-email">Work email</label>
               <input id="footer-email" name="email" type="email" autocomplete="email" placeholder="you@yourcompany.com" required>
+            </div>
+
+            <div class="field">
+              <label for="footer-message">What should we improve?</label>
+              <textarea id="footer-message" name="message" placeholder="Tell us one workflow that's slow, manual, or guesswork."></textarea>
             </div>
 
             <button class="btn btn-primary" data-submit-button type="submit">Request a discovery call</button>
