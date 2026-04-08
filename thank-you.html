@@ -26,49 +26,19 @@ p{margin:0 0 12px;color:#a8aec0;line-height:1.7}
 a{min-height:50px;padding:0 20px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;text-decoration:none;font-weight:700}
 .primary{background:#ff6b2b;color:#1c120d}
 .secondary{border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.03);color:#edf0fa}
-.demo-card{margin-top:16px;padding:16px;border-radius:16px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.03)}
-.demo-card strong{display:block;font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;color:#a8aec0}
-.demo-card code{display:block;margin-top:6px;padding:10px 12px;border-radius:10px;background:rgba(0,0,0,.26);color:#f6d2bf;font:700 .95rem "JetBrains Mono",monospace}
 </style>
 </head>
 <body>
   <main class="card">
     <div class="badge" aria-hidden="true">RS</div>
-    <h1 id="thanks-title">Request received.</h1>
-    <p id="thanks-copy">Thanks for reaching out to RocketSloth.Space about a discovery call.</p>
-    <p id="thanks-subcopy">We will review your notes and follow up with next steps for a workflow assessment focused on highest-impact automation opportunities.</p>
-    <section class="demo-card" id="demo-access-card" hidden>
-      <strong>Demo login URL</strong>
-      <code id="demo-url">https://rocketsloth.space/crm/login?tenant=demo</code>
-      <strong style="margin-top:10px;">Demo email</strong>
-      <code id="demo-email">demo@rocketsloth.space</code>
-      <strong style="margin-top:10px;">Demo password</strong>
-      <code id="demo-password">demo-rocketsloth-2026</code>
-    </section>
+    <h1>Request received.</h1>
+    <p>Thanks for reaching out to RocketSloth.Space about a discovery call.</p>
+    <p>We will review your notes and follow up with next steps for a workflow assessment focused on highest-impact automation opportunities.</p>
     <div class="row">
       <a class="primary" href="/">Back to the homepage</a>
-      <a class="secondary" href="/crm/login?tenant=demo">Open the CRM demo</a>
+      <a class="secondary" href="/#demo-access">Open the CRM demo</a>
     </div>
     <p>If you want to see our thought-leadership style analysis, you can still read <a href="/reports/claude-code-leak">the Claude Code leak report</a>.</p>
   </main>
-  <script>
-    (async function () {
-      const params = new URLSearchParams(window.location.search);
-      if (params.get("demo") !== "1") return;
-
-      document.getElementById("thanks-title").textContent = "Demo access unlocked.";
-      document.getElementById("thanks-copy").textContent = "Thanks — your demo request was saved.";
-      document.getElementById("thanks-subcopy").textContent = "Use the credentials below to explore the live CRM with sample data.";
-      document.getElementById("demo-access-card").hidden = false;
-      try {
-        const response = await fetch("/api/crm/demo-access", { headers: { Accept: "application/json" } });
-        if (!response.ok) return;
-        const data = await response.json();
-        if (data.loginUrl) document.getElementById("demo-url").textContent = window.location.origin + data.loginUrl;
-        if (data.email) document.getElementById("demo-email").textContent = data.email;
-        if (data.password) document.getElementById("demo-password").textContent = data.password;
-      } catch {}
-    })();
-  </script>
 </body>
 </html>

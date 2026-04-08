@@ -150,6 +150,25 @@
           throw new Error(data.error || "Something went wrong. Please try again.");
         }
 
+        if (form.dataset.demoAccess === "1") {
+          const demoResponse = await fetch("/api/crm/demo-view", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Accept": "application/json"
+            },
+            body: JSON.stringify({ email: payload.email })
+          });
+
+          const demoData = await demoResponse.json().catch(function () { return {}; });
+          if (!demoResponse.ok) {
+            throw new Error(demoData.error || "Unable to open demo right now. Please try again.");
+          }
+
+          window.location.href = demoData.redirectTo || "/crm";
+          return;
+        }
+
         setStatus(form, "You are in. Redirecting...", "success");
         window.location.href = redirectTarget;
       } catch (error) {
