@@ -7,6 +7,7 @@ const { sbSelect, sbInsert, sbDelete, sbUpdate } = require("./supabase");
 
 const SESSION_TTL_MS = 1000 * 60 * 60 * 24 * 14; // 14 days
 const SESSION_COOKIE_NAME = "rs_crm_session";
+const READ_ONLY_ROLES = new Set(["viewer", "demo_viewer"]);
 
 function hashPassword(password, salt) {
   const useSalt = salt || crypto.randomBytes(16).toString("hex");
@@ -143,6 +144,19 @@ async function destroySession(token) {
   await sbDelete("crm_sessions", { token: `eq.${token}` });
 }
 
+function isReadOnlyRole(role) {
+  return READ_ONLY_ROLES.has(String(role || "").trim().toLowerCase());
+}
+
+function assertWritableSession(session) {
+  if (isReadOnlyRole(session && session.user && session.user.role)) {
+    const err = new Error("This demo is read-only");
+    err.status = 403;
+    throw err;
+  }
+  return session;
+}
+
 module.exports = {
   hashPassword,
   verifyPassword,
@@ -152,5 +166,7 @@ module.exports = {
   extractToken,
   setSessionCookie,
   clearSessionCookie,
+  isReadOnlyRole,
+  assertWritableSession,
   SESSION_COOKIE_NAME
 };

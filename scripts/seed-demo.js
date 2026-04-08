@@ -12,7 +12,7 @@
 //      with branded config and a known owner login.
 //   2. Talks directly to Supabase REST to bulk-insert ~30 contacts,
 //      ~15 deals across stages, and a few activities.
-//   3. Prints the demo login URL and credentials at the end.
+//   3. Prints the public demo URL plus owner credentials at the end.
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -242,7 +242,8 @@ async function main() {
   const deals = await seedDeals(tenantId, contacts);
   await seedActivities(tenantId, contacts, deals);
   console.log(`\n✅ Demo ready.`);
-  console.log(`   URL:      ${BASE_URL}/crm/login?tenant=${DEMO_SLUG}`);
+  console.log(`   Public URL: ${BASE_URL}/crm?tenant=${DEMO_SLUG}&public=1`);
+  console.log(`   Owner URL:  ${BASE_URL}/crm/login?tenant=${DEMO_SLUG}`);
   console.log(`   Email:    ${DEMO_EMAIL}`);
   console.log(`   Password: ${DEMO_PASSWORD}`);
 }

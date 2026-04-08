@@ -1,6 +1,6 @@
 const { parseBody, json, handleError, methodGuard } = require("../_lib/http");
 const { sbSelect, sbInsert, sbUpdate, sbDelete } = require("../_lib/supabase");
-const { requireSession } = require("../_lib/auth");
+const { assertWritableSession, requireSession } = require("../_lib/auth");
 
 function sanitize(body, tenantId, userId) {
   const out = {};
@@ -19,7 +19,8 @@ function sanitize(body, tenantId, userId) {
 module.exports = async function handler(req, res) {
   if (!methodGuard(req, res, ["GET", "POST", "PATCH", "DELETE"])) return;
   try {
-    const { tenantId, user } = await requireSession(req);
+    const session = await requireSession(req);
+    const { tenantId, user } = session;
     const id = (req.query && req.query.id) || null;
     const contactId = (req.query && req.query.contact_id) || null;
     const dealId = (req.query && req.query.deal_id) || null;
@@ -38,6 +39,7 @@ module.exports = async function handler(req, res) {
     }
 
     if (req.method === "POST") {
+      assertWritableSession(session);
       const body = parseBody(req);
       const record = sanitize(body, tenantId, user.id);
       const inserted = await sbInsert("crm_activities", record);
@@ -45,6 +47,7 @@ module.exports = async function handler(req, res) {
     }
 
     if (req.method === "PATCH") {
+      assertWritableSession(session);
       if (!id) return json(res, 400, { error: "id is required" });
       const body = parseBody(req);
       const patch = sanitize(body, null, null);
@@ -57,6 +60,7 @@ module.exports = async function handler(req, res) {
     }
 
     if (req.method === "DELETE") {
+      assertWritableSession(session);
       if (!id) return json(res, 400, { error: "id is required" });
       await sbDelete("crm_activities", { tenant_id: `eq.${tenantId}`, id: `eq.${id}` });
       return json(res, 200, { ok: true });
