@@ -26,13 +26,17 @@
     </header>
 
     <main class="app-main">
+      <div id="read-only-banner" class="demo-banner" hidden>
+        You are viewing the public demo. Click contacts, jobs, and activity items to explore how the pool-service workflow is set up. Editing is disabled.
+      </div>
+
       <section id="view-dashboard" class="view">
         <h1>Dashboard</h1>
         <div class="stat-grid">
-          <div class="stat"><span class="stat-label">Contacts</span><span id="stat-contacts" class="stat-value">—</span></div>
-          <div class="stat"><span class="stat-label">Open deals</span><span id="stat-open" class="stat-value">—</span></div>
-          <div class="stat"><span class="stat-label">Pipeline value</span><span id="stat-value" class="stat-value">—</span></div>
-          <div class="stat"><span class="stat-label">Won this month</span><span id="stat-won" class="stat-value">—</span></div>
+          <div class="stat"><span class="stat-label">Contacts</span><span id="stat-contacts" class="stat-value">-</span></div>
+          <div class="stat"><span class="stat-label">Open deals</span><span id="stat-open" class="stat-value">-</span></div>
+          <div class="stat"><span class="stat-label">Pipeline value</span><span id="stat-value" class="stat-value">-</span></div>
+          <div class="stat"><span class="stat-label">Won this month</span><span id="stat-won" class="stat-value">-</span></div>
         </div>
         <h2>Recent activity</h2>
         <ul id="recent-activities" class="timeline"></ul>
@@ -42,7 +46,7 @@
         <div class="view-header">
           <h1>Contacts</h1>
           <div class="view-actions">
-            <input id="contact-search" type="search" placeholder="Search contacts…" />
+            <input id="contact-search" type="search" placeholder="Search contacts..." />
             <button id="new-contact-btn" class="primary-btn">New contact</button>
           </div>
         </div>

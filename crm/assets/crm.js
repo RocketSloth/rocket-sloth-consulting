@@ -201,13 +201,17 @@
     return state.session && state.session.demo === true && demoStore !== null;
   }
 
-  function getSession() {
+  function runSessionMigrationGuard() {
     try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      return raw ? JSON.parse(raw) : null;
-    } catch {
-      return null;
-    }
+      if (!localStorage.getItem(MIGRATION_FLAG_KEY)) {
+        localStorage.removeItem(STORAGE_KEY);
+        localStorage.setItem(MIGRATION_FLAG_KEY, "1");
+      }
+    } catch {}
+  }
+
+  function getSession() {
+    return state.session;
   }
 
   function setSession(data) {
@@ -218,7 +222,29 @@
   }
 
   function clearSession() {
-    localStorage.removeItem(STORAGE_KEY);
+    state.session = null;
+    try { localStorage.removeItem(STORAGE_KEY); } catch {}
+  }
+
+  function normalizeTenant(value) {
+    return String(value || "").trim().toLowerCase();
+  }
+
+  function getRouteContext() {
+    const params = new URLSearchParams(window.location.search);
+    const requestedTenant = normalizeTenant(params.get("tenant"));
+    return {
+      requestedTenant,
+      wantsPublicDemo: params.get("public") === "1" && requestedTenant === PUBLIC_DEMO_TENANT
+    };
+  }
+
+  function isReadOnlyUser(user) {
+    return READ_ONLY_ROLES.has(String((user && user.role) || "").trim().toLowerCase());
+  }
+
+  function isReadOnlySession() {
+    return isReadOnlyUser(state.session && state.session.user);
   }
 
   function getLastTenant() {
@@ -226,18 +252,15 @@
   }
 
   async function api(path, options = {}) {
-    const session = getSession();
     const headers = Object.assign(
       { "Content-Type": "application/json" },
       options.headers || {}
     );
-    if (session && session.token) {
-      headers.Authorization = `Bearer ${session.token}`;
-    }
     const response = await fetch(path, {
       method: options.method || "GET",
       headers,
-      body: options.body ? JSON.stringify(options.body) : undefined
+      body: options.body ? JSON.stringify(options.body) : undefined,
+      credentials: "same-origin"
     });
     const text = await response.text();
     let data = null;
@@ -265,6 +288,172 @@
     } catch {
       return `${currency || "USD"} ${amount || 0}`;
     }
+  }
+
+  function formatDate(value) {
+    if (!value) return "-";
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return String(value);
+    return date.toLocaleDateString(undefined, {
+      month: "short",
+      day: "numeric",
+      year: "numeric"
+    });
+  }
+
+  function formatDateTime(value) {
+    if (!value) return "-";
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return String(value);
+    return date.toLocaleString(undefined, {
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit"
+    });
+  }
+
+  function getTenantConfig() {
+    return (state.session && state.session.tenant && state.session.tenant.config) || {};
+  }
+
+  function getContactName(contact) {
+    if (!contact) return "Unknown contact";
+    return [contact.first_name, contact.last_name].filter(Boolean).join(" ") || contact.email || "Unnamed";
+  }
+
+  function getContactById(id) {
+    return state.contacts.find((contact) => contact.id === id) || null;
+  }
+
+  function getDealById(id) {
+    return state.deals.find((deal) => deal.id === id) || null;
+  }
+
+  function getCustomFieldDefs(kind) {
+    const config = getTenantConfig();
+    return (config.customFields && config.customFields[kind]) || [];
+  }
+
+  function getCustomFieldValue(record, fieldId) {
+    return record && record.custom_fields ? record.custom_fields[fieldId] : "";
+  }
+
+  function renderCustomFieldInputs(fields, values, disabledAttr) {
+    return fields.map((field) => {
+      const value = values && values[field.id] ? values[field.id] : "";
+      return `<label>${escapeHtml(field.label)}<input data-custom="${escapeAttr(field.id)}" value="${escapeAttr(value)}" ${disabledAttr}/></label>`;
+    }).join("");
+  }
+
+  function renderDetailSection(title, items) {
+    const safeItems = items.filter((item) => item && item.label);
+    if (!safeItems.length) return "";
+    return `
+      <section class="modal-section">
+        <h3>${escapeHtml(title)}</h3>
+        <div class="detail-grid">
+          ${safeItems.map((item) => `
+            <div class="detail-card">
+              <span class="detail-label">${escapeHtml(item.label)}</span>
+              <strong class="detail-value">${escapeHtml(item.value || "-")}</strong>
+            </div>
+          `).join("")}
+        </div>
+      </section>
+    `;
+  }
+
+  function renderActivityFeed(activities, emptyMessage) {
+    if (!activities.length) {
+      return `
+        <section class="modal-section">
+          <h3>Recent activity</h3>
+          <p class="section-empty">${escapeHtml(emptyMessage)}</p>
+        </section>
+      `;
+    }
+
+    return `
+      <section class="modal-section">
+        <h3>Recent activity</h3>
+        <ul class="timeline compact">
+          ${activities.map((activity) => `
+            <li>
+              <div class="t-head">
+                <span>${escapeHtml(activity.type || "note")}</span>
+                <span>${escapeHtml(formatDateTime(activity.created_at))}</span>
+              </div>
+              <div class="t-subject">${escapeHtml(activity.subject || "(no subject)")}</div>
+              <div class="t-body">${escapeHtml(activity.body || "")}</div>
+            </li>
+          `).join("")}
+        </ul>
+      </section>
+    `;
+  }
+
+  function renderRelatedDeals(deals, title) {
+    if (!deals.length) return "";
+    return `
+      <section class="modal-section">
+        <h3>${escapeHtml(title)}</h3>
+        <div class="linked-list">
+          ${deals.map((deal) => `
+            <button type="button" class="linked-item" data-open-deal-id="${escapeAttr(deal.id)}">
+              <span class="linked-main">${escapeHtml(deal.title)}</span>
+              <span class="linked-meta">${escapeHtml(formatMoney(deal.amount, deal.currency))} / ${escapeHtml(deal.stage || "-")}</span>
+            </button>
+          `).join("")}
+        </div>
+      </section>
+    `;
+  }
+
+  function renderLinkedContact(contact) {
+    if (!contact) return "";
+    return `
+      <section class="modal-section">
+        <div class="section-head-inline">
+          <h3>Linked contact</h3>
+          <button type="button" class="link-btn" data-open-contact-id="${escapeAttr(contact.id)}">Open contact</button>
+        </div>
+        <div class="detail-grid">
+          <div class="detail-card">
+            <span class="detail-label">Name</span>
+            <strong class="detail-value">${escapeHtml(getContactName(contact))}</strong>
+          </div>
+          <div class="detail-card">
+            <span class="detail-label">Company</span>
+            <strong class="detail-value">${escapeHtml(contact.company || "-")}</strong>
+          </div>
+          <div class="detail-card">
+            <span class="detail-label">Phone</span>
+            <strong class="detail-value">${escapeHtml(contact.phone || "-")}</strong>
+          </div>
+          <div class="detail-card">
+            <span class="detail-label">Service plan</span>
+            <strong class="detail-value">${escapeHtml(getCustomFieldValue(contact, "service_plan") || "-")}</strong>
+          </div>
+        </div>
+      </section>
+    `;
+  }
+
+  function wireLinkedRecordButtons(modal) {
+    modal.querySelectorAll("[data-open-contact-id]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const contact = getContactById(button.dataset.openContactId);
+        if (contact) openContactModal(contact);
+      });
+    });
+
+    modal.querySelectorAll("[data-open-deal-id]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const deal = getDealById(button.dataset.openDealId);
+        if (deal) openDealModal(deal);
+      });
+    });
   }
 
   function applyBranding(config) {
@@ -419,6 +608,21 @@
         pwError.hidden = false;
       }
     });
+
+    if (demoButton) {
+      demoButton.addEventListener("click", async () => {
+        errorEl.hidden = true;
+        demoButton.disabled = true;
+        try {
+          await createPublicDemoSession();
+          window.location.href = demoHref;
+        } catch (err) {
+          errorEl.textContent = err.message;
+          errorEl.hidden = false;
+          demoButton.disabled = false;
+        }
+      });
+    }
   }
 
   // ---------- Auth page (magic link token exchange) ----------
@@ -467,7 +671,6 @@
       window.location.href = "/crm/login";
       return;
     }
-    state.session = session;
 
     // Restore in-memory demo store if returning to the CRM in demo mode.
     if (session.demo && !demoStore) {
@@ -496,7 +699,7 @@
         try { await api("/api/crm/me", { method: "DELETE" }); } catch (ignored) {}
       }
       clearSession();
-      window.location.href = "/crm/login";
+      window.location.href = routeContext.wantsPublicDemo ? "/" : "/crm/login";
     });
 
     document.getElementById("new-contact-btn").addEventListener("click", function () { openContactModal(); });
@@ -709,7 +912,8 @@
         card.addEventListener("click", function () { openDealModal(d); });
         col.appendChild(card);
       });
-      board.appendChild(col);
+
+      board.appendChild(column);
     });
   }
 
@@ -915,6 +1119,8 @@
         }
       });
     });
+
+    wireLinkedRecordButtons(modal);
   }
 
   function closeModal() {
@@ -930,7 +1136,7 @@
       if (el.type === "number") {
         result[el.name] = el.value === "" ? null : Number(el.value);
       } else {
-        result[el.name] = el.value;
+        result[element.name] = element.value;
       }
     });
     modal.querySelectorAll("[data-custom]").forEach(function (el) {

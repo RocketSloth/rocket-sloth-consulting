@@ -66,6 +66,18 @@ html, body {
 .auth-form button:hover, .primary-btn:hover { filter: brightness(1.05); }
 .auth-form button:disabled { opacity: 0.6; cursor: not-allowed; }
 
+.secondary-btn {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--border);
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.secondary-btn:hover { background: var(--bg); }
+
 .auth-error { color: var(--danger); font-size: 13px; margin: 4px 0 0; }
 .auth-status { color: var(--success); font-size: 13px; margin: 4px 0 0; font-weight: 600; }
 .auth-toggle { margin-top: 12px; font-size: 13px; text-align: center; }
@@ -150,6 +162,16 @@ html, body {
 
 .view { max-width: 1200px; margin: 0 auto; }
 .view h1 { margin: 0 0 20px; font-size: 24px; }
+.demo-banner {
+  max-width: 1200px;
+  margin: 0 auto 16px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid #fed7aa;
+  background: #fff7ed;
+  color: #9a3412;
+  font-size: 14px;
+}
 .view-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px; }
 .view-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 .view-actions input[type="search"] {
@@ -183,6 +205,7 @@ html, body {
 .deal-card { background: var(--bg); padding: 10px 12px; border-radius: 8px; font-size: 13px; cursor: pointer; }
 .deal-card:hover { background: #eef0f7; }
 .deal-card .deal-title { font-weight: 600; }
+.deal-card .deal-meta { color: var(--muted); font-size: 12px; margin-top: 4px; line-height: 1.4; }
 .deal-card .deal-amount { color: var(--muted); font-size: 12px; margin-top: 2px; }
 
 /* ---------- Timeline ---------- */
@@ -191,6 +214,8 @@ html, body {
 .timeline li { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
 .timeline .t-head { display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); margin-bottom: 4px; }
 .timeline .t-subject { font-weight: 600; }
+.timeline .t-meta { color: var(--muted); font-size: 12px; margin-bottom: 6px; }
+.timeline.compact li { background: #fafbfc; }
 
 /* ---------- Modal ---------- */
 

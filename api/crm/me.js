@@ -1,6 +1,6 @@
 const { json, handleError, methodGuard } = require("../_lib/http");
 const { sbSelect } = require("../_lib/supabase");
-const { requireSession, destroySession } = require("../_lib/auth");
+const { requireSession, destroySession, clearSessionCookie } = require("../_lib/auth");
 
 module.exports = async function handler(req, res) {
   if (!methodGuard(req, res, ["GET", "DELETE"])) return;
@@ -9,6 +9,7 @@ module.exports = async function handler(req, res) {
 
     if (req.method === "DELETE") {
       await destroySession(token);
+      clearSessionCookie(res);
       return json(res, 200, { ok: true });
     }
 

@@ -1,6 +1,6 @@
 const { parseBody, json, handleError, methodGuard } = require("../_lib/http");
 const { sbSelect, sbInsert, sbUpdate, sbDelete } = require("../_lib/supabase");
-const { requireSession } = require("../_lib/auth");
+const { assertWritableSession, requireSession } = require("../_lib/auth");
 
 function sanitize(body, tenantId) {
   const out = {};
@@ -20,10 +20,25 @@ function sanitize(body, tenantId) {
   return out;
 }
 
+const SEARCH_QUERY_MAX_LENGTH = 80;
+
+function normalizeSearchQuery(value) {
+  const source = Array.isArray(value) ? value[0] : value;
+  return String(source || "").trim().slice(0, SEARCH_QUERY_MAX_LENGTH);
+}
+
+function escapePostgrestLikePattern(value) {
+  // PostgREST OR filters parse commas/parentheses as grammar tokens, and LIKE/ILIKE
+  // treats wildcard/meta characters specially. Escaping here prevents user input from
+  // breaking the expression or widening the query in unexpected ways.
+  return String(value).replace(/[\\"(),*%_]/g, "\\$&");
+}
+
 module.exports = async function handler(req, res) {
   if (!methodGuard(req, res, ["GET", "POST", "PATCH", "DELETE"])) return;
   try {
-    const { tenantId } = await requireSession(req);
+    const session = await requireSession(req);
+    const { tenantId } = session;
     const id = (req.query && req.query.id) || null;
 
     if (req.method === "GET") {
@@ -46,13 +61,25 @@ module.exports = async function handler(req, res) {
         limit: "200"
       };
       if (search) {
-        query.or = `(first_name.ilike.*${search}*,last_name.ilike.*${search}*,email.ilike.*${search}*,company.ilike.*${search}*)`;
+        const escapedSearch = escapePostgrestLikePattern(search);
+        const safeLikePattern = `"*${escapedSearch}*"`;
+        // Do not directly interpolate req.query.q into `or=(...)`: unescaped values can
+        // inject extra filter clauses because PostgREST parses the full expression string.
+        query.or = `(
+          first_name.ilike.${safeLikePattern},
+          last_name.ilike.${safeLikePattern},
+          email.ilike.${safeLikePattern},
+          company.ilike.${safeLikePattern}
+        )`.replace(/\s+/g, "");
+        // If escaping semantics become hard to reason about, prefer a DB RPC endpoint
+        // (or another server-side query path) instead of string-building `or` filters.
       }
       const rows = await sbSelect("crm_contacts", query);
       return json(res, 200, { contacts: rows });
     }
 
     if (req.method === "POST") {
+      assertWritableSession(session);
       const body = parseBody(req);
       const record = sanitize(body, tenantId);
       const inserted = await sbInsert("crm_contacts", record);
@@ -60,6 +87,7 @@ module.exports = async function handler(req, res) {
     }
 
     if (req.method === "PATCH") {
+      assertWritableSession(session);
       if (!id) return json(res, 400, { error: "id is required" });
       const body = parseBody(req);
       const patch = sanitize(body, null);
@@ -73,6 +101,7 @@ module.exports = async function handler(req, res) {
     }
 
     if (req.method === "DELETE") {
+      assertWritableSession(session);
       if (!id) return json(res, 400, { error: "id is required" });
       await sbDelete("crm_contacts", { tenant_id: `eq.${tenantId}`, id: `eq.${id}` });
       return json(res, 200, { ok: true });

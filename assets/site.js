@@ -107,6 +107,7 @@
   forms.forEach(function (form) {
     const button = form.querySelector("[data-submit-button]");
     const originalLabel = button ? button.textContent : "";
+    const redirectTarget = form.dataset.redirect || "/thank-you";
 
     form.addEventListener("submit", async function (event) {
       event.preventDefault();
@@ -116,11 +117,12 @@
       }
 
       const rawEntries = Object.fromEntries(new FormData(form).entries());
+      const interestMessage = String(rawEntries.message || rawEntries.interest || "").trim();
       const payload = {
         name: String(rawEntries.name || "").trim(),
         email: String(rawEntries.email || "").trim(),
-        company: String(rawEntries.company || "").trim() || "Future AI News",
-        interest: String(rawEntries.interest || "").trim() || "Future AI News signup"
+        company: String(rawEntries.company || "").trim() || "Discovery call lead",
+        interest: interestMessage || "Workflow assessment request"
       };
 
       if (button) {
@@ -148,8 +150,27 @@
           throw new Error(data.error || "Something went wrong. Please try again.");
         }
 
+        if (form.dataset.demoAccess === "1") {
+          const demoResponse = await fetch("/api/crm/demo-view", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Accept": "application/json"
+            },
+            body: JSON.stringify({ email: payload.email })
+          });
+
+          const demoData = await demoResponse.json().catch(function () { return {}; });
+          if (!demoResponse.ok) {
+            throw new Error(demoData.error || "Unable to open demo right now. Please try again.");
+          }
+
+          window.location.href = demoData.redirectTo || "/crm";
+          return;
+        }
+
         setStatus(form, "You are in. Redirecting...", "success");
-        window.location.href = "/thank-you";
+        window.location.href = redirectTarget;
       } catch (error) {
         setStatus(form, error.message || "Something went wrong. Please try again.", "error");
 
