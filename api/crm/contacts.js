@@ -36,7 +36,9 @@ module.exports = async function handler(req, res) {
         if (!rows[0]) return json(res, 404, { error: "Not found" });
         return json(res, 200, rows[0]);
       }
-      const search = (req.query && req.query.q) || "";
+      const rawSearch = (req.query && req.query.q) || "";
+      // Sanitize: strip PostgREST filter metacharacters to prevent injection.
+      const search = rawSearch.replace(/[(),.*\\]/g, "").slice(0, 100);
       const query = {
         tenant_id: `eq.${tenantId}`,
         select: "*",

@@ -77,6 +77,15 @@ async function requireSession(req) {
     err.status = 401;
     throw err;
   }
+  // Re-check tenant is still active on every request.
+  const tenants = await sbSelect("crm_tenants", { id: `eq.${user.tenant_id}`, select: "id,status" });
+  const tenant = tenants && tenants[0];
+  if (!tenant || tenant.status !== "active") {
+    await sbDelete("crm_sessions", { token: `eq.${token}` });
+    const err = new Error("Workspace is no longer active");
+    err.status = 401;
+    throw err;
+  }
   return { token, user, tenantId: user.tenant_id };
 }
 

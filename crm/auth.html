@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Signing in…</title>
+    <link rel="stylesheet" href="/crm/assets/crm.css" />
+  </head>
+  <body class="auth-body">
+    <main class="auth-card" style="text-align:center;">
+      <h1 id="auth-title">Signing in…</h1>
+      <p class="auth-sub" id="auth-status">Verifying your link, one moment.</p>
+      <p id="auth-error" class="auth-error" hidden></p>
+    </main>
+    <script src="/crm/assets/crm.js"></script>
+    <script>
+      CRM.initAuth();
+    </script>
+  </body>
+</html>
