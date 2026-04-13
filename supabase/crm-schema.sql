@@ -26,7 +26,7 @@ create table if not exists public.crm_users (
   email text not null,
   full_name text not null default '',
   role text not null default 'member',
-  password_hash text not null,
+  password_hash text not null default '',
   last_login_at timestamptz,
   created_at timestamptz not null default timezone('utc', now()),
   unique (tenant_id, email)
@@ -44,6 +44,19 @@ create table if not exists public.crm_sessions (
 );
 
 create index if not exists crm_sessions_user_idx on public.crm_sessions (user_id);
+create index if not exists crm_sessions_expires_at_idx on public.crm_sessions (expires_at);
+
+-- Magic-link tokens (passwordless login)
+create table if not exists public.crm_magic_links (
+  token text primary key,
+  tenant_id uuid not null references public.crm_tenants(id) on delete cascade,
+  user_id uuid not null references public.crm_users(id) on delete cascade,
+  expires_at timestamptz not null,
+  used_at timestamptz,
+  created_at timestamptz not null default timezone('utc', now())
+);
+
+create index if not exists crm_magic_links_user_idx on public.crm_magic_links (user_id);
 
 -- Contacts (people / leads)
 create table if not exists public.crm_contacts (
@@ -104,3 +117,4 @@ create table if not exists public.crm_activities (
 create index if not exists crm_activities_tenant_idx on public.crm_activities (tenant_id);
 create index if not exists crm_activities_contact_idx on public.crm_activities (contact_id);
 create index if not exists crm_activities_deal_idx on public.crm_activities (deal_id);
+create index if not exists crm_activities_created_idx on public.crm_activities (tenant_id, created_at desc);

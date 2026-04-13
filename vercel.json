@@ -3,7 +3,9 @@
   "cleanUrls": true,
   "rewrites": [
     { "source": "/crm", "destination": "/crm/index.html" },
-    { "source": "/crm/login", "destination": "/crm/login.html" }
+    { "source": "/crm/login", "destination": "/crm/login.html" },
+    { "source": "/crm/auth", "destination": "/crm/auth.html" },
+    { "source": "/crm/t/:slug", "destination": "/crm/login.html" }
   ],
   "headers": [
     {

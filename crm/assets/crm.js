@@ -1,19 +1,205 @@
 // Rocket Sloth CRM frontend.
-// Single global `CRM` object exposing initLogin() and initApp().
+// Single global `CRM` object exposing initLogin(), initAuth(), and initApp().
 // Reads the tenant config object (stored alongside the session) to
 // drive branding, pipeline stages, and contact statuses per customer.
 
 (function () {
   const STORAGE_KEY = "rs_crm_session";
-  const MIGRATION_FLAG_KEY = "rs_crm_cookie_auth_migrated_v1";
-  const PUBLIC_DEMO_TENANT = "demo";
-  const READ_ONLY_ROLES = new Set(["viewer", "demo_viewer"]);
-  const state = {
-    session: null,
-    contacts: [],
-    deals: [],
-    activities: []
+  const TENANT_KEY = "rs_crm_last_tenant";
+
+  // ---------- Client-side demo mode ----------
+  // When the backend isn't configured, the demo runs entirely in the browser
+  // with mock data. All CRUD operations work against in-memory arrays.
+
+  var demoIdCounter = 100;
+  function demoId() { return "demo-" + (++demoIdCounter); }
+
+  var DEMO_CONFIG = {
+    branding: { productName: "Rocket Sloth CRM", accentColor: "#4f46e5", logoUrl: "" },
+    pipeline: {
+      stages: [
+        { id: "new", label: "New", probability: 10 },
+        { id: "qualified", label: "Qualified", probability: 25 },
+        { id: "proposal", label: "Proposal", probability: 50 },
+        { id: "negotiation", label: "Negotiation", probability: 75 },
+        { id: "won", label: "Won", probability: 100 },
+        { id: "lost", label: "Lost", probability: 0 }
+      ]
+    },
+    contactStatuses: ["lead", "customer", "partner", "archived"],
+    customFields: { contact: [], deal: [] },
+    modules: { contacts: true, deals: true, activities: true }
   };
+
+  function buildDemoData() {
+    var now = new Date();
+    var day = 86400000;
+
+    var contacts = [
+      { id: demoId(), first_name: "Sarah", last_name: "Chen", email: "sarah@techvault.io", phone: "(415) 555-0101", company: "TechVault", title: "VP Engineering", status: "customer", custom_fields: {}, created_at: new Date(now - 30 * day).toISOString() },
+      { id: demoId(), first_name: "Marcus", last_name: "Rivera", email: "marcus@greenleaf.co", phone: "(512) 555-0202", company: "GreenLeaf Analytics", title: "CEO", status: "customer", custom_fields: {}, created_at: new Date(now - 28 * day).toISOString() },
+      { id: demoId(), first_name: "Priya", last_name: "Patel", email: "priya@novahealth.com", phone: "(646) 555-0303", company: "NovaHealth", title: "Director of Data", status: "lead", custom_fields: {}, created_at: new Date(now - 25 * day).toISOString() },
+      { id: demoId(), first_name: "James", last_name: "O'Brien", email: "james@coastalmfg.com", phone: "(619) 555-0404", company: "Coastal Manufacturing", title: "COO", status: "lead", custom_fields: {}, created_at: new Date(now - 22 * day).toISOString() },
+      { id: demoId(), first_name: "Aisha", last_name: "Williams", email: "aisha@brightedu.org", phone: "(312) 555-0505", company: "BrightPath Education", title: "Head of IT", status: "prospect", custom_fields: {}, created_at: new Date(now - 20 * day).toISOString() },
+      { id: demoId(), first_name: "Erik", last_name: "Johansson", email: "erik@nordicfin.se", phone: "+46 70 555 0606", company: "Nordic Finance Group", title: "CTO", status: "customer", custom_fields: {}, created_at: new Date(now - 18 * day).toISOString() },
+      { id: demoId(), first_name: "Maria", last_name: "Santos", email: "maria@solarbright.com", phone: "(305) 555-0707", company: "SolarBright Energy", title: "VP Operations", status: "lead", custom_fields: {}, created_at: new Date(now - 15 * day).toISOString() },
+      { id: demoId(), first_name: "David", last_name: "Kim", email: "david@apexlogistics.com", phone: "(213) 555-0808", company: "Apex Logistics", title: "Director of Strategy", status: "lead", custom_fields: {}, created_at: new Date(now - 12 * day).toISOString() },
+      { id: demoId(), first_name: "Lauren", last_name: "Mitchell", email: "lauren@crestview.io", phone: "(617) 555-0909", company: "Crestview Software", title: "Product Manager", status: "customer", custom_fields: {}, created_at: new Date(now - 10 * day).toISOString() },
+      { id: demoId(), first_name: "Raj", last_name: "Gupta", email: "raj@quantumleap.ai", phone: "(408) 555-1010", company: "QuantumLeap AI", title: "Founder", status: "lead", custom_fields: {}, created_at: new Date(now - 8 * day).toISOString() },
+      { id: demoId(), first_name: "Nina", last_name: "Volkov", email: "nina@stratoscloud.com", phone: "(720) 555-1111", company: "Stratos Cloud", title: "VP Sales", status: "prospect", custom_fields: {}, created_at: new Date(now - 5 * day).toISOString() },
+      { id: demoId(), first_name: "Tom", last_name: "Fischer", email: "tom@blueridgehvac.com", phone: "(704) 555-1212", company: "BlueRidge HVAC", title: "Owner", status: "archived", custom_fields: {}, created_at: new Date(now - 45 * day).toISOString() }
+    ];
+
+    var deals = [
+      { id: demoId(), title: "TechVault BI Dashboard", contact_id: contacts[0].id, stage: "won", amount: 48000, currency: "USD", expected_close_date: new Date(now - 5 * day).toISOString().slice(0, 10), created_at: new Date(now - 25 * day).toISOString(), updated_at: new Date(now - 2 * day).toISOString() },
+      { id: demoId(), title: "GreenLeaf Data Pipeline", contact_id: contacts[1].id, stage: "negotiation", amount: 72000, currency: "USD", expected_close_date: new Date(now + 14 * day).toISOString().slice(0, 10), created_at: new Date(now - 20 * day).toISOString(), updated_at: new Date(now - 1 * day).toISOString() },
+      { id: demoId(), title: "NovaHealth AI Integration", contact_id: contacts[2].id, stage: "proposal", amount: 95000, currency: "USD", expected_close_date: new Date(now + 30 * day).toISOString().slice(0, 10), created_at: new Date(now - 18 * day).toISOString(), updated_at: new Date(now - 3 * day).toISOString() },
+      { id: demoId(), title: "Coastal Mfg Inventory System", contact_id: contacts[3].id, stage: "qualified", amount: 35000, currency: "USD", expected_close_date: new Date(now + 45 * day).toISOString().slice(0, 10), created_at: new Date(now - 15 * day).toISOString(), updated_at: new Date(now - 4 * day).toISOString() },
+      { id: demoId(), title: "BrightPath LMS Analytics", contact_id: contacts[4].id, stage: "new", amount: 28000, currency: "USD", expected_close_date: new Date(now + 60 * day).toISOString().slice(0, 10), created_at: new Date(now - 10 * day).toISOString(), updated_at: new Date(now - 5 * day).toISOString() },
+      { id: demoId(), title: "Nordic Finance Compliance Tool", contact_id: contacts[5].id, stage: "proposal", amount: 110000, currency: "USD", expected_close_date: new Date(now + 20 * day).toISOString().slice(0, 10), created_at: new Date(now - 22 * day).toISOString(), updated_at: new Date(now - 2 * day).toISOString() },
+      { id: demoId(), title: "SolarBright Reporting Suite", contact_id: contacts[6].id, stage: "new", amount: 42000, currency: "USD", expected_close_date: new Date(now + 50 * day).toISOString().slice(0, 10), created_at: new Date(now - 8 * day).toISOString(), updated_at: new Date(now - 6 * day).toISOString() },
+      { id: demoId(), title: "Apex Route Optimization AI", contact_id: contacts[7].id, stage: "qualified", amount: 65000, currency: "USD", expected_close_date: new Date(now + 35 * day).toISOString().slice(0, 10), created_at: new Date(now - 12 * day).toISOString(), updated_at: new Date(now - 3 * day).toISOString() },
+      { id: demoId(), title: "Crestview CRM Customization", contact_id: contacts[8].id, stage: "won", amount: 18000, currency: "USD", expected_close_date: new Date(now - 10 * day).toISOString().slice(0, 10), created_at: new Date(now - 30 * day).toISOString(), updated_at: new Date(now - 8 * day).toISOString() },
+      { id: demoId(), title: "QuantumLeap ML Platform", contact_id: contacts[9].id, stage: "negotiation", amount: 150000, currency: "USD", expected_close_date: new Date(now + 10 * day).toISOString().slice(0, 10), created_at: new Date(now - 14 * day).toISOString(), updated_at: new Date(now - 1 * day).toISOString() },
+      { id: demoId(), title: "BlueRidge Legacy Migration", contact_id: contacts[11].id, stage: "lost", amount: 22000, currency: "USD", expected_close_date: new Date(now - 20 * day).toISOString().slice(0, 10), created_at: new Date(now - 40 * day).toISOString(), updated_at: new Date(now - 15 * day).toISOString() }
+    ];
+
+    var activities = [
+      { id: demoId(), type: "meeting", contact_id: contacts[1].id, deal_id: deals[1].id, subject: "Contract review with GreenLeaf", body: "Walked through SOW and pricing. They want to start in Q2. Follow up with revised timeline.", created_at: new Date(now - 1 * day).toISOString() },
+      { id: demoId(), type: "call", contact_id: contacts[9].id, deal_id: deals[9].id, subject: "QuantumLeap budget discussion", body: "Raj confirmed budget approval from board. Need to send final proposal by Friday.", created_at: new Date(now - 1.5 * day).toISOString() },
+      { id: demoId(), type: "email", contact_id: contacts[2].id, deal_id: deals[2].id, subject: "NovaHealth proposal sent", body: "Sent the technical proposal for the AI integration project. Includes timeline and team allocation.", created_at: new Date(now - 2 * day).toISOString() },
+      { id: demoId(), type: "note", contact_id: contacts[5].id, deal_id: deals[5].id, subject: "Nordic Finance compliance requirements", body: "They need GDPR and SOC2 compliance documentation before signing. Legal is reviewing.", created_at: new Date(now - 3 * day).toISOString() },
+      { id: demoId(), type: "call", contact_id: contacts[3].id, deal_id: deals[3].id, subject: "Coastal Mfg discovery call", body: "Discussed pain points with current inventory tracking. They're using spreadsheets for everything.", created_at: new Date(now - 4 * day).toISOString() },
+      { id: demoId(), type: "meeting", contact_id: contacts[0].id, deal_id: deals[0].id, subject: "TechVault dashboard launch", body: "Successful launch meeting! Dashboard is live. Sarah's team is thrilled with the real-time metrics.", created_at: new Date(now - 5 * day).toISOString() },
+      { id: demoId(), type: "email", contact_id: contacts[6].id, deal_id: deals[6].id, subject: "SolarBright intro follow-up", body: "Maria responded to our outreach. Interested in automated reporting for their solar farm data.", created_at: new Date(now - 6 * day).toISOString() },
+      { id: demoId(), type: "task", contact_id: contacts[7].id, deal_id: deals[7].id, subject: "Prepare Apex demo environment", body: "Set up sandbox with sample route data for the optimization demo next week.", created_at: new Date(now - 7 * day).toISOString() },
+      { id: demoId(), type: "note", contact_id: contacts[4].id, deal_id: deals[4].id, subject: "BrightPath budget cycle", body: "Aisha mentioned their fiscal year starts July. Timing works well for a summer kickoff.", created_at: new Date(now - 8 * day).toISOString() },
+      { id: demoId(), type: "call", contact_id: contacts[8].id, deal_id: deals[8].id, subject: "Crestview post-launch check-in", body: "Lauren reported positive feedback from her sales team. Considering phase 2 expansion.", created_at: new Date(now - 10 * day).toISOString() }
+    ];
+
+    return { contacts: contacts, deals: deals, activities: activities };
+  }
+
+  // In-memory store for demo mode.
+  var demoStore = null;
+
+  function startDemoMode() {
+    demoStore = buildDemoData();
+    var session = {
+      demo: true,
+      token: "demo-token",
+      user: { id: "demo-user", email: "demo@rocketsloth.space", fullName: "Demo User", role: "owner" },
+      tenant: { id: "demo-tenant", slug: "demo", name: "Demo Company", plan: "starter", config: DEMO_CONFIG }
+    };
+    setSession(session);
+    return session;
+  }
+
+  // Mock API handler for demo mode — intercepts all CRUD calls.
+  function mockApi(path, options) {
+    var method = (options && options.method) || "GET";
+    var body = (options && options.body) || {};
+
+    // --- Contacts ---
+    if (path.indexOf("/api/crm/contacts") === 0) {
+      if (method === "GET") {
+        var qMatch = path.match(/[?&]q=([^&]*)/);
+        var search = qMatch ? decodeURIComponent(qMatch[1]).toLowerCase() : "";
+        var filtered = demoStore.contacts;
+        if (search) {
+          filtered = demoStore.contacts.filter(function (c) {
+            return (c.first_name + " " + c.last_name + " " + c.email + " " + c.company).toLowerCase().indexOf(search) !== -1;
+          });
+        }
+        return { contacts: filtered };
+      }
+      if (method === "POST") {
+        var newContact = Object.assign({ id: demoId(), status: "lead", custom_fields: {}, created_at: new Date().toISOString() }, body);
+        demoStore.contacts.push(newContact);
+        return { contact: newContact };
+      }
+      var idMatch = path.match(/[?&]id=([^&]*)/);
+      var cid = idMatch ? idMatch[1] : null;
+      if (method === "PATCH" && cid) {
+        demoStore.contacts = demoStore.contacts.map(function (c) {
+          return c.id === cid ? Object.assign({}, c, body) : c;
+        });
+        return { ok: true };
+      }
+      if (method === "DELETE" && cid) {
+        demoStore.contacts = demoStore.contacts.filter(function (c) { return c.id !== cid; });
+        return { ok: true };
+      }
+    }
+
+    // --- Deals ---
+    if (path.indexOf("/api/crm/deals") === 0) {
+      if (method === "GET") {
+        return { deals: demoStore.deals };
+      }
+      if (method === "POST") {
+        var newDeal = Object.assign({ id: demoId(), currency: "USD", created_at: new Date().toISOString(), updated_at: new Date().toISOString() }, body);
+        demoStore.deals.push(newDeal);
+        return { deal: newDeal };
+      }
+      var didMatch = path.match(/[?&]id=([^&]*)/);
+      var did = didMatch ? didMatch[1] : null;
+      if (method === "PATCH" && did) {
+        demoStore.deals = demoStore.deals.map(function (d) {
+          return d.id === did ? Object.assign({}, d, body, { updated_at: new Date().toISOString() }) : d;
+        });
+        return { ok: true };
+      }
+      if (method === "DELETE" && did) {
+        demoStore.deals = demoStore.deals.filter(function (d) { return d.id !== did; });
+        return { ok: true };
+      }
+    }
+
+    // --- Activities ---
+    if (path.indexOf("/api/crm/activities") === 0) {
+      if (method === "GET") {
+        return { activities: demoStore.activities };
+      }
+      if (method === "POST") {
+        var newAct = Object.assign({ id: demoId(), created_at: new Date().toISOString() }, body);
+        demoStore.activities.unshift(newAct);
+        return { activity: newAct };
+      }
+    }
+
+    // --- AI Summary ---
+    if (path.indexOf("/api/crm/ai-summary") === 0) {
+      var dealIdMatch = path.match(/[?&]deal_id=([^&]*)/);
+      var dealId = dealIdMatch ? dealIdMatch[1] : null;
+      var deal = demoStore.deals.find(function (d) { return d.id === dealId; });
+      var contact = deal ? demoStore.contacts.find(function (c) { return c.id === deal.contact_id; }) : null;
+      var contactName = contact ? (contact.first_name + " " + contact.last_name) : "the contact";
+      var dealTitle = deal ? deal.title : "this deal";
+      return {
+        stub: true,
+        summary: dealTitle + " is progressing well. " + contactName + " has shown strong interest and engagement throughout the sales process. Key decision-makers are aligned and the technical requirements are well-understood by both teams.",
+        nextActions: [
+          "Schedule a follow-up call with " + contactName + " to discuss timeline",
+          "Prepare a detailed implementation roadmap",
+          "Send case studies from similar projects for reference"
+        ],
+        riskScore: deal && deal.stage === "negotiation" ? 35 : deal && deal.stage === "proposal" ? 45 : 25
+      };
+    }
+
+    // --- Logout (DELETE /api/crm/me) ---
+    if (path.indexOf("/api/crm/me") === 0 && method === "DELETE") {
+      demoStore = null;
+      return { ok: true };
+    }
+
+    return { ok: true };
+  }
+
+  function isDemo() {
+    return state.session && state.session.demo === true && demoStore !== null;
+  }
 
   function runSessionMigrationGuard() {
     try {
@@ -29,7 +215,10 @@
   }
 
   function setSession(data) {
-    state.session = data || null;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    if (data && data.tenant && data.tenant.slug) {
+      localStorage.setItem(TENANT_KEY, data.tenant.slug);
+    }
   }
 
   function clearSession() {
@@ -58,6 +247,10 @@
     return isReadOnlyUser(state.session && state.session.user);
   }
 
+  function getLastTenant() {
+    try { return localStorage.getItem(TENANT_KEY) || ""; } catch { return ""; }
+  }
+
   async function api(path, options = {}) {
     const headers = Object.assign(
       { "Content-Type": "application/json" },
@@ -70,21 +263,15 @@
       credentials: "same-origin"
     });
     const text = await response.text();
-    const contentType = response.headers.get("content-type") || "";
-    const isJson = contentType.toLowerCase().includes("application/json");
-    let data = text;
-    if (text && isJson) {
-      try {
-        data = JSON.parse(text);
-      } catch {
-        data = text;
-      }
-    } else if (!text) {
-      data = null;
-    }
+    let data = null;
+    try { data = text ? JSON.parse(text) : null; } catch { data = null; }
     if (!response.ok) {
-      const fallbackMessage = `Request failed (HTTP ${response.status})`;
-      const err = new Error((data && data.error) || fallbackMessage);
+      if (response.status === 401 && !options.skipAuthRedirect) {
+        clearSession();
+        window.location.href = "/crm/login";
+        return;
+      }
+      const err = new Error((data && data.error) || "Request failed");
       err.status = response.status;
       throw err;
     }
@@ -286,68 +473,139 @@
     }
   }
 
-  async function createPublicDemoSession() {
-    return api("/api/crm/demo-access", {
-      method: "POST",
-      body: { tenant: PUBLIC_DEMO_TENANT }
-    });
-  }
-
-  function applyReadOnlyUi(session) {
-    const readOnly = isReadOnlyUser(session && session.user);
-    document.body.classList.toggle("is-read-only", readOnly);
-
-    const banner = document.getElementById("read-only-banner");
-    if (banner) banner.hidden = !readOnly;
-
-    const newContactBtn = document.getElementById("new-contact-btn");
-    if (newContactBtn) newContactBtn.hidden = readOnly;
-
-    const newDealBtn = document.getElementById("new-deal-btn");
-    if (newDealBtn) newDealBtn.hidden = readOnly;
-
-    const newActivityBtn = document.getElementById("new-activity-btn");
-    if (newActivityBtn) newActivityBtn.hidden = readOnly;
-
-    const logoutBtn = document.getElementById("logout-btn");
-    if (logoutBtn) logoutBtn.textContent = readOnly ? "Exit demo" : "Sign out";
+  // Helper: resolve the tenant slug from URL path or query string.
+  // Supports /crm/t/<slug>, ?tenant=<slug>, or localStorage fallback.
+  function resolveTenant() {
+    const pathMatch = window.location.pathname.match(/^\/crm\/t\/([a-z0-9_-]+)/i);
+    if (pathMatch) return pathMatch[1].toLowerCase();
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("tenant")) return params.get("tenant").toLowerCase();
+    return getLastTenant();
   }
 
   // ---------- Login page ----------
 
   function initLogin() {
-    runSessionMigrationGuard();
-    const form = document.getElementById("login-form");
-    const errorEl = document.getElementById("auth-error");
-    const params = new URLSearchParams(window.location.search);
-    const tenantInput = document.getElementById("tenant");
-    const demoButton = document.getElementById("demo-access-btn");
-    const demoHref = `/crm?tenant=${encodeURIComponent(PUBLIC_DEMO_TENANT)}&public=1`;
+    if (getSession()) {
+      window.location.href = "/crm";
+      return;
+    }
 
-    if (params.get("tenant")) tenantInput.value = params.get("tenant");
+    const tenant = resolveTenant();
+    const isDemo = (tenant === "demo");
+    const magicForm = document.getElementById("magic-form");
+    const pwForm = document.getElementById("password-form");
+    const demoEntry = document.getElementById("demo-entry");
+    const toggle = document.getElementById("toggle-mode");
+    const toggleRow = document.getElementById("toggle-row");
+    const magicError = document.getElementById("magic-error");
+    const magicStatus = document.getElementById("magic-status");
+    const pwError = document.getElementById("pw-error");
 
-    api("/api/crm/me")
-      .then(() => { window.location.href = "/crm"; })
-      .catch(() => {});
+    document.getElementById("tenant").value = tenant;
+    document.getElementById("pw-tenant").value = tenant;
 
-    form.addEventListener("submit", async (e) => {
+    if (isDemo) {
+      // Demo tenant: show one-click entry, hide email form.
+      demoEntry.hidden = false;
+      magicForm.hidden = true;
+      toggleRow.hidden = true;
+
+      document.getElementById("demo-btn").addEventListener("click", async function () {
+        var btn = document.getElementById("demo-btn");
+        var errEl = document.getElementById("demo-error");
+        errEl.hidden = true;
+        btn.disabled = true;
+        btn.textContent = "Loading demo…";
+        try {
+          var result = await api("/api/crm/demo-session", {
+            method: "POST",
+            skipAuthRedirect: true
+          });
+          setSession(result);
+          window.location.href = "/crm";
+        } catch (err) {
+          // Backend not available — fall back to client-side demo mode.
+          startDemoMode();
+          window.location.href = "/crm";
+        }
+      });
+
+      // "I have an account" — switch to magic-link form.
+      document.getElementById("demo-has-account").addEventListener("click", function (e) {
+        e.preventDefault();
+        demoEntry.hidden = true;
+        magicForm.hidden = false;
+        toggleRow.hidden = false;
+      });
+    } else {
+      // Real tenant: show email form directly.
+      magicForm.hidden = false;
+    }
+
+    let showingPassword = false;
+    toggle.addEventListener("click", function (e) {
       e.preventDefault();
-      errorEl.hidden = true;
-      const data = new FormData(form);
+      showingPassword = !showingPassword;
+      magicForm.hidden = showingPassword;
+      pwForm.hidden = !showingPassword;
+      toggle.textContent = showingPassword ? "Use email link instead" : "Use password instead";
+    });
+
+    // Magic-link form
+    magicForm.addEventListener("submit", async function (e) {
+      e.preventDefault();
+      magicError.hidden = true;
+      magicStatus.hidden = true;
+      var btn = document.getElementById("magic-btn");
+      btn.disabled = true;
+      btn.textContent = "Sending…";
       try {
-        const result = await api("/api/crm/login", {
+        var fd = new FormData(magicForm);
+        var result = await api("/api/crm/magic-link", {
           method: "POST",
+          skipAuthRedirect: true,
           body: {
-            tenant: data.get("tenant"),
-            email: data.get("email"),
-            password: data.get("password")
+            tenant: fd.get("tenant") || tenant,
+            email: fd.get("email")
+          }
+        });
+        if (result && result.link) {
+          // Dev mode: Resend not configured, redirect directly.
+          window.location.href = result.link;
+          return;
+        }
+        magicStatus.textContent = "Check your email for a sign-in link.";
+        magicStatus.hidden = false;
+        btn.textContent = "Link sent!";
+      } catch (err) {
+        magicError.textContent = err.message;
+        magicError.hidden = false;
+        btn.disabled = false;
+        btn.textContent = "Send sign-in link";
+      }
+    });
+
+    // Password form (fallback)
+    pwForm.addEventListener("submit", async function (e) {
+      e.preventDefault();
+      pwError.hidden = true;
+      var fd = new FormData(pwForm);
+      try {
+        var result = await api("/api/crm/login", {
+          method: "POST",
+          skipAuthRedirect: true,
+          body: {
+            tenant: fd.get("tenant") || tenant,
+            email: fd.get("email"),
+            password: fd.get("password")
           }
         });
         setSession(result);
         window.location.href = "/crm";
       } catch (err) {
-        errorEl.textContent = err.message;
-        errorEl.hidden = false;
+        pwError.textContent = err.message;
+        pwError.hidden = false;
       }
     });
 
@@ -367,111 +625,148 @@
     }
   }
 
-  // ---------- App shell ----------
+  // ---------- Auth page (magic link token exchange) ----------
 
-  async function initApp() {
-    runSessionMigrationGuard();
-    const routeContext = getRouteContext();
-    let session = getSession();
+  async function initAuth() {
+    var params = new URLSearchParams(window.location.search);
+    var token = params.get("token");
+    var errorEl = document.getElementById("auth-error");
+    var statusEl = document.getElementById("auth-status");
 
-    if (routeContext.wantsPublicDemo) {
-      try {
-        session = await api("/api/crm/me");
-      } catch {}
-
-      if (
-        !session ||
-        normalizeTenant(session.tenant && session.tenant.slug) !== PUBLIC_DEMO_TENANT ||
-        !isReadOnlyUser(session.user)
-      ) {
-        try {
-          session = await createPublicDemoSession();
-        } catch {
-          session = null;
-        }
-      }
-    } else if (!session) {
-      try {
-        session = await api("/api/crm/me");
-      } catch {}
-    }
-
-    if (!session || !session.user || !session.tenant) {
-      clearSession();
-      const tenantQs = routeContext.requestedTenant ? `?tenant=${encodeURIComponent(routeContext.requestedTenant)}` : "";
-      window.location.href = `/crm/login${tenantQs}`;
+    if (!token) {
+      statusEl.textContent = "";
+      errorEl.textContent = "No sign-in token found. Please request a new link.";
+      errorEl.hidden = false;
       return;
     }
 
-    setSession(session);
-    applyBranding(session.tenant && session.tenant.config);
-    applyReadOnlyUi(session);
+    try {
+      var result = await api("/api/crm/magic-verify", {
+        method: "POST",
+        skipAuthRedirect: true,
+        body: { token: token }
+      });
+      setSession(result);
+      window.location.href = "/crm";
+    } catch (err) {
+      statusEl.textContent = "";
+      document.getElementById("auth-title").textContent = "Link expired";
+      errorEl.textContent = err.message || "This link is invalid or has expired. Please request a new one.";
+      errorEl.hidden = false;
+    }
+  }
 
-    const userLabel = document.getElementById("user-label");
-    if (userLabel) {
-      userLabel.textContent = isReadOnlyUser(session.user)
-        ? "Viewing public demo"
-        : (session.user.fullName || session.user.email);
+  // ---------- App shell ----------
+
+  var state = {
+    session: null,
+    contacts: [],
+    deals: [],
+    activities: []
+  };
+
+  function initApp() {
+    var session = getSession();
+    if (!session) {
+      window.location.href = "/crm/login";
+      return;
     }
 
-    document.querySelectorAll(".nav-btn").forEach((btn) => {
-      btn.addEventListener("click", () => switchView(btn.dataset.view));
+    // Restore in-memory demo store if returning to the CRM in demo mode.
+    if (session.demo && !demoStore) {
+      demoStore = buildDemoData();
+    }
+
+    applyBranding(session.tenant && session.tenant.config);
+    var label = (session.user.fullName && session.user.fullName.length > 0)
+      ? session.user.fullName : session.user.email;
+    document.getElementById("user-label").textContent = label;
+
+    // Show "← Home" link only for demo tenant so real customers don't accidentally leave.
+    var homeLink = document.getElementById("home-link");
+    if (homeLink) {
+      homeLink.style.display = (session.tenant && session.tenant.slug === "demo") ? "" : "none";
+    }
+
+    document.querySelectorAll(".nav-btn").forEach(function (btn) {
+      btn.addEventListener("click", function () { switchView(btn.dataset.view); });
     });
 
-    document.getElementById("logout-btn").addEventListener("click", async () => {
-      try { await api("/api/crm/me", { method: "DELETE" }); } catch {}
+    document.getElementById("logout-btn").addEventListener("click", async function () {
+      if (isDemo()) {
+        demoStore = null;
+      } else {
+        try { await api("/api/crm/me", { method: "DELETE" }); } catch (ignored) {}
+      }
       clearSession();
       window.location.href = routeContext.wantsPublicDemo ? "/" : "/crm/login";
     });
 
-    const newContactBtn = document.getElementById("new-contact-btn");
-    if (newContactBtn) newContactBtn.addEventListener("click", () => openContactModal());
+    document.getElementById("new-contact-btn").addEventListener("click", function () { openContactModal(); });
+    document.getElementById("new-deal-btn").addEventListener("click", function () { openDealModal(); });
+    document.getElementById("new-activity-btn").addEventListener("click", function () { openActivityModal(); });
 
-    const newDealBtn = document.getElementById("new-deal-btn");
-    if (newDealBtn) newDealBtn.addEventListener("click", () => openDealModal());
-
-    const newActivityBtn = document.getElementById("new-activity-btn");
-    if (newActivityBtn) newActivityBtn.addEventListener("click", () => openActivityModal());
-
-    const searchInput = document.getElementById("contact-search");
-    let searchTimer;
-    searchInput.addEventListener("input", () => {
+    var searchInput = document.getElementById("contact-search");
+    var searchTimer;
+    searchInput.addEventListener("input", function () {
       clearTimeout(searchTimer);
-      searchTimer = setTimeout(() => loadContacts(searchInput.value), 200);
+      searchTimer = setTimeout(function () { loadContacts(searchInput.value); }, 200);
     });
 
     loadAll();
   }
 
   function switchView(view) {
-    document.querySelectorAll(".nav-btn").forEach((button) => {
-      button.classList.toggle("active", button.dataset.view === view);
+    document.querySelectorAll(".nav-btn").forEach(function (b) {
+      b.classList.toggle("active", b.dataset.view === view);
     });
-    document.querySelectorAll(".view").forEach((panel) => {
-      panel.hidden = panel.id !== `view-${view}`;
+    document.querySelectorAll(".view").forEach(function (v) {
+      v.hidden = v.id !== "view-" + view;
     });
   }
 
   async function loadAll() {
-    await Promise.all([loadContacts(), loadDeals(), loadActivities()]);
+    try {
+      await Promise.all([loadContacts(), loadDeals(), loadActivities()]);
+    } catch (err) {
+      // 401 already handled by api() — ignore load errors silently.
+    }
     renderDashboard();
   }
 
   async function loadContacts(search) {
-    const qs = search ? `?q=${encodeURIComponent(search)}` : "";
-    const data = await api(`/api/crm/contacts${qs}`);
+    var qs = search ? "?q=" + encodeURIComponent(search) : "";
+    var data;
+    if (isDemo()) {
+      data = mockApi("/api/crm/contacts" + qs);
+    } else {
+      data = await api("/api/crm/contacts" + qs);
+    }
+    if (!data) return;
     state.contacts = data.contacts || [];
     renderContacts();
   }
 
   async function loadDeals() {
-    const data = await api("/api/crm/deals");
+    var data;
+    if (isDemo()) {
+      data = mockApi("/api/crm/deals");
+    } else {
+      data = await api("/api/crm/deals");
+    }
+    if (!data) return;
     state.deals = data.deals || [];
     renderPipeline();
   }
 
   async function loadActivities() {
-    const data = await api("/api/crm/activities");
+    var data;
+    if (isDemo()) {
+      data = mockApi("/api/crm/activities");
+    } else {
+      data = await api("/api/crm/activities");
+    }
+    if (!data) return;
     state.activities = data.activities || [];
     renderActivities();
   }
@@ -480,165 +775,142 @@
 
   function renderDashboard() {
     document.getElementById("stat-contacts").textContent = state.contacts.length;
-    const openDeals = state.deals.filter((deal) => deal.stage !== "won" && deal.stage !== "lost");
+    var openDeals = state.deals.filter(function (d) { return d.stage !== "won" && d.stage !== "lost"; });
     document.getElementById("stat-open").textContent = openDeals.length;
-    const total = openDeals.reduce((sum, deal) => sum + Number(deal.amount || 0), 0);
+    var total = openDeals.reduce(function (sum, d) { return sum + Number(d.amount || 0); }, 0);
     document.getElementById("stat-value").textContent = formatMoney(total, openDeals[0] && openDeals[0].currency);
 
-    const now = new Date();
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    const wonThisMonth = state.deals.filter(
-      (deal) => deal.stage === "won" && new Date(deal.updated_at) >= startOfMonth
-    );
-    const wonTotal = wonThisMonth.reduce((sum, deal) => sum + Number(deal.amount || 0), 0);
+    var now = new Date();
+    var startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    var wonThisMonth = state.deals.filter(function (d) {
+      return d.stage === "won" && new Date(d.updated_at) >= startOfMonth;
+    });
+    var wonTotal = wonThisMonth.reduce(function (sum, d) { return sum + Number(d.amount || 0); }, 0);
     document.getElementById("stat-won").textContent = formatMoney(wonTotal);
 
-    const recent = state.activities
-      .slice()
-      .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-      .slice(0, 10);
-
-    const list = document.getElementById("recent-activities");
+    var recent = state.activities.slice(0, 10);
+    var list = document.getElementById("recent-activities");
     list.innerHTML = "";
     if (recent.length === 0) {
       list.innerHTML = '<li class="empty">No activity yet.</li>';
       return;
     }
-    recent.forEach((activity) => list.appendChild(renderActivityItem(activity)));
+    recent.forEach(function (a) { list.appendChild(renderActivityItem(a)); });
   }
 
   // ---------- Contacts ----------
 
   function renderContacts() {
-    const tbody = document.getElementById("contacts-tbody");
-    const readOnly = isReadOnlySession();
+    var tbody = document.getElementById("contacts-tbody");
     tbody.innerHTML = "";
     if (state.contacts.length === 0) {
       tbody.innerHTML = '<tr><td colspan="5" class="empty">No contacts yet.</td></tr>';
       return;
     }
-
-    state.contacts.forEach((contact) => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td>${escapeHtml(getContactName(contact))}</td>
-        <td>${escapeHtml(contact.email || "")}</td>
-        <td>${escapeHtml(contact.company || "")}</td>
-        <td><span class="status-pill ${escapeHtml(contact.status || "lead")}">${escapeHtml(contact.status || "lead")}</span></td>
-        <td><button class="ghost-btn">${readOnly ? "View" : "Edit"}</button></td>
-      `;
-      tr.addEventListener("click", () => openContactModal(contact));
+    state.contacts.forEach(function (c) {
+      var tr = document.createElement("tr");
+      var name = [c.first_name, c.last_name].filter(Boolean).join(" ") || "\u2014";
+      tr.innerHTML =
+        "<td>" + escapeHtml(name) + "</td>" +
+        "<td>" + escapeHtml(c.email || "") + "</td>" +
+        "<td>" + escapeHtml(c.company || "") + "</td>" +
+        '<td><span class="status-pill ' + escapeHtml(c.status || "lead") + '">' + escapeHtml(c.status || "lead") + "</span></td>" +
+        '<td><button class="ghost-btn">Edit</button></td>';
+      tr.addEventListener("click", function () { openContactModal(c); });
       tbody.appendChild(tr);
     });
   }
 
   function openContactModal(contact) {
-    const statuses = getTenantConfig().contactStatuses || ["lead", "customer", "archived"];
-    const customFields = getCustomFieldDefs("contact");
-    const isEdit = Boolean(contact);
-    const readOnly = isReadOnlySession();
-    const current = contact || {};
+    var config = (state.session.tenant && state.session.tenant.config) || {};
+    var statuses = config.contactStatuses || ["lead", "customer", "archived"];
+    var customFields = (config.customFields && config.customFields.contact) || [];
+    var isEdit = Boolean(contact);
+    var c = contact || {};
 
-    if (readOnly && !isEdit) return;
-
-    const disabledAttr = readOnly ? "disabled" : "";
-    const relatedDeals = state.deals
-      .filter((deal) => deal.contact_id === current.id)
-      .sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at))
-      .slice(0, 5);
-    const relatedActivities = state.activities
-      .filter((activity) => activity.contact_id === current.id)
-      .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-      .slice(0, 5);
-    const contactDetails = isEdit ? renderDetailSection("Service snapshot", [
-      { label: "Phone", value: current.phone || "-" },
-      { label: "Address", value: getCustomFieldValue(current, "service_address") || "-" },
-      { label: "Pool type", value: getCustomFieldValue(current, "pool_type") || "-" },
-      { label: "Route day", value: getCustomFieldValue(current, "route_day") || "-" },
-      { label: "Service plan", value: getCustomFieldValue(current, "service_plan") || "-" }
-    ]) : "";
-
-    openModal(`
-      <h2>${readOnly ? "Contact details" : isEdit ? "Edit contact" : "New contact"}</h2>
-      ${readOnly ? '<div class="readonly-note">Public demo mode is view-only.</div>' : ""}
-      <label>First name<input name="first_name" value="${escapeAttr(current.first_name)}" ${disabledAttr}/></label>
-      <label>Last name<input name="last_name" value="${escapeAttr(current.last_name)}" ${disabledAttr}/></label>
-      <label>Email<input name="email" type="email" value="${escapeAttr(current.email)}" ${disabledAttr}/></label>
-      <label>Phone<input name="phone" value="${escapeAttr(current.phone)}" ${disabledAttr}/></label>
-      <label>Company<input name="company" value="${escapeAttr(current.company)}" ${disabledAttr}/></label>
-      <label>Title<input name="title" value="${escapeAttr(current.title)}" ${disabledAttr}/></label>
-      <label>Status<select name="status" ${disabledAttr}>${statuses
-        .map((status) => `<option value="${escapeAttr(status)}" ${(current.status || "lead") === status ? "selected" : ""}>${escapeHtml(status)}</option>`)
-        .join("")}</select></label>
-      ${renderCustomFieldInputs(customFields, current.custom_fields || {}, disabledAttr)}
-      ${contactDetails}
-      ${isEdit ? renderRelatedDeals(relatedDeals, "Linked jobs") : ""}
-      ${isEdit ? renderActivityFeed(relatedActivities, "No activity logged for this contact yet.") : ""}
-      <div class="modal-actions">
-        ${readOnly
-          ? '<button type="button" class="ghost-btn" data-action="cancel">Close</button>'
-          : `${isEdit ? '<button type="button" class="ghost-btn" data-action="delete">Delete</button>' : ""}
-        <button type="button" class="ghost-btn" data-action="cancel">Cancel</button>
-        <button type="button" class="primary-btn" data-action="save">Save</button>`}
-      </div>
-    `, async (modal, action) => {
-      if (action === "cancel") return true;
-      if (readOnly) return true;
-      if (action === "delete" && isEdit) {
-        await api(`/api/crm/contacts?id=${current.id}`, { method: "DELETE" });
-        await loadContacts();
-        renderDashboard();
-        return true;
-      }
-      if (action === "save") {
-        const body = collectForm(modal);
-        if (isEdit) {
-          await api(`/api/crm/contacts?id=${current.id}`, { method: "PATCH", body });
-        } else {
-          await api("/api/crm/contacts", { method: "POST", body });
+    openModal(
+      "<h2>" + (isEdit ? "Edit contact" : "New contact") + "</h2>" +
+      '<label>First name<input name="first_name" value="' + escapeAttr(c.first_name) + '"/></label>' +
+      '<label>Last name<input name="last_name" value="' + escapeAttr(c.last_name) + '"/></label>' +
+      '<label>Email<input name="email" type="email" value="' + escapeAttr(c.email) + '"/></label>' +
+      '<label>Phone<input name="phone" value="' + escapeAttr(c.phone) + '"/></label>' +
+      '<label>Company<input name="company" value="' + escapeAttr(c.company) + '"/></label>' +
+      '<label>Title<input name="title" value="' + escapeAttr(c.title) + '"/></label>' +
+      '<label>Status<select name="status">' + statuses.map(function (s) {
+        return '<option value="' + escapeAttr(s) + '"' + (c.status === s ? " selected" : "") + '>' + escapeHtml(s) + "</option>";
+      }).join("") + "</select></label>" +
+      customFields.map(function (f) {
+        var val = (c.custom_fields && c.custom_fields[f.id]) || "";
+        return '<label>' + escapeHtml(f.label) + '<input data-custom="' + escapeAttr(f.id) + '" value="' + escapeAttr(val) + '"/></label>';
+      }).join("") +
+      '<div class="modal-actions">' +
+        (isEdit ? '<button type="button" class="ghost-btn danger-btn" data-action="delete">Delete</button>' : "") +
+        '<button type="button" class="ghost-btn" data-action="cancel">Cancel</button>' +
+        '<button type="button" class="primary-btn" data-action="save">Save</button>' +
+      "</div>",
+      async function (modal, action) {
+        if (action === "cancel") return true;
+        if (action === "delete" && isEdit) {
+          if (!confirm("Delete this contact? This cannot be undone.")) return false;
+          if (isDemo()) {
+            mockApi("/api/crm/contacts?id=" + c.id, { method: "DELETE" });
+          } else {
+            await api("/api/crm/contacts?id=" + c.id, { method: "DELETE" });
+          }
+          await loadContacts();
+          renderDashboard();
+          return true;
         }
-        await loadContacts();
-        renderDashboard();
-        return true;
+        if (action === "save") {
+          var body = collectForm(modal);
+          if (isDemo()) {
+            if (isEdit) {
+              mockApi("/api/crm/contacts?id=" + c.id, { method: "PATCH", body: body });
+            } else {
+              mockApi("/api/crm/contacts", { method: "POST", body: body });
+            }
+          } else {
+            if (isEdit) {
+              await api("/api/crm/contacts?id=" + c.id, { method: "PATCH", body: body });
+            } else {
+              await api("/api/crm/contacts", { method: "POST", body: body });
+            }
+          }
+          await loadContacts();
+          renderDashboard();
+          return true;
+        }
       }
-    });
+    );
   }
 
   // ---------- Deals ----------
 
   function renderPipeline() {
-    const board = document.getElementById("pipeline-board");
+    var board = document.getElementById("pipeline-board");
     board.innerHTML = "";
-    const config = getTenantConfig();
-    const stages = (config.pipeline && config.pipeline.stages) || [
+    var config = (state.session.tenant && state.session.tenant.config) || {};
+    var stages = (config.pipeline && config.pipeline.stages) || [
       { id: "new", label: "New" },
       { id: "won", label: "Won" },
       { id: "lost", label: "Lost" }
     ];
-
-    stages.forEach((stage) => {
-      const column = document.createElement("div");
-      column.className = "pipeline-col";
-      const dealsInStage = state.deals.filter((deal) => deal.stage === stage.id);
-      const total = dealsInStage.reduce((sum, deal) => sum + Number(deal.amount || 0), 0);
-      column.innerHTML = `<h3><span>${escapeHtml(stage.label)}</span><span>${dealsInStage.length}</span></h3>
-        <div class="stage-total">${formatMoney(total, dealsInStage[0] && dealsInStage[0].currency)}</div>`;
-
-      dealsInStage.forEach((deal) => {
-        const linkedContact = getContactById(deal.contact_id);
-        const metaBits = [];
-        const serviceType = getCustomFieldValue(deal, "service_type");
-        if (serviceType) metaBits.push(serviceType);
-        if (linkedContact) metaBits.push(getContactName(linkedContact));
-        if (deal.expected_close_date) metaBits.push(`Closes ${formatDate(deal.expected_close_date)}`);
-
-        const card = document.createElement("div");
+    stages.forEach(function (stage) {
+      var col = document.createElement("div");
+      col.className = "pipeline-col";
+      var dealsInStage = state.deals.filter(function (d) { return d.stage === stage.id; });
+      var total = dealsInStage.reduce(function (sum, d) { return sum + Number(d.amount || 0); }, 0);
+      col.innerHTML =
+        "<h3><span>" + escapeHtml(stage.label) + "</span><span>" + dealsInStage.length + "</span></h3>" +
+        '<div class="stage-total">' + formatMoney(total, dealsInStage[0] && dealsInStage[0].currency) + "</div>";
+      dealsInStage.forEach(function (d) {
+        var card = document.createElement("div");
         card.className = "deal-card";
-        card.innerHTML = `<div class="deal-title">${escapeHtml(deal.title)}</div>
-          <div class="deal-meta">${escapeHtml(metaBits.join(" / ") || "Open deal")}</div>
-          <div class="deal-amount">${formatMoney(deal.amount, deal.currency)}</div>`;
-        card.addEventListener("click", () => openDealModal(deal));
-        column.appendChild(card);
+        card.innerHTML =
+          '<div class="deal-title">' + escapeHtml(d.title) + "</div>" +
+          '<div class="deal-amount">' + formatMoney(d.amount, d.currency) + "</div>";
+        card.addEventListener("click", function () { openDealModal(d); });
+        col.appendChild(card);
       });
 
       board.appendChild(column);
@@ -646,199 +918,204 @@
   }
 
   function openDealModal(deal) {
-    const config = getTenantConfig();
-    const stages = (config.pipeline && config.pipeline.stages) || [{ id: "new", label: "New" }];
-    const customFields = getCustomFieldDefs("deal");
-    const isEdit = Boolean(deal);
-    const readOnly = isReadOnlySession();
-    const current = deal || {};
-    const linkedContact = getContactById(current.contact_id);
+    var config = (state.session.tenant && state.session.tenant.config) || {};
+    var stages = (config.pipeline && config.pipeline.stages) || [{ id: "new", label: "New" }];
+    var isEdit = Boolean(deal);
+    var d = deal || {};
 
-    if (readOnly && !isEdit) return;
+    var contactOptions = '<option value="">\u2014</option>' +
+      state.contacts.map(function (c) {
+        var name = [c.first_name, c.last_name].filter(Boolean).join(" ") || c.email || "Unnamed";
+        return '<option value="' + escapeAttr(c.id) + '"' + (d.contact_id === c.id ? " selected" : "") + '>' + escapeHtml(name) + "</option>";
+      }).join("");
 
-    const contactOptions = ['<option value="">-</option>']
-      .concat(
-        state.contacts.map((contact) => {
-          return `<option value="${escapeAttr(contact.id)}" ${current.contact_id === contact.id ? "selected" : ""}>${escapeHtml(getContactName(contact))}</option>`;
-        })
-      )
-      .join("");
-
-    const disabledAttr = readOnly ? "disabled" : "";
-    const dealActivities = state.activities
-      .filter((activity) => activity.deal_id === current.id)
-      .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-      .slice(0, 6);
-    const dealDetails = isEdit ? renderDetailSection("Job snapshot", [
-      { label: "Expected close", value: current.expected_close_date ? formatDate(current.expected_close_date) : "-" },
-      { label: "Service type", value: getCustomFieldValue(current, "service_type") || "-" },
-      { label: "Volume", value: getCustomFieldValue(current, "volume_gallons") || "-" },
-      { label: "Assigned tech", value: getCustomFieldValue(current, "technician") || "-" },
-      { label: "Equipment", value: getCustomFieldValue(current, "equipment") || "-" }
-    ]) : "";
-
-    openModal(`
-      <h2>${readOnly ? "Deal details" : isEdit ? "Edit deal" : "New deal"}</h2>
-      ${readOnly ? '<div class="readonly-note">Public demo mode is view-only.</div>' : ""}
-      <label>Title<input name="title" value="${escapeAttr(current.title)}" required ${disabledAttr}/></label>
-      <label>Contact<select name="contact_id" ${disabledAttr}>${contactOptions}</select></label>
-      <label>Stage<select name="stage" ${disabledAttr}>${stages
-        .map((stage) => `<option value="${escapeAttr(stage.id)}" ${(current.stage || stages[0].id) === stage.id ? "selected" : ""}>${escapeHtml(stage.label)}</option>`)
-        .join("")}</select></label>
-      <label>Amount<input name="amount" type="number" step="0.01" value="${escapeAttr(current.amount || 0)}" ${disabledAttr}/></label>
-      <label>Currency<input name="currency" value="${escapeAttr(current.currency || "USD")}" ${disabledAttr}/></label>
-      <label>Expected close<input name="expected_close_date" type="date" value="${escapeAttr(current.expected_close_date || "")}" ${disabledAttr}/></label>
-      ${renderCustomFieldInputs(customFields, current.custom_fields || {}, disabledAttr)}
-      ${dealDetails}
-      ${isEdit ? renderLinkedContact(linkedContact) : ""}
-      ${isEdit ? renderActivityFeed(dealActivities, "No activity logged for this job yet.") : ""}
-      ${isEdit ? `
-        <div class="ai-panel">
-          <button type="button" class="primary-btn" data-action="ai-summary">Summarize with AI</button>
-          <div class="ai-result" id="ai-result" hidden></div>
-        </div>
-      ` : ""}
-      <div class="modal-actions">
-        ${readOnly
-          ? '<button type="button" class="ghost-btn" data-action="cancel">Close</button>'
-          : `${isEdit ? '<button type="button" class="ghost-btn" data-action="delete">Delete</button>' : ""}
-        <button type="button" class="ghost-btn" data-action="cancel">Cancel</button>
-        <button type="button" class="primary-btn" data-action="save">Save</button>`}
-      </div>
-    `, async (modal, action) => {
-      if (action === "cancel") return true;
-      if (action === "ai-summary" && isEdit) {
-        const result = modal.querySelector("#ai-result");
-        result.hidden = false;
-        result.innerHTML = "<em>Generating summary...</em>";
-        try {
-          const data = await api(`/api/crm/ai-summary?deal_id=${current.id}`, { method: "POST" });
-          const actions = (data.nextActions || []).map((entry) => `<li>${escapeHtml(entry)}</li>`).join("");
-          const stub = data.stub ? '<div class="ai-stub-warning">Demo mode: set ANTHROPIC_API_KEY for live AI.</div>' : "";
-          result.innerHTML = `
-            ${stub}
-            <div class="ai-summary-text">${escapeHtml(data.summary || "(no summary)")}</div>
-            <div class="ai-risk">Risk score: <strong>${data.riskScore || 0}</strong>/100</div>
-            <div class="ai-actions-label">Suggested next actions</div>
-            <ul class="ai-actions">${actions}</ul>
-          `;
-        } catch (err) {
-          result.innerHTML = `<div class="ai-error">${escapeHtml(err.message)}</div>`;
+    openModal(
+      "<h2>" + (isEdit ? "Edit deal" : "New deal") + "</h2>" +
+      '<label>Title<input name="title" value="' + escapeAttr(d.title) + '" required/></label>' +
+      '<label>Contact<select name="contact_id">' + contactOptions + "</select></label>" +
+      '<label>Stage<select name="stage">' + stages.map(function (s) {
+        return '<option value="' + escapeAttr(s.id) + '"' + (d.stage === s.id ? " selected" : "") + '>' + escapeHtml(s.label) + "</option>";
+      }).join("") + "</select></label>" +
+      '<label>Amount<input name="amount" type="number" step="0.01" value="' + escapeAttr(d.amount || 0) + '"/></label>' +
+      '<label>Currency<input name="currency" value="' + escapeAttr(d.currency || "USD") + '"/></label>' +
+      '<label>Expected close<input name="expected_close_date" type="date" value="' + escapeAttr(d.expected_close_date || "") + '"/></label>' +
+      (isEdit ?
+        '<div class="ai-panel">' +
+          '<button type="button" class="primary-btn" data-action="ai-summary">Summarize with AI</button>' +
+          '<div class="ai-result" id="ai-result" hidden></div>' +
+        '</div>' : "") +
+      '<div class="modal-actions">' +
+        (isEdit ? '<button type="button" class="ghost-btn danger-btn" data-action="delete">Delete</button>' : "") +
+        '<button type="button" class="ghost-btn" data-action="cancel">Cancel</button>' +
+        '<button type="button" class="primary-btn" data-action="save">Save</button>' +
+      "</div>",
+      async function (modal, action) {
+        if (action === "cancel") return true;
+        if (action === "delete" && isEdit) {
+          if (!confirm("Delete this deal? This cannot be undone.")) return false;
+          if (isDemo()) {
+            mockApi("/api/crm/deals?id=" + d.id, { method: "DELETE" });
+          } else {
+            await api("/api/crm/deals?id=" + d.id, { method: "DELETE" });
+          }
+          await loadDeals();
+          renderDashboard();
+          return true;
         }
-        return false;
-      }
-      if (readOnly) return true;
-      if (action === "delete" && isEdit) {
-        await api(`/api/crm/deals?id=${current.id}`, { method: "DELETE" });
-        await loadDeals();
-        renderDashboard();
-        return true;
-      }
-      if (action === "save") {
-        const body = collectForm(modal);
-        if (isEdit) {
-          await api(`/api/crm/deals?id=${current.id}`, { method: "PATCH", body });
-        } else {
-          await api("/api/crm/deals", { method: "POST", body });
+        if (action === "ai-summary" && isEdit) {
+          var resultEl = modal.querySelector("#ai-result");
+          resultEl.hidden = false;
+          resultEl.innerHTML = "<em>Asking Claude\u2026</em>";
+          try {
+            var data;
+            if (isDemo()) {
+              data = mockApi("/api/crm/ai-summary?deal_id=" + d.id, { method: "POST" });
+            } else {
+              data = await api("/api/crm/ai-summary?deal_id=" + d.id, { method: "POST" });
+            }
+            var actions = (data.nextActions || []).map(function (a) { return "<li>" + escapeHtml(a) + "</li>"; }).join("");
+            var stub = data.stub ? '<div class="ai-stub-warning">Demo mode \u2014 connect the Anthropic API for live AI insights.</div>' : "";
+            resultEl.innerHTML =
+              stub +
+              '<div class="ai-summary-text">' + escapeHtml(data.summary || "(no summary)") + "</div>" +
+              '<div class="ai-risk">Risk score: <strong>' + (data.riskScore || 0) + "</strong>/100</div>" +
+              '<div class="ai-actions-label">Suggested next actions</div>' +
+              '<ul class="ai-actions">' + actions + "</ul>";
+          } catch (err) {
+            resultEl.innerHTML = '<div class="ai-error">' + escapeHtml(err.message) + "</div>";
+          }
+          return false;
         }
-        await loadDeals();
-        renderDashboard();
-        return true;
+        if (action === "save") {
+          var body = collectForm(modal);
+          if (isDemo()) {
+            if (isEdit) {
+              mockApi("/api/crm/deals?id=" + d.id, { method: "PATCH", body: body });
+            } else {
+              mockApi("/api/crm/deals", { method: "POST", body: body });
+            }
+          } else {
+            if (isEdit) {
+              await api("/api/crm/deals?id=" + d.id, { method: "PATCH", body: body });
+            } else {
+              await api("/api/crm/deals", { method: "POST", body: body });
+            }
+          }
+          await loadDeals();
+          renderDashboard();
+          return true;
+        }
       }
-    });
+    );
   }
 
   // ---------- Activities ----------
 
   function renderActivities() {
-    const list = document.getElementById("activities-list");
+    var list = document.getElementById("activities-list");
     list.innerHTML = "";
     if (state.activities.length === 0) {
       list.innerHTML = '<li class="empty">No activities logged yet.</li>';
       return;
     }
-
-    state.activities
-      .slice()
-      .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-      .forEach((activity) => list.appendChild(renderActivityItem(activity)));
+    state.activities.forEach(function (a) { list.appendChild(renderActivityItem(a)); });
   }
 
-  function renderActivityItem(activity) {
-    const li = document.createElement("li");
-    const contact = getContactById(activity.contact_id);
-    const deal = getDealById(activity.deal_id);
-    const meta = [contact ? getContactName(contact) : "", deal ? deal.title : ""].filter(Boolean).join(" / ");
-    li.innerHTML = `
-      <div class="t-head"><span>${escapeHtml(activity.type || "note")}</span><span>${escapeHtml(formatDateTime(activity.created_at))}</span></div>
-      <div class="t-subject">${escapeHtml(activity.subject || "(no subject)")}</div>
-      ${meta ? `<div class="t-meta">${escapeHtml(meta)}</div>` : ""}
-      <div class="t-body">${escapeHtml(activity.body || "")}</div>
-    `;
+  function renderActivityItem(a) {
+    var li = document.createElement("li");
+    var when = new Date(a.created_at).toLocaleString();
+    li.innerHTML =
+      '<div class="t-head"><span>' + escapeHtml(a.type || "note") + "</span><span>" + escapeHtml(when) + "</span></div>" +
+      '<div class="t-subject">' + escapeHtml(a.subject || "(no subject)") + "</div>" +
+      '<div class="t-body">' + escapeHtml(a.body || "") + "</div>";
     return li;
   }
 
   function openActivityModal() {
-    if (isReadOnlySession()) return;
+    var contactOptions = '<option value="">\u2014</option>' +
+      state.contacts.map(function (c) {
+        var name = [c.first_name, c.last_name].filter(Boolean).join(" ") || c.email || "Unnamed";
+        return '<option value="' + escapeAttr(c.id) + '">' + escapeHtml(name) + "</option>";
+      }).join("");
 
-    const contactOptions = ['<option value="">-</option>']
-      .concat(
-        state.contacts.map((contact) => {
-          return `<option value="${escapeAttr(contact.id)}">${escapeHtml(getContactName(contact))}</option>`;
-        })
-      )
-      .join("");
+    var dealOptions = '<option value="">\u2014</option>' +
+      state.deals.map(function (d) {
+        return '<option value="' + escapeAttr(d.id) + '">' + escapeHtml(d.title) + "</option>";
+      }).join("");
 
-    const dealOptions = ['<option value="">-</option>']
-      .concat(
-        state.deals.map((deal) => `<option value="${escapeAttr(deal.id)}">${escapeHtml(deal.title)}</option>`)
-      )
-      .join("");
-
-    openModal(`
-      <h2>Log activity</h2>
-      <label>Type<select name="type">
-        <option value="note">Note</option>
-        <option value="call">Call</option>
-        <option value="email">Email</option>
-        <option value="meeting">Meeting</option>
-        <option value="task">Task</option>
-      </select></label>
-      <label>Contact<select name="contact_id">${contactOptions}</select></label>
-      <label>Deal<select name="deal_id">${dealOptions}</select></label>
-      <label>Subject<input name="subject"/></label>
-      <label>Details<textarea name="body" rows="4"></textarea></label>
-      <div class="modal-actions">
-        <button type="button" class="ghost-btn" data-action="cancel">Cancel</button>
-        <button type="button" class="primary-btn" data-action="save">Save</button>
-      </div>
-    `, async (modal, action) => {
-      if (action === "cancel") return true;
-      if (action === "save") {
-        const body = collectForm(modal);
-        await api("/api/crm/activities", { method: "POST", body });
-        await loadActivities();
-        renderDashboard();
-        return true;
+    openModal(
+      "<h2>Log activity</h2>" +
+      '<label>Type<select name="type">' +
+        '<option value="note">Note</option><option value="call">Call</option>' +
+        '<option value="email">Email</option><option value="meeting">Meeting</option>' +
+        '<option value="task">Task</option></select></label>' +
+      '<label>Contact<select name="contact_id">' + contactOptions + "</select></label>" +
+      '<label>Deal<select name="deal_id">' + dealOptions + "</select></label>" +
+      '<label>Subject<input name="subject"/></label>' +
+      '<label>Details<textarea name="body" rows="4"></textarea></label>' +
+      '<div class="modal-actions">' +
+        '<button type="button" class="ghost-btn" data-action="cancel">Cancel</button>' +
+        '<button type="button" class="primary-btn" data-action="save">Save</button>' +
+      "</div>",
+      async function (modal, action) {
+        if (action === "cancel") return true;
+        if (action === "save") {
+          var body = collectForm(modal);
+          if (isDemo()) {
+            mockApi("/api/crm/activities", { method: "POST", body: body });
+          } else {
+            await api("/api/crm/activities", { method: "POST", body: body });
+          }
+          await loadActivities();
+          renderDashboard();
+          return true;
+        }
       }
-    });
+    );
   }
 
   // ---------- Modal helpers ----------
 
   function openModal(html, onAction) {
-    const root = document.getElementById("modal-root");
+    var root = document.getElementById("modal-root");
     root.hidden = false;
-    root.innerHTML = `<div class="modal">${html}</div>`;
-    const modal = root.querySelector(".modal");
+    root.innerHTML = '<div class="modal" role="dialog">' + html + "</div>";
+    var modal = root.querySelector(".modal");
 
-    modal.querySelectorAll("[data-action]").forEach((button) => {
-      button.addEventListener("click", async () => {
+    // Close on backdrop click.
+    root.addEventListener("click", function handler(e) {
+      if (e.target === root) {
+        closeModal();
+        root.removeEventListener("click", handler);
+      }
+    });
+
+    // Close on Escape.
+    function escHandler(e) {
+      if (e.key === "Escape") {
+        closeModal();
+        document.removeEventListener("keydown", escHandler);
+      }
+    }
+    document.addEventListener("keydown", escHandler);
+
+    // Focus first input.
+    var firstInput = modal.querySelector("input, select, textarea");
+    if (firstInput) firstInput.focus();
+
+    modal.querySelectorAll("[data-action]").forEach(function (btn) {
+      btn.addEventListener("click", async function () {
         try {
-          const done = await onAction(modal, button.dataset.action);
+          var done = await onAction(modal, btn.dataset.action);
           if (done) closeModal();
         } catch (err) {
-          alert(err.message);
+          var errDiv = modal.querySelector(".modal-error");
+          if (!errDiv) {
+            errDiv = document.createElement("p");
+            errDiv.className = "modal-error auth-error";
+            modal.appendChild(errDiv);
+          }
+          errDiv.textContent = err.message;
         }
       });
     });
@@ -847,23 +1124,23 @@
   }
 
   function closeModal() {
-    const root = document.getElementById("modal-root");
+    var root = document.getElementById("modal-root");
     root.hidden = true;
     root.innerHTML = "";
   }
 
   function collectForm(modal) {
-    const result = {};
-    const custom = {};
-    modal.querySelectorAll("input[name], select[name], textarea[name]").forEach((element) => {
-      if (element.type === "number") {
-        result[element.name] = element.value === "" ? null : Number(element.value);
+    var result = {};
+    var custom = {};
+    modal.querySelectorAll("input[name], select[name], textarea[name]").forEach(function (el) {
+      if (el.type === "number") {
+        result[el.name] = el.value === "" ? null : Number(el.value);
       } else {
         result[element.name] = element.value;
       }
     });
-    modal.querySelectorAll("[data-custom]").forEach((element) => {
-      custom[element.dataset.custom] = element.value;
+    modal.querySelectorAll("[data-custom]").forEach(function (el) {
+      custom[el.dataset.custom] = el.value;
     });
     if (Object.keys(custom).length) result.custom_fields = custom;
     return result;
@@ -882,5 +1159,5 @@
     return escapeHtml(value);
   }
 
-  window.CRM = { initLogin, initApp };
+  window.CRM = { initLogin: initLogin, initAuth: initAuth, initApp: initApp };
 })();

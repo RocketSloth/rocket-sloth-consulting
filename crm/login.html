@@ -3,18 +3,42 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>CRM Sign in</title>
+    <title>Sign in</title>
     <link rel="stylesheet" href="/crm/assets/crm.css" />
   </head>
   <body class="auth-body">
+    <a href="/" class="back-home">&larr; rocketsloth.space</a>
+
     <main class="auth-card">
       <h1 id="auth-title">Sign in</h1>
-      <p class="auth-sub">Access your CRM workspace.</p>
-      <form id="login-form" class="auth-form">
+      <p class="auth-sub" id="auth-sub">Enter your email and we&rsquo;ll send you a sign-in link.</p>
+
+      <!-- Demo one-click entry (shown only for tenant=demo) -->
+      <div id="demo-entry" hidden>
+        <p class="demo-blurb">
+          This is a live sandbox CRM — explore contacts, deals, and the AI deal summary feature.
+          No account needed.
+        </p>
+        <button id="demo-btn" class="primary-btn demo-full-btn">Enter the live demo &rarr;</button>
+        <p id="demo-error" class="auth-error" hidden></p>
+        <p class="auth-toggle"><a href="#" id="demo-has-account">I have an account</a></p>
+      </div>
+
+      <!-- Magic-link form (default for real tenants, toggled on for demo) -->
+      <form id="magic-form" class="auth-form" hidden>
+        <input type="hidden" name="tenant" id="tenant" />
         <label>
-          Workspace
-          <input name="tenant" id="tenant" required autocomplete="organization" placeholder="acme" />
+          Email
+          <input name="email" type="email" required autocomplete="email" placeholder="you@company.com" />
         </label>
+        <button type="submit" id="magic-btn">Send sign-in link</button>
+        <p id="magic-status" class="auth-status" hidden></p>
+        <p id="magic-error" class="auth-error" hidden></p>
+      </form>
+
+      <!-- Password form (hidden, toggled by "Use password" link) -->
+      <form id="password-form" class="auth-form" hidden>
+        <input type="hidden" name="tenant" id="pw-tenant" />
         <label>
           Email
           <input name="email" type="email" required autocomplete="email" />
@@ -23,16 +47,15 @@
           Password
           <input name="password" type="password" required autocomplete="current-password" />
         </label>
-        <button type="submit">Sign in</button>
-        <p id="auth-error" class="auth-error" hidden></p>
+        <button type="submit">Sign in with password</button>
+        <p id="pw-error" class="auth-error" hidden></p>
       </form>
-      <div class="auth-divider"><span>or</span></div>
-      <div class="auth-demo">
-        <strong>Browsing the demo?</strong>
-        <p>Open the sample workspace in read-only mode. No login required.</p>
-        <button id="demo-access-btn" type="button" class="secondary-btn">Open public demo</button>
-      </div>
+
+      <p class="auth-toggle" id="toggle-row">
+        <a href="#" id="toggle-mode">Use password instead</a>
+      </p>
     </main>
+
     <script src="/crm/assets/crm.js"></script>
     <script>
       CRM.initLogin();

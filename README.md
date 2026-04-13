@@ -63,10 +63,28 @@ Fields:
 - `contactStatuses` for allowed contact states
 - `customFields.contact` and `customFields.deal` for extra JSON fields
 
+### Magic-link login (passwordless)
+
+The default login flow is passwordless:
+
+1. Customer visits `rocketsloth.space/crm/t/acme` (tenant slug in URL, no
+   typing).
+2. They enter only their email address and click "Send sign-in link."
+3. Resend delivers an email with a one-click sign-in link (30 min expiry).
+4. Clicking the link lands on `/crm/auth?token=...` which exchanges the token
+   for a session and redirects to the CRM.
+
+If `RESEND_API_KEY` + `RESEND_FROM_EMAIL` are not set, the endpoint returns the
+link directly in the JSON response for dev/testing.
+
+Password login is still available behind a "Use password instead" toggle for
+admin use.
+
 ### CRM API endpoints
 
-- `POST /api/crm/login` — tenant + email + password → session token
-- `POST /api/crm/demo-view` — email-only instant demo session bootstrap
+- `POST /api/crm/magic-link` — request a magic login link (tenant + email)
+- `POST /api/crm/magic-verify` — exchange a magic token for a session
+- `POST /api/crm/login` — tenant + email + password → session token (admin fallback)
 - `GET/DELETE /api/crm/me` — current session / logout
 - `GET/POST/PATCH/DELETE /api/crm/contacts`
 - `GET/POST/PATCH/DELETE /api/crm/deals`
@@ -74,9 +92,9 @@ Fields:
 - `POST /api/crm/provision` for admin-only tenant bootstrap
 - `POST /api/crm/ai-summary?deal_id=<uuid>` for AI deal status and next actions
 
-All CRM endpoints require an authenticated session except `login`,
-`demo-access`, and `provision`. Data access is automatically scoped to the
-current tenant. The public demo session is read-only.
+All CRM endpoints require `Authorization: Bearer <sessionToken>` except
+`login`, `magic-link`, `magic-verify`, and `provision`. All data access is
+automatically scoped to the authenticated user's tenant.
 
 ### AI features
 

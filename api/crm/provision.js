@@ -87,7 +87,7 @@ module.exports = async function handler(req, res) {
     return json(res, 201, {
       tenant: { id: tenant.id, slug: tenant.slug, name: tenant.name, plan: tenant.plan },
       owner: { id: user.id, email: user.email, role: user.role },
-      loginUrl: `/crm/login?tenant=${encodeURIComponent(slug)}`
+      loginUrl: `/crm/t/${encodeURIComponent(slug)}`
     });
   } catch (err) {
     return handleError(res, err);

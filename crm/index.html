@@ -20,6 +20,7 @@
       </nav>
       <div class="user-area">
         <span id="user-label"></span>
+        <a href="/" class="ghost-btn" id="home-link" style="text-decoration:none;">&#8592; Home</a>
         <button id="logout-btn" class="ghost-btn">Sign out</button>
       </div>
     </header>
@@ -49,12 +50,14 @@
             <button id="new-contact-btn" class="primary-btn">New contact</button>
           </div>
         </div>
-        <table class="data-table">
-          <thead>
-            <tr><th>Name</th><th>Email</th><th>Company</th><th>Status</th><th></th></tr>
-          </thead>
-          <tbody id="contacts-tbody"></tbody>
-        </table>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr><th>Name</th><th>Email</th><th>Company</th><th>Status</th><th></th></tr>
+            </thead>
+            <tbody id="contacts-tbody"></tbody>
+          </table>
+        </div>
       </section>
 
       <section id="view-deals" class="view" hidden>
