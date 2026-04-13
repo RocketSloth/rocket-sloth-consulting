@@ -6,6 +6,8 @@
 (function () {
   const STORAGE_KEY = "rs_crm_session";
   const MIGRATION_FLAG_KEY = "rs_crm_cookie_auth_migrated_v1";
+  const PUBLIC_DEMO_TENANT = "demo";
+  const READ_ONLY_ROLES = new Set(["viewer", "demo_viewer"]);
   const state = {
     session: null,
     contacts: [],
@@ -33,6 +35,27 @@
   function clearSession() {
     state.session = null;
     try { localStorage.removeItem(STORAGE_KEY); } catch {}
+  }
+
+  function normalizeTenant(value) {
+    return String(value || "").trim().toLowerCase();
+  }
+
+  function getRouteContext() {
+    const params = new URLSearchParams(window.location.search);
+    const requestedTenant = normalizeTenant(params.get("tenant"));
+    return {
+      requestedTenant,
+      wantsPublicDemo: params.get("public") === "1" && requestedTenant === PUBLIC_DEMO_TENANT
+    };
+  }
+
+  function isReadOnlyUser(user) {
+    return READ_ONLY_ROLES.has(String((user && user.role) || "").trim().toLowerCase());
+  }
+
+  function isReadOnlySession() {
+    return isReadOnlyUser(state.session && state.session.user);
   }
 
   async function api(path, options = {}) {
@@ -80,6 +103,172 @@
     }
   }
 
+  function formatDate(value) {
+    if (!value) return "-";
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return String(value);
+    return date.toLocaleDateString(undefined, {
+      month: "short",
+      day: "numeric",
+      year: "numeric"
+    });
+  }
+
+  function formatDateTime(value) {
+    if (!value) return "-";
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return String(value);
+    return date.toLocaleString(undefined, {
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit"
+    });
+  }
+
+  function getTenantConfig() {
+    return (state.session && state.session.tenant && state.session.tenant.config) || {};
+  }
+
+  function getContactName(contact) {
+    if (!contact) return "Unknown contact";
+    return [contact.first_name, contact.last_name].filter(Boolean).join(" ") || contact.email || "Unnamed";
+  }
+
+  function getContactById(id) {
+    return state.contacts.find((contact) => contact.id === id) || null;
+  }
+
+  function getDealById(id) {
+    return state.deals.find((deal) => deal.id === id) || null;
+  }
+
+  function getCustomFieldDefs(kind) {
+    const config = getTenantConfig();
+    return (config.customFields && config.customFields[kind]) || [];
+  }
+
+  function getCustomFieldValue(record, fieldId) {
+    return record && record.custom_fields ? record.custom_fields[fieldId] : "";
+  }
+
+  function renderCustomFieldInputs(fields, values, disabledAttr) {
+    return fields.map((field) => {
+      const value = values && values[field.id] ? values[field.id] : "";
+      return `<label>${escapeHtml(field.label)}<input data-custom="${escapeAttr(field.id)}" value="${escapeAttr(value)}" ${disabledAttr}/></label>`;
+    }).join("");
+  }
+
+  function renderDetailSection(title, items) {
+    const safeItems = items.filter((item) => item && item.label);
+    if (!safeItems.length) return "";
+    return `
+      <section class="modal-section">
+        <h3>${escapeHtml(title)}</h3>
+        <div class="detail-grid">
+          ${safeItems.map((item) => `
+            <div class="detail-card">
+              <span class="detail-label">${escapeHtml(item.label)}</span>
+              <strong class="detail-value">${escapeHtml(item.value || "-")}</strong>
+            </div>
+          `).join("")}
+        </div>
+      </section>
+    `;
+  }
+
+  function renderActivityFeed(activities, emptyMessage) {
+    if (!activities.length) {
+      return `
+        <section class="modal-section">
+          <h3>Recent activity</h3>
+          <p class="section-empty">${escapeHtml(emptyMessage)}</p>
+        </section>
+      `;
+    }
+
+    return `
+      <section class="modal-section">
+        <h3>Recent activity</h3>
+        <ul class="timeline compact">
+          ${activities.map((activity) => `
+            <li>
+              <div class="t-head">
+                <span>${escapeHtml(activity.type || "note")}</span>
+                <span>${escapeHtml(formatDateTime(activity.created_at))}</span>
+              </div>
+              <div class="t-subject">${escapeHtml(activity.subject || "(no subject)")}</div>
+              <div class="t-body">${escapeHtml(activity.body || "")}</div>
+            </li>
+          `).join("")}
+        </ul>
+      </section>
+    `;
+  }
+
+  function renderRelatedDeals(deals, title) {
+    if (!deals.length) return "";
+    return `
+      <section class="modal-section">
+        <h3>${escapeHtml(title)}</h3>
+        <div class="linked-list">
+          ${deals.map((deal) => `
+            <button type="button" class="linked-item" data-open-deal-id="${escapeAttr(deal.id)}">
+              <span class="linked-main">${escapeHtml(deal.title)}</span>
+              <span class="linked-meta">${escapeHtml(formatMoney(deal.amount, deal.currency))} / ${escapeHtml(deal.stage || "-")}</span>
+            </button>
+          `).join("")}
+        </div>
+      </section>
+    `;
+  }
+
+  function renderLinkedContact(contact) {
+    if (!contact) return "";
+    return `
+      <section class="modal-section">
+        <div class="section-head-inline">
+          <h3>Linked contact</h3>
+          <button type="button" class="link-btn" data-open-contact-id="${escapeAttr(contact.id)}">Open contact</button>
+        </div>
+        <div class="detail-grid">
+          <div class="detail-card">
+            <span class="detail-label">Name</span>
+            <strong class="detail-value">${escapeHtml(getContactName(contact))}</strong>
+          </div>
+          <div class="detail-card">
+            <span class="detail-label">Company</span>
+            <strong class="detail-value">${escapeHtml(contact.company || "-")}</strong>
+          </div>
+          <div class="detail-card">
+            <span class="detail-label">Phone</span>
+            <strong class="detail-value">${escapeHtml(contact.phone || "-")}</strong>
+          </div>
+          <div class="detail-card">
+            <span class="detail-label">Service plan</span>
+            <strong class="detail-value">${escapeHtml(getCustomFieldValue(contact, "service_plan") || "-")}</strong>
+          </div>
+        </div>
+      </section>
+    `;
+  }
+
+  function wireLinkedRecordButtons(modal) {
+    modal.querySelectorAll("[data-open-contact-id]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const contact = getContactById(button.dataset.openContactId);
+        if (contact) openContactModal(contact);
+      });
+    });
+
+    modal.querySelectorAll("[data-open-deal-id]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const deal = getDealById(button.dataset.openDealId);
+        if (deal) openDealModal(deal);
+      });
+    });
+  }
+
   function applyBranding(config) {
     const branding = (config && config.branding) || {};
     if (branding.accentColor) {
@@ -97,6 +286,33 @@
     }
   }
 
+  async function createPublicDemoSession() {
+    return api("/api/crm/demo-access", {
+      method: "POST",
+      body: { tenant: PUBLIC_DEMO_TENANT }
+    });
+  }
+
+  function applyReadOnlyUi(session) {
+    const readOnly = isReadOnlyUser(session && session.user);
+    document.body.classList.toggle("is-read-only", readOnly);
+
+    const banner = document.getElementById("read-only-banner");
+    if (banner) banner.hidden = !readOnly;
+
+    const newContactBtn = document.getElementById("new-contact-btn");
+    if (newContactBtn) newContactBtn.hidden = readOnly;
+
+    const newDealBtn = document.getElementById("new-deal-btn");
+    if (newDealBtn) newDealBtn.hidden = readOnly;
+
+    const newActivityBtn = document.getElementById("new-activity-btn");
+    if (newActivityBtn) newActivityBtn.hidden = readOnly;
+
+    const logoutBtn = document.getElementById("logout-btn");
+    if (logoutBtn) logoutBtn.textContent = readOnly ? "Exit demo" : "Sign out";
+  }
+
   // ---------- Login page ----------
 
   function initLogin() {
@@ -105,6 +321,9 @@
     const errorEl = document.getElementById("auth-error");
     const params = new URLSearchParams(window.location.search);
     const tenantInput = document.getElementById("tenant");
+    const demoButton = document.getElementById("demo-access-btn");
+    const demoHref = `/crm?tenant=${encodeURIComponent(PUBLIC_DEMO_TENANT)}&public=1`;
+
     if (params.get("tenant")) tenantInput.value = params.get("tenant");
 
     api("/api/crm/me")
@@ -131,31 +350,69 @@
         errorEl.hidden = false;
       }
     });
+
+    if (demoButton) {
+      demoButton.addEventListener("click", async () => {
+        errorEl.hidden = true;
+        demoButton.disabled = true;
+        try {
+          await createPublicDemoSession();
+          window.location.href = demoHref;
+        } catch (err) {
+          errorEl.textContent = err.message;
+          errorEl.hidden = false;
+          demoButton.disabled = false;
+        }
+      });
+    }
   }
 
   // ---------- App shell ----------
 
   async function initApp() {
     runSessionMigrationGuard();
+    const routeContext = getRouteContext();
     let session = getSession();
-    if (!session) {
+
+    if (routeContext.wantsPublicDemo) {
       try {
         session = await api("/api/crm/me");
-      } catch {
-        clearSession();
-        window.location.href = "/crm/login";
-        return;
+      } catch {}
+
+      if (
+        !session ||
+        normalizeTenant(session.tenant && session.tenant.slug) !== PUBLIC_DEMO_TENANT ||
+        !isReadOnlyUser(session.user)
+      ) {
+        try {
+          session = await createPublicDemoSession();
+        } catch {
+          session = null;
+        }
       }
+    } else if (!session) {
+      try {
+        session = await api("/api/crm/me");
+      } catch {}
     }
+
     if (!session || !session.user || !session.tenant) {
       clearSession();
-      window.location.href = "/crm/login";
+      const tenantQs = routeContext.requestedTenant ? `?tenant=${encodeURIComponent(routeContext.requestedTenant)}` : "";
+      window.location.href = `/crm/login${tenantQs}`;
       return;
     }
-    setSession(session);
 
+    setSession(session);
     applyBranding(session.tenant && session.tenant.config);
-    document.getElementById("user-label").textContent = session.user.fullName || session.user.email;
+    applyReadOnlyUi(session);
+
+    const userLabel = document.getElementById("user-label");
+    if (userLabel) {
+      userLabel.textContent = isReadOnlyUser(session.user)
+        ? "Viewing public demo"
+        : (session.user.fullName || session.user.email);
+    }
 
     document.querySelectorAll(".nav-btn").forEach((btn) => {
       btn.addEventListener("click", () => switchView(btn.dataset.view));
@@ -164,12 +421,17 @@
     document.getElementById("logout-btn").addEventListener("click", async () => {
       try { await api("/api/crm/me", { method: "DELETE" }); } catch {}
       clearSession();
-      window.location.href = "/crm/login";
+      window.location.href = routeContext.wantsPublicDemo ? "/" : "/crm/login";
     });
 
-    document.getElementById("new-contact-btn").addEventListener("click", () => openContactModal());
-    document.getElementById("new-deal-btn").addEventListener("click", () => openDealModal());
-    document.getElementById("new-activity-btn").addEventListener("click", () => openActivityModal());
+    const newContactBtn = document.getElementById("new-contact-btn");
+    if (newContactBtn) newContactBtn.addEventListener("click", () => openContactModal());
+
+    const newDealBtn = document.getElementById("new-deal-btn");
+    if (newDealBtn) newDealBtn.addEventListener("click", () => openDealModal());
+
+    const newActivityBtn = document.getElementById("new-activity-btn");
+    if (newActivityBtn) newActivityBtn.addEventListener("click", () => openActivityModal());
 
     const searchInput = document.getElementById("contact-search");
     let searchTimer;
@@ -182,8 +444,12 @@
   }
 
   function switchView(view) {
-    document.querySelectorAll(".nav-btn").forEach((b) => b.classList.toggle("active", b.dataset.view === view));
-    document.querySelectorAll(".view").forEach((v) => v.hidden = v.id !== `view-${view}`);
+    document.querySelectorAll(".nav-btn").forEach((button) => {
+      button.classList.toggle("active", button.dataset.view === view);
+    });
+    document.querySelectorAll(".view").forEach((panel) => {
+      panel.hidden = panel.id !== `view-${view}`;
+    });
   }
 
   async function loadAll() {
@@ -214,86 +480,112 @@
 
   function renderDashboard() {
     document.getElementById("stat-contacts").textContent = state.contacts.length;
-    const openDeals = state.deals.filter((d) => d.stage !== "won" && d.stage !== "lost");
+    const openDeals = state.deals.filter((deal) => deal.stage !== "won" && deal.stage !== "lost");
     document.getElementById("stat-open").textContent = openDeals.length;
-    const total = openDeals.reduce((sum, d) => sum + Number(d.amount || 0), 0);
+    const total = openDeals.reduce((sum, deal) => sum + Number(deal.amount || 0), 0);
     document.getElementById("stat-value").textContent = formatMoney(total, openDeals[0] && openDeals[0].currency);
 
     const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
     const wonThisMonth = state.deals.filter(
-      (d) => d.stage === "won" && new Date(d.updated_at) >= startOfMonth
+      (deal) => deal.stage === "won" && new Date(deal.updated_at) >= startOfMonth
     );
-    const wonTotal = wonThisMonth.reduce((sum, d) => sum + Number(d.amount || 0), 0);
+    const wonTotal = wonThisMonth.reduce((sum, deal) => sum + Number(deal.amount || 0), 0);
     document.getElementById("stat-won").textContent = formatMoney(wonTotal);
 
-    const recent = state.activities.slice(0, 10);
+    const recent = state.activities
+      .slice()
+      .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+      .slice(0, 10);
+
     const list = document.getElementById("recent-activities");
     list.innerHTML = "";
     if (recent.length === 0) {
       list.innerHTML = '<li class="empty">No activity yet.</li>';
       return;
     }
-    recent.forEach((a) => list.appendChild(renderActivityItem(a)));
+    recent.forEach((activity) => list.appendChild(renderActivityItem(activity)));
   }
 
   // ---------- Contacts ----------
 
   function renderContacts() {
     const tbody = document.getElementById("contacts-tbody");
+    const readOnly = isReadOnlySession();
     tbody.innerHTML = "";
     if (state.contacts.length === 0) {
       tbody.innerHTML = '<tr><td colspan="5" class="empty">No contacts yet.</td></tr>';
       return;
     }
-    state.contacts.forEach((c) => {
+
+    state.contacts.forEach((contact) => {
       const tr = document.createElement("tr");
-      const name = [c.first_name, c.last_name].filter(Boolean).join(" ") || "—";
       tr.innerHTML = `
-        <td>${escapeHtml(name)}</td>
-        <td>${escapeHtml(c.email || "")}</td>
-        <td>${escapeHtml(c.company || "")}</td>
-        <td><span class="status-pill ${escapeHtml(c.status || "lead")}">${escapeHtml(c.status || "lead")}</span></td>
-        <td><button class="ghost-btn">Edit</button></td>
+        <td>${escapeHtml(getContactName(contact))}</td>
+        <td>${escapeHtml(contact.email || "")}</td>
+        <td>${escapeHtml(contact.company || "")}</td>
+        <td><span class="status-pill ${escapeHtml(contact.status || "lead")}">${escapeHtml(contact.status || "lead")}</span></td>
+        <td><button class="ghost-btn">${readOnly ? "View" : "Edit"}</button></td>
       `;
-      tr.addEventListener("click", () => openContactModal(c));
+      tr.addEventListener("click", () => openContactModal(contact));
       tbody.appendChild(tr);
     });
   }
 
   function openContactModal(contact) {
-    const config = (state.session.tenant && state.session.tenant.config) || {};
-    const statuses = config.contactStatuses || ["lead", "customer", "archived"];
-    const customFields = (config.customFields && config.customFields.contact) || [];
+    const statuses = getTenantConfig().contactStatuses || ["lead", "customer", "archived"];
+    const customFields = getCustomFieldDefs("contact");
     const isEdit = Boolean(contact);
-    const c = contact || {};
+    const readOnly = isReadOnlySession();
+    const current = contact || {};
+
+    if (readOnly && !isEdit) return;
+
+    const disabledAttr = readOnly ? "disabled" : "";
+    const relatedDeals = state.deals
+      .filter((deal) => deal.contact_id === current.id)
+      .sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at))
+      .slice(0, 5);
+    const relatedActivities = state.activities
+      .filter((activity) => activity.contact_id === current.id)
+      .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+      .slice(0, 5);
+    const contactDetails = isEdit ? renderDetailSection("Service snapshot", [
+      { label: "Phone", value: current.phone || "-" },
+      { label: "Address", value: getCustomFieldValue(current, "service_address") || "-" },
+      { label: "Pool type", value: getCustomFieldValue(current, "pool_type") || "-" },
+      { label: "Route day", value: getCustomFieldValue(current, "route_day") || "-" },
+      { label: "Service plan", value: getCustomFieldValue(current, "service_plan") || "-" }
+    ]) : "";
 
     openModal(`
-      <h2>${isEdit ? "Edit contact" : "New contact"}</h2>
-      <label>First name<input name="first_name" value="${escapeAttr(c.first_name)}"/></label>
-      <label>Last name<input name="last_name" value="${escapeAttr(c.last_name)}"/></label>
-      <label>Email<input name="email" type="email" value="${escapeAttr(c.email)}"/></label>
-      <label>Phone<input name="phone" value="${escapeAttr(c.phone)}"/></label>
-      <label>Company<input name="company" value="${escapeAttr(c.company)}"/></label>
-      <label>Title<input name="title" value="${escapeAttr(c.title)}"/></label>
-      <label>Status<select name="status">${statuses
-        .map((s) => `<option value="${escapeAttr(s)}" ${c.status === s ? "selected" : ""}>${escapeHtml(s)}</option>`)
+      <h2>${readOnly ? "Contact details" : isEdit ? "Edit contact" : "New contact"}</h2>
+      ${readOnly ? '<div class="readonly-note">Public demo mode is view-only.</div>' : ""}
+      <label>First name<input name="first_name" value="${escapeAttr(current.first_name)}" ${disabledAttr}/></label>
+      <label>Last name<input name="last_name" value="${escapeAttr(current.last_name)}" ${disabledAttr}/></label>
+      <label>Email<input name="email" type="email" value="${escapeAttr(current.email)}" ${disabledAttr}/></label>
+      <label>Phone<input name="phone" value="${escapeAttr(current.phone)}" ${disabledAttr}/></label>
+      <label>Company<input name="company" value="${escapeAttr(current.company)}" ${disabledAttr}/></label>
+      <label>Title<input name="title" value="${escapeAttr(current.title)}" ${disabledAttr}/></label>
+      <label>Status<select name="status" ${disabledAttr}>${statuses
+        .map((status) => `<option value="${escapeAttr(status)}" ${(current.status || "lead") === status ? "selected" : ""}>${escapeHtml(status)}</option>`)
         .join("")}</select></label>
-      ${customFields
-        .map((f) => {
-          const val = (c.custom_fields && c.custom_fields[f.id]) || "";
-          return `<label>${escapeHtml(f.label)}<input data-custom="${escapeAttr(f.id)}" value="${escapeAttr(val)}"/></label>`;
-        })
-        .join("")}
+      ${renderCustomFieldInputs(customFields, current.custom_fields || {}, disabledAttr)}
+      ${contactDetails}
+      ${isEdit ? renderRelatedDeals(relatedDeals, "Linked jobs") : ""}
+      ${isEdit ? renderActivityFeed(relatedActivities, "No activity logged for this contact yet.") : ""}
       <div class="modal-actions">
-        ${isEdit ? '<button type="button" class="ghost-btn" data-action="delete">Delete</button>' : ""}
+        ${readOnly
+          ? '<button type="button" class="ghost-btn" data-action="cancel">Close</button>'
+          : `${isEdit ? '<button type="button" class="ghost-btn" data-action="delete">Delete</button>' : ""}
         <button type="button" class="ghost-btn" data-action="cancel">Cancel</button>
-        <button type="button" class="primary-btn" data-action="save">Save</button>
+        <button type="button" class="primary-btn" data-action="save">Save</button>`}
       </div>
     `, async (modal, action) => {
       if (action === "cancel") return true;
+      if (readOnly) return true;
       if (action === "delete" && isEdit) {
-        await api(`/api/crm/contacts?id=${c.id}`, { method: "DELETE" });
+        await api(`/api/crm/contacts?id=${current.id}`, { method: "DELETE" });
         await loadContacts();
         renderDashboard();
         return true;
@@ -301,7 +593,7 @@
       if (action === "save") {
         const body = collectForm(modal);
         if (isEdit) {
-          await api(`/api/crm/contacts?id=${c.id}`, { method: "PATCH", body });
+          await api(`/api/crm/contacts?id=${current.id}`, { method: "PATCH", body });
         } else {
           await api("/api/crm/contacts", { method: "POST", body });
         }
@@ -317,83 +609,112 @@
   function renderPipeline() {
     const board = document.getElementById("pipeline-board");
     board.innerHTML = "";
-    const config = (state.session.tenant && state.session.tenant.config) || {};
+    const config = getTenantConfig();
     const stages = (config.pipeline && config.pipeline.stages) || [
       { id: "new", label: "New" },
       { id: "won", label: "Won" },
       { id: "lost", label: "Lost" }
     ];
+
     stages.forEach((stage) => {
-      const col = document.createElement("div");
-      col.className = "pipeline-col";
-      const dealsInStage = state.deals.filter((d) => d.stage === stage.id);
-      const total = dealsInStage.reduce((sum, d) => sum + Number(d.amount || 0), 0);
-      col.innerHTML = `<h3><span>${escapeHtml(stage.label)}</span><span>${dealsInStage.length}</span></h3>
+      const column = document.createElement("div");
+      column.className = "pipeline-col";
+      const dealsInStage = state.deals.filter((deal) => deal.stage === stage.id);
+      const total = dealsInStage.reduce((sum, deal) => sum + Number(deal.amount || 0), 0);
+      column.innerHTML = `<h3><span>${escapeHtml(stage.label)}</span><span>${dealsInStage.length}</span></h3>
         <div class="stage-total">${formatMoney(total, dealsInStage[0] && dealsInStage[0].currency)}</div>`;
-      dealsInStage.forEach((d) => {
+
+      dealsInStage.forEach((deal) => {
+        const linkedContact = getContactById(deal.contact_id);
+        const metaBits = [];
+        const serviceType = getCustomFieldValue(deal, "service_type");
+        if (serviceType) metaBits.push(serviceType);
+        if (linkedContact) metaBits.push(getContactName(linkedContact));
+        if (deal.expected_close_date) metaBits.push(`Closes ${formatDate(deal.expected_close_date)}`);
+
         const card = document.createElement("div");
         card.className = "deal-card";
-        card.innerHTML = `<div class="deal-title">${escapeHtml(d.title)}</div>
-          <div class="deal-amount">${formatMoney(d.amount, d.currency)}</div>`;
-        card.addEventListener("click", () => openDealModal(d));
-        col.appendChild(card);
+        card.innerHTML = `<div class="deal-title">${escapeHtml(deal.title)}</div>
+          <div class="deal-meta">${escapeHtml(metaBits.join(" / ") || "Open deal")}</div>
+          <div class="deal-amount">${formatMoney(deal.amount, deal.currency)}</div>`;
+        card.addEventListener("click", () => openDealModal(deal));
+        column.appendChild(card);
       });
-      board.appendChild(col);
+
+      board.appendChild(column);
     });
   }
 
   function openDealModal(deal) {
-    const config = (state.session.tenant && state.session.tenant.config) || {};
+    const config = getTenantConfig();
     const stages = (config.pipeline && config.pipeline.stages) || [{ id: "new", label: "New" }];
+    const customFields = getCustomFieldDefs("deal");
     const isEdit = Boolean(deal);
-    const d = deal || {};
+    const readOnly = isReadOnlySession();
+    const current = deal || {};
+    const linkedContact = getContactById(current.contact_id);
 
-    const contactOptions = ['<option value="">—</option>']
+    if (readOnly && !isEdit) return;
+
+    const contactOptions = ['<option value="">-</option>']
       .concat(
-        state.contacts.map((c) => {
-          const name = [c.first_name, c.last_name].filter(Boolean).join(" ") || c.email || "Unnamed";
-          return `<option value="${escapeAttr(c.id)}" ${d.contact_id === c.id ? "selected" : ""}>${escapeHtml(name)}</option>`;
+        state.contacts.map((contact) => {
+          return `<option value="${escapeAttr(contact.id)}" ${current.contact_id === contact.id ? "selected" : ""}>${escapeHtml(getContactName(contact))}</option>`;
         })
       )
       .join("");
 
+    const disabledAttr = readOnly ? "disabled" : "";
+    const dealActivities = state.activities
+      .filter((activity) => activity.deal_id === current.id)
+      .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+      .slice(0, 6);
+    const dealDetails = isEdit ? renderDetailSection("Job snapshot", [
+      { label: "Expected close", value: current.expected_close_date ? formatDate(current.expected_close_date) : "-" },
+      { label: "Service type", value: getCustomFieldValue(current, "service_type") || "-" },
+      { label: "Volume", value: getCustomFieldValue(current, "volume_gallons") || "-" },
+      { label: "Assigned tech", value: getCustomFieldValue(current, "technician") || "-" },
+      { label: "Equipment", value: getCustomFieldValue(current, "equipment") || "-" }
+    ]) : "";
+
     openModal(`
-      <h2>${isEdit ? "Edit deal" : "New deal"}</h2>
-      <label>Title<input name="title" value="${escapeAttr(d.title)}" required/></label>
-      <label>Contact<select name="contact_id">${contactOptions}</select></label>
-      <label>Stage<select name="stage">${stages
-        .map((s) => `<option value="${escapeAttr(s.id)}" ${d.stage === s.id ? "selected" : ""}>${escapeHtml(s.label)}</option>`)
+      <h2>${readOnly ? "Deal details" : isEdit ? "Edit deal" : "New deal"}</h2>
+      ${readOnly ? '<div class="readonly-note">Public demo mode is view-only.</div>' : ""}
+      <label>Title<input name="title" value="${escapeAttr(current.title)}" required ${disabledAttr}/></label>
+      <label>Contact<select name="contact_id" ${disabledAttr}>${contactOptions}</select></label>
+      <label>Stage<select name="stage" ${disabledAttr}>${stages
+        .map((stage) => `<option value="${escapeAttr(stage.id)}" ${(current.stage || stages[0].id) === stage.id ? "selected" : ""}>${escapeHtml(stage.label)}</option>`)
         .join("")}</select></label>
-      <label>Amount<input name="amount" type="number" step="0.01" value="${escapeAttr(d.amount || 0)}"/></label>
-      <label>Currency<input name="currency" value="${escapeAttr(d.currency || "USD")}"/></label>
-      <label>Expected close<input name="expected_close_date" type="date" value="${escapeAttr(d.expected_close_date || "")}"/></label>
+      <label>Amount<input name="amount" type="number" step="0.01" value="${escapeAttr(current.amount || 0)}" ${disabledAttr}/></label>
+      <label>Currency<input name="currency" value="${escapeAttr(current.currency || "USD")}" ${disabledAttr}/></label>
+      <label>Expected close<input name="expected_close_date" type="date" value="${escapeAttr(current.expected_close_date || "")}" ${disabledAttr}/></label>
+      ${renderCustomFieldInputs(customFields, current.custom_fields || {}, disabledAttr)}
+      ${dealDetails}
+      ${isEdit ? renderLinkedContact(linkedContact) : ""}
+      ${isEdit ? renderActivityFeed(dealActivities, "No activity logged for this job yet.") : ""}
       ${isEdit ? `
         <div class="ai-panel">
-          <button type="button" class="primary-btn" data-action="ai-summary">✨ Summarize with AI</button>
+          <button type="button" class="primary-btn" data-action="ai-summary">Summarize with AI</button>
           <div class="ai-result" id="ai-result" hidden></div>
         </div>
       ` : ""}
       <div class="modal-actions">
-        ${isEdit ? '<button type="button" class="ghost-btn" data-action="delete">Delete</button>' : ""}
+        ${readOnly
+          ? '<button type="button" class="ghost-btn" data-action="cancel">Close</button>'
+          : `${isEdit ? '<button type="button" class="ghost-btn" data-action="delete">Delete</button>' : ""}
         <button type="button" class="ghost-btn" data-action="cancel">Cancel</button>
-        <button type="button" class="primary-btn" data-action="save">Save</button>
+        <button type="button" class="primary-btn" data-action="save">Save</button>`}
       </div>
     `, async (modal, action) => {
       if (action === "cancel") return true;
-      if (action === "delete" && isEdit) {
-        await api(`/api/crm/deals?id=${d.id}`, { method: "DELETE" });
-        await loadDeals();
-        renderDashboard();
-        return true;
-      }
       if (action === "ai-summary" && isEdit) {
         const result = modal.querySelector("#ai-result");
         result.hidden = false;
-        result.innerHTML = '<em>Asking Claude…</em>';
+        result.innerHTML = "<em>Generating summary...</em>";
         try {
-          const data = await api(`/api/crm/ai-summary?deal_id=${d.id}`, { method: "POST" });
-          const actions = (data.nextActions || []).map((a) => `<li>${escapeHtml(a)}</li>`).join("");
-          const stub = data.stub ? '<div class="ai-stub-warning">Demo mode — set ANTHROPIC_API_KEY for live AI.</div>' : "";
+          const data = await api(`/api/crm/ai-summary?deal_id=${current.id}`, { method: "POST" });
+          const actions = (data.nextActions || []).map((entry) => `<li>${escapeHtml(entry)}</li>`).join("");
+          const stub = data.stub ? '<div class="ai-stub-warning">Demo mode: set ANTHROPIC_API_KEY for live AI.</div>' : "";
           result.innerHTML = `
             ${stub}
             <div class="ai-summary-text">${escapeHtml(data.summary || "(no summary)")}</div>
@@ -406,10 +727,17 @@
         }
         return false;
       }
+      if (readOnly) return true;
+      if (action === "delete" && isEdit) {
+        await api(`/api/crm/deals?id=${current.id}`, { method: "DELETE" });
+        await loadDeals();
+        renderDashboard();
+        return true;
+      }
       if (action === "save") {
         const body = collectForm(modal);
         if (isEdit) {
-          await api(`/api/crm/deals?id=${d.id}`, { method: "PATCH", body });
+          await api(`/api/crm/deals?id=${current.id}`, { method: "PATCH", body });
         } else {
           await api("/api/crm/deals", { method: "POST", body });
         }
@@ -429,33 +757,41 @@
       list.innerHTML = '<li class="empty">No activities logged yet.</li>';
       return;
     }
-    state.activities.forEach((a) => list.appendChild(renderActivityItem(a)));
+
+    state.activities
+      .slice()
+      .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+      .forEach((activity) => list.appendChild(renderActivityItem(activity)));
   }
 
-  function renderActivityItem(a) {
+  function renderActivityItem(activity) {
     const li = document.createElement("li");
-    const when = new Date(a.created_at).toLocaleString();
+    const contact = getContactById(activity.contact_id);
+    const deal = getDealById(activity.deal_id);
+    const meta = [contact ? getContactName(contact) : "", deal ? deal.title : ""].filter(Boolean).join(" / ");
     li.innerHTML = `
-      <div class="t-head"><span>${escapeHtml(a.type || "note")}</span><span>${escapeHtml(when)}</span></div>
-      <div class="t-subject">${escapeHtml(a.subject || "(no subject)")}</div>
-      <div class="t-body">${escapeHtml(a.body || "")}</div>
+      <div class="t-head"><span>${escapeHtml(activity.type || "note")}</span><span>${escapeHtml(formatDateTime(activity.created_at))}</span></div>
+      <div class="t-subject">${escapeHtml(activity.subject || "(no subject)")}</div>
+      ${meta ? `<div class="t-meta">${escapeHtml(meta)}</div>` : ""}
+      <div class="t-body">${escapeHtml(activity.body || "")}</div>
     `;
     return li;
   }
 
   function openActivityModal() {
-    const contactOptions = ['<option value="">—</option>']
+    if (isReadOnlySession()) return;
+
+    const contactOptions = ['<option value="">-</option>']
       .concat(
-        state.contacts.map((c) => {
-          const name = [c.first_name, c.last_name].filter(Boolean).join(" ") || c.email || "Unnamed";
-          return `<option value="${escapeAttr(c.id)}">${escapeHtml(name)}</option>`;
+        state.contacts.map((contact) => {
+          return `<option value="${escapeAttr(contact.id)}">${escapeHtml(getContactName(contact))}</option>`;
         })
       )
       .join("");
 
-    const dealOptions = ['<option value="">—</option>']
+    const dealOptions = ['<option value="">-</option>']
       .concat(
-        state.deals.map((d) => `<option value="${escapeAttr(d.id)}">${escapeHtml(d.title)}</option>`)
+        state.deals.map((deal) => `<option value="${escapeAttr(deal.id)}">${escapeHtml(deal.title)}</option>`)
       )
       .join("");
 
@@ -495,16 +831,19 @@
     root.hidden = false;
     root.innerHTML = `<div class="modal">${html}</div>`;
     const modal = root.querySelector(".modal");
-    modal.querySelectorAll("[data-action]").forEach((btn) => {
-      btn.addEventListener("click", async () => {
+
+    modal.querySelectorAll("[data-action]").forEach((button) => {
+      button.addEventListener("click", async () => {
         try {
-          const done = await onAction(modal, btn.dataset.action);
+          const done = await onAction(modal, button.dataset.action);
           if (done) closeModal();
         } catch (err) {
           alert(err.message);
         }
       });
     });
+
+    wireLinkedRecordButtons(modal);
   }
 
   function closeModal() {
@@ -516,15 +855,15 @@
   function collectForm(modal) {
     const result = {};
     const custom = {};
-    modal.querySelectorAll("input[name], select[name], textarea[name]").forEach((el) => {
-      if (el.type === "number") {
-        result[el.name] = el.value === "" ? null : Number(el.value);
+    modal.querySelectorAll("input[name], select[name], textarea[name]").forEach((element) => {
+      if (element.type === "number") {
+        result[element.name] = element.value === "" ? null : Number(element.value);
       } else {
-        result[el.name] = el.value;
+        result[element.name] = element.value;
       }
     });
-    modal.querySelectorAll("[data-custom]").forEach((el) => {
-      custom[el.dataset.custom] = el.value;
+    modal.querySelectorAll("[data-custom]").forEach((element) => {
+      custom[element.dataset.custom] = element.value;
     });
     if (Object.keys(custom).length) result.custom_fields = custom;
     return result;
