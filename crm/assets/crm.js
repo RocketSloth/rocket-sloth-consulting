@@ -7,6 +7,200 @@
   const STORAGE_KEY = "rs_crm_session";
   const TENANT_KEY = "rs_crm_last_tenant";
 
+  // ---------- Client-side demo mode ----------
+  // When the backend isn't configured, the demo runs entirely in the browser
+  // with mock data. All CRUD operations work against in-memory arrays.
+
+  var demoIdCounter = 100;
+  function demoId() { return "demo-" + (++demoIdCounter); }
+
+  var DEMO_CONFIG = {
+    branding: { productName: "Rocket Sloth CRM", accentColor: "#4f46e5", logoUrl: "" },
+    pipeline: {
+      stages: [
+        { id: "new", label: "New", probability: 10 },
+        { id: "qualified", label: "Qualified", probability: 25 },
+        { id: "proposal", label: "Proposal", probability: 50 },
+        { id: "negotiation", label: "Negotiation", probability: 75 },
+        { id: "won", label: "Won", probability: 100 },
+        { id: "lost", label: "Lost", probability: 0 }
+      ]
+    },
+    contactStatuses: ["lead", "customer", "partner", "archived"],
+    customFields: { contact: [], deal: [] },
+    modules: { contacts: true, deals: true, activities: true }
+  };
+
+  function buildDemoData() {
+    var now = new Date();
+    var day = 86400000;
+
+    var contacts = [
+      { id: demoId(), first_name: "Sarah", last_name: "Chen", email: "sarah@techvault.io", phone: "(415) 555-0101", company: "TechVault", title: "VP Engineering", status: "customer", custom_fields: {}, created_at: new Date(now - 30 * day).toISOString() },
+      { id: demoId(), first_name: "Marcus", last_name: "Rivera", email: "marcus@greenleaf.co", phone: "(512) 555-0202", company: "GreenLeaf Analytics", title: "CEO", status: "customer", custom_fields: {}, created_at: new Date(now - 28 * day).toISOString() },
+      { id: demoId(), first_name: "Priya", last_name: "Patel", email: "priya@novahealth.com", phone: "(646) 555-0303", company: "NovaHealth", title: "Director of Data", status: "lead", custom_fields: {}, created_at: new Date(now - 25 * day).toISOString() },
+      { id: demoId(), first_name: "James", last_name: "O'Brien", email: "james@coastalmfg.com", phone: "(619) 555-0404", company: "Coastal Manufacturing", title: "COO", status: "lead", custom_fields: {}, created_at: new Date(now - 22 * day).toISOString() },
+      { id: demoId(), first_name: "Aisha", last_name: "Williams", email: "aisha@brightedu.org", phone: "(312) 555-0505", company: "BrightPath Education", title: "Head of IT", status: "prospect", custom_fields: {}, created_at: new Date(now - 20 * day).toISOString() },
+      { id: demoId(), first_name: "Erik", last_name: "Johansson", email: "erik@nordicfin.se", phone: "+46 70 555 0606", company: "Nordic Finance Group", title: "CTO", status: "customer", custom_fields: {}, created_at: new Date(now - 18 * day).toISOString() },
+      { id: demoId(), first_name: "Maria", last_name: "Santos", email: "maria@solarbright.com", phone: "(305) 555-0707", company: "SolarBright Energy", title: "VP Operations", status: "lead", custom_fields: {}, created_at: new Date(now - 15 * day).toISOString() },
+      { id: demoId(), first_name: "David", last_name: "Kim", email: "david@apexlogistics.com", phone: "(213) 555-0808", company: "Apex Logistics", title: "Director of Strategy", status: "lead", custom_fields: {}, created_at: new Date(now - 12 * day).toISOString() },
+      { id: demoId(), first_name: "Lauren", last_name: "Mitchell", email: "lauren@crestview.io", phone: "(617) 555-0909", company: "Crestview Software", title: "Product Manager", status: "customer", custom_fields: {}, created_at: new Date(now - 10 * day).toISOString() },
+      { id: demoId(), first_name: "Raj", last_name: "Gupta", email: "raj@quantumleap.ai", phone: "(408) 555-1010", company: "QuantumLeap AI", title: "Founder", status: "lead", custom_fields: {}, created_at: new Date(now - 8 * day).toISOString() },
+      { id: demoId(), first_name: "Nina", last_name: "Volkov", email: "nina@stratoscloud.com", phone: "(720) 555-1111", company: "Stratos Cloud", title: "VP Sales", status: "prospect", custom_fields: {}, created_at: new Date(now - 5 * day).toISOString() },
+      { id: demoId(), first_name: "Tom", last_name: "Fischer", email: "tom@blueridgehvac.com", phone: "(704) 555-1212", company: "BlueRidge HVAC", title: "Owner", status: "archived", custom_fields: {}, created_at: new Date(now - 45 * day).toISOString() }
+    ];
+
+    var deals = [
+      { id: demoId(), title: "TechVault BI Dashboard", contact_id: contacts[0].id, stage: "won", amount: 48000, currency: "USD", expected_close_date: new Date(now - 5 * day).toISOString().slice(0, 10), created_at: new Date(now - 25 * day).toISOString(), updated_at: new Date(now - 2 * day).toISOString() },
+      { id: demoId(), title: "GreenLeaf Data Pipeline", contact_id: contacts[1].id, stage: "negotiation", amount: 72000, currency: "USD", expected_close_date: new Date(now + 14 * day).toISOString().slice(0, 10), created_at: new Date(now - 20 * day).toISOString(), updated_at: new Date(now - 1 * day).toISOString() },
+      { id: demoId(), title: "NovaHealth AI Integration", contact_id: contacts[2].id, stage: "proposal", amount: 95000, currency: "USD", expected_close_date: new Date(now + 30 * day).toISOString().slice(0, 10), created_at: new Date(now - 18 * day).toISOString(), updated_at: new Date(now - 3 * day).toISOString() },
+      { id: demoId(), title: "Coastal Mfg Inventory System", contact_id: contacts[3].id, stage: "qualified", amount: 35000, currency: "USD", expected_close_date: new Date(now + 45 * day).toISOString().slice(0, 10), created_at: new Date(now - 15 * day).toISOString(), updated_at: new Date(now - 4 * day).toISOString() },
+      { id: demoId(), title: "BrightPath LMS Analytics", contact_id: contacts[4].id, stage: "new", amount: 28000, currency: "USD", expected_close_date: new Date(now + 60 * day).toISOString().slice(0, 10), created_at: new Date(now - 10 * day).toISOString(), updated_at: new Date(now - 5 * day).toISOString() },
+      { id: demoId(), title: "Nordic Finance Compliance Tool", contact_id: contacts[5].id, stage: "proposal", amount: 110000, currency: "USD", expected_close_date: new Date(now + 20 * day).toISOString().slice(0, 10), created_at: new Date(now - 22 * day).toISOString(), updated_at: new Date(now - 2 * day).toISOString() },
+      { id: demoId(), title: "SolarBright Reporting Suite", contact_id: contacts[6].id, stage: "new", amount: 42000, currency: "USD", expected_close_date: new Date(now + 50 * day).toISOString().slice(0, 10), created_at: new Date(now - 8 * day).toISOString(), updated_at: new Date(now - 6 * day).toISOString() },
+      { id: demoId(), title: "Apex Route Optimization AI", contact_id: contacts[7].id, stage: "qualified", amount: 65000, currency: "USD", expected_close_date: new Date(now + 35 * day).toISOString().slice(0, 10), created_at: new Date(now - 12 * day).toISOString(), updated_at: new Date(now - 3 * day).toISOString() },
+      { id: demoId(), title: "Crestview CRM Customization", contact_id: contacts[8].id, stage: "won", amount: 18000, currency: "USD", expected_close_date: new Date(now - 10 * day).toISOString().slice(0, 10), created_at: new Date(now - 30 * day).toISOString(), updated_at: new Date(now - 8 * day).toISOString() },
+      { id: demoId(), title: "QuantumLeap ML Platform", contact_id: contacts[9].id, stage: "negotiation", amount: 150000, currency: "USD", expected_close_date: new Date(now + 10 * day).toISOString().slice(0, 10), created_at: new Date(now - 14 * day).toISOString(), updated_at: new Date(now - 1 * day).toISOString() },
+      { id: demoId(), title: "BlueRidge Legacy Migration", contact_id: contacts[11].id, stage: "lost", amount: 22000, currency: "USD", expected_close_date: new Date(now - 20 * day).toISOString().slice(0, 10), created_at: new Date(now - 40 * day).toISOString(), updated_at: new Date(now - 15 * day).toISOString() }
+    ];
+
+    var activities = [
+      { id: demoId(), type: "meeting", contact_id: contacts[1].id, deal_id: deals[1].id, subject: "Contract review with GreenLeaf", body: "Walked through SOW and pricing. They want to start in Q2. Follow up with revised timeline.", created_at: new Date(now - 1 * day).toISOString() },
+      { id: demoId(), type: "call", contact_id: contacts[9].id, deal_id: deals[9].id, subject: "QuantumLeap budget discussion", body: "Raj confirmed budget approval from board. Need to send final proposal by Friday.", created_at: new Date(now - 1.5 * day).toISOString() },
+      { id: demoId(), type: "email", contact_id: contacts[2].id, deal_id: deals[2].id, subject: "NovaHealth proposal sent", body: "Sent the technical proposal for the AI integration project. Includes timeline and team allocation.", created_at: new Date(now - 2 * day).toISOString() },
+      { id: demoId(), type: "note", contact_id: contacts[5].id, deal_id: deals[5].id, subject: "Nordic Finance compliance requirements", body: "They need GDPR and SOC2 compliance documentation before signing. Legal is reviewing.", created_at: new Date(now - 3 * day).toISOString() },
+      { id: demoId(), type: "call", contact_id: contacts[3].id, deal_id: deals[3].id, subject: "Coastal Mfg discovery call", body: "Discussed pain points with current inventory tracking. They're using spreadsheets for everything.", created_at: new Date(now - 4 * day).toISOString() },
+      { id: demoId(), type: "meeting", contact_id: contacts[0].id, deal_id: deals[0].id, subject: "TechVault dashboard launch", body: "Successful launch meeting! Dashboard is live. Sarah's team is thrilled with the real-time metrics.", created_at: new Date(now - 5 * day).toISOString() },
+      { id: demoId(), type: "email", contact_id: contacts[6].id, deal_id: deals[6].id, subject: "SolarBright intro follow-up", body: "Maria responded to our outreach. Interested in automated reporting for their solar farm data.", created_at: new Date(now - 6 * day).toISOString() },
+      { id: demoId(), type: "task", contact_id: contacts[7].id, deal_id: deals[7].id, subject: "Prepare Apex demo environment", body: "Set up sandbox with sample route data for the optimization demo next week.", created_at: new Date(now - 7 * day).toISOString() },
+      { id: demoId(), type: "note", contact_id: contacts[4].id, deal_id: deals[4].id, subject: "BrightPath budget cycle", body: "Aisha mentioned their fiscal year starts July. Timing works well for a summer kickoff.", created_at: new Date(now - 8 * day).toISOString() },
+      { id: demoId(), type: "call", contact_id: contacts[8].id, deal_id: deals[8].id, subject: "Crestview post-launch check-in", body: "Lauren reported positive feedback from her sales team. Considering phase 2 expansion.", created_at: new Date(now - 10 * day).toISOString() }
+    ];
+
+    return { contacts: contacts, deals: deals, activities: activities };
+  }
+
+  // In-memory store for demo mode.
+  var demoStore = null;
+
+  function startDemoMode() {
+    demoStore = buildDemoData();
+    var session = {
+      demo: true,
+      token: "demo-token",
+      user: { id: "demo-user", email: "demo@rocketsloth.space", fullName: "Demo User", role: "owner" },
+      tenant: { id: "demo-tenant", slug: "demo", name: "Demo Company", plan: "starter", config: DEMO_CONFIG }
+    };
+    setSession(session);
+    return session;
+  }
+
+  // Mock API handler for demo mode — intercepts all CRUD calls.
+  function mockApi(path, options) {
+    var method = (options && options.method) || "GET";
+    var body = (options && options.body) || {};
+
+    // --- Contacts ---
+    if (path.indexOf("/api/crm/contacts") === 0) {
+      if (method === "GET") {
+        var qMatch = path.match(/[?&]q=([^&]*)/);
+        var search = qMatch ? decodeURIComponent(qMatch[1]).toLowerCase() : "";
+        var filtered = demoStore.contacts;
+        if (search) {
+          filtered = demoStore.contacts.filter(function (c) {
+            return (c.first_name + " " + c.last_name + " " + c.email + " " + c.company).toLowerCase().indexOf(search) !== -1;
+          });
+        }
+        return { contacts: filtered };
+      }
+      if (method === "POST") {
+        var newContact = Object.assign({ id: demoId(), status: "lead", custom_fields: {}, created_at: new Date().toISOString() }, body);
+        demoStore.contacts.push(newContact);
+        return { contact: newContact };
+      }
+      var idMatch = path.match(/[?&]id=([^&]*)/);
+      var cid = idMatch ? idMatch[1] : null;
+      if (method === "PATCH" && cid) {
+        demoStore.contacts = demoStore.contacts.map(function (c) {
+          return c.id === cid ? Object.assign({}, c, body) : c;
+        });
+        return { ok: true };
+      }
+      if (method === "DELETE" && cid) {
+        demoStore.contacts = demoStore.contacts.filter(function (c) { return c.id !== cid; });
+        return { ok: true };
+      }
+    }
+
+    // --- Deals ---
+    if (path.indexOf("/api/crm/deals") === 0) {
+      if (method === "GET") {
+        return { deals: demoStore.deals };
+      }
+      if (method === "POST") {
+        var newDeal = Object.assign({ id: demoId(), currency: "USD", created_at: new Date().toISOString(), updated_at: new Date().toISOString() }, body);
+        demoStore.deals.push(newDeal);
+        return { deal: newDeal };
+      }
+      var didMatch = path.match(/[?&]id=([^&]*)/);
+      var did = didMatch ? didMatch[1] : null;
+      if (method === "PATCH" && did) {
+        demoStore.deals = demoStore.deals.map(function (d) {
+          return d.id === did ? Object.assign({}, d, body, { updated_at: new Date().toISOString() }) : d;
+        });
+        return { ok: true };
+      }
+      if (method === "DELETE" && did) {
+        demoStore.deals = demoStore.deals.filter(function (d) { return d.id !== did; });
+        return { ok: true };
+      }
+    }
+
+    // --- Activities ---
+    if (path.indexOf("/api/crm/activities") === 0) {
+      if (method === "GET") {
+        return { activities: demoStore.activities };
+      }
+      if (method === "POST") {
+        var newAct = Object.assign({ id: demoId(), created_at: new Date().toISOString() }, body);
+        demoStore.activities.unshift(newAct);
+        return { activity: newAct };
+      }
+    }
+
+    // --- AI Summary ---
+    if (path.indexOf("/api/crm/ai-summary") === 0) {
+      var dealIdMatch = path.match(/[?&]deal_id=([^&]*)/);
+      var dealId = dealIdMatch ? dealIdMatch[1] : null;
+      var deal = demoStore.deals.find(function (d) { return d.id === dealId; });
+      var contact = deal ? demoStore.contacts.find(function (c) { return c.id === deal.contact_id; }) : null;
+      var contactName = contact ? (contact.first_name + " " + contact.last_name) : "the contact";
+      var dealTitle = deal ? deal.title : "this deal";
+      return {
+        stub: true,
+        summary: dealTitle + " is progressing well. " + contactName + " has shown strong interest and engagement throughout the sales process. Key decision-makers are aligned and the technical requirements are well-understood by both teams.",
+        nextActions: [
+          "Schedule a follow-up call with " + contactName + " to discuss timeline",
+          "Prepare a detailed implementation roadmap",
+          "Send case studies from similar projects for reference"
+        ],
+        riskScore: deal && deal.stage === "negotiation" ? 35 : deal && deal.stage === "proposal" ? 45 : 25
+      };
+    }
+
+    // --- Logout (DELETE /api/crm/me) ---
+    if (path.indexOf("/api/crm/me") === 0 && method === "DELETE") {
+      demoStore = null;
+      return { ok: true };
+    }
+
+    return { ok: true };
+  }
+
+  function isDemo() {
+    return state.session && state.session.demo === true && demoStore !== null;
+  }
+
   function getSession() {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
@@ -142,10 +336,9 @@
           setSession(result);
           window.location.href = "/crm";
         } catch (err) {
-          errEl.textContent = err.message;
-          errEl.hidden = false;
-          btn.disabled = false;
-          btn.textContent = "Enter the live demo →";
+          // Backend not available — fall back to client-side demo mode.
+          startDemoMode();
+          window.location.href = "/crm";
         }
       });
 
@@ -276,6 +469,11 @@
     }
     state.session = session;
 
+    // Restore in-memory demo store if returning to the CRM in demo mode.
+    if (session.demo && !demoStore) {
+      demoStore = buildDemoData();
+    }
+
     applyBranding(session.tenant && session.tenant.config);
     var label = (session.user.fullName && session.user.fullName.length > 0)
       ? session.user.fullName : session.user.email;
@@ -292,7 +490,11 @@
     });
 
     document.getElementById("logout-btn").addEventListener("click", async function () {
-      try { await api("/api/crm/me", { method: "DELETE" }); } catch (ignored) {}
+      if (isDemo()) {
+        demoStore = null;
+      } else {
+        try { await api("/api/crm/me", { method: "DELETE" }); } catch (ignored) {}
+      }
       clearSession();
       window.location.href = "/crm/login";
     });
@@ -331,21 +533,36 @@
 
   async function loadContacts(search) {
     var qs = search ? "?q=" + encodeURIComponent(search) : "";
-    var data = await api("/api/crm/contacts" + qs);
+    var data;
+    if (isDemo()) {
+      data = mockApi("/api/crm/contacts" + qs);
+    } else {
+      data = await api("/api/crm/contacts" + qs);
+    }
     if (!data) return;
     state.contacts = data.contacts || [];
     renderContacts();
   }
 
   async function loadDeals() {
-    var data = await api("/api/crm/deals");
+    var data;
+    if (isDemo()) {
+      data = mockApi("/api/crm/deals");
+    } else {
+      data = await api("/api/crm/deals");
+    }
     if (!data) return;
     state.deals = data.deals || [];
     renderPipeline();
   }
 
   async function loadActivities() {
-    var data = await api("/api/crm/activities");
+    var data;
+    if (isDemo()) {
+      data = mockApi("/api/crm/activities");
+    } else {
+      data = await api("/api/crm/activities");
+    }
     if (!data) return;
     state.activities = data.activities || [];
     renderActivities();
@@ -432,17 +649,29 @@
         if (action === "cancel") return true;
         if (action === "delete" && isEdit) {
           if (!confirm("Delete this contact? This cannot be undone.")) return false;
-          await api("/api/crm/contacts?id=" + c.id, { method: "DELETE" });
+          if (isDemo()) {
+            mockApi("/api/crm/contacts?id=" + c.id, { method: "DELETE" });
+          } else {
+            await api("/api/crm/contacts?id=" + c.id, { method: "DELETE" });
+          }
           await loadContacts();
           renderDashboard();
           return true;
         }
         if (action === "save") {
           var body = collectForm(modal);
-          if (isEdit) {
-            await api("/api/crm/contacts?id=" + c.id, { method: "PATCH", body: body });
+          if (isDemo()) {
+            if (isEdit) {
+              mockApi("/api/crm/contacts?id=" + c.id, { method: "PATCH", body: body });
+            } else {
+              mockApi("/api/crm/contacts", { method: "POST", body: body });
+            }
           } else {
-            await api("/api/crm/contacts", { method: "POST", body: body });
+            if (isEdit) {
+              await api("/api/crm/contacts?id=" + c.id, { method: "PATCH", body: body });
+            } else {
+              await api("/api/crm/contacts", { method: "POST", body: body });
+            }
           }
           await loadContacts();
           renderDashboard();
@@ -520,7 +749,11 @@
         if (action === "cancel") return true;
         if (action === "delete" && isEdit) {
           if (!confirm("Delete this deal? This cannot be undone.")) return false;
-          await api("/api/crm/deals?id=" + d.id, { method: "DELETE" });
+          if (isDemo()) {
+            mockApi("/api/crm/deals?id=" + d.id, { method: "DELETE" });
+          } else {
+            await api("/api/crm/deals?id=" + d.id, { method: "DELETE" });
+          }
           await loadDeals();
           renderDashboard();
           return true;
@@ -530,9 +763,14 @@
           resultEl.hidden = false;
           resultEl.innerHTML = "<em>Asking Claude\u2026</em>";
           try {
-            var data = await api("/api/crm/ai-summary?deal_id=" + d.id, { method: "POST" });
+            var data;
+            if (isDemo()) {
+              data = mockApi("/api/crm/ai-summary?deal_id=" + d.id, { method: "POST" });
+            } else {
+              data = await api("/api/crm/ai-summary?deal_id=" + d.id, { method: "POST" });
+            }
             var actions = (data.nextActions || []).map(function (a) { return "<li>" + escapeHtml(a) + "</li>"; }).join("");
-            var stub = data.stub ? '<div class="ai-stub-warning">Demo mode \u2014 set ANTHROPIC_API_KEY for live AI.</div>' : "";
+            var stub = data.stub ? '<div class="ai-stub-warning">Demo mode \u2014 connect the Anthropic API for live AI insights.</div>' : "";
             resultEl.innerHTML =
               stub +
               '<div class="ai-summary-text">' + escapeHtml(data.summary || "(no summary)") + "</div>" +
@@ -546,10 +784,18 @@
         }
         if (action === "save") {
           var body = collectForm(modal);
-          if (isEdit) {
-            await api("/api/crm/deals?id=" + d.id, { method: "PATCH", body: body });
+          if (isDemo()) {
+            if (isEdit) {
+              mockApi("/api/crm/deals?id=" + d.id, { method: "PATCH", body: body });
+            } else {
+              mockApi("/api/crm/deals", { method: "POST", body: body });
+            }
           } else {
-            await api("/api/crm/deals", { method: "POST", body: body });
+            if (isEdit) {
+              await api("/api/crm/deals?id=" + d.id, { method: "PATCH", body: body });
+            } else {
+              await api("/api/crm/deals", { method: "POST", body: body });
+            }
           }
           await loadDeals();
           renderDashboard();
@@ -611,7 +857,11 @@
         if (action === "cancel") return true;
         if (action === "save") {
           var body = collectForm(modal);
-          await api("/api/crm/activities", { method: "POST", body: body });
+          if (isDemo()) {
+            mockApi("/api/crm/activities", { method: "POST", body: body });
+          } else {
+            await api("/api/crm/activities", { method: "POST", body: body });
+          }
           await loadActivities();
           renderDashboard();
           return true;
