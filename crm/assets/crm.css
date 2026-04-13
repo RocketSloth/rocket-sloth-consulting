@@ -72,6 +72,38 @@ html, body {
 .auth-toggle a { color: var(--accent); text-decoration: none; }
 .auth-toggle a:hover { text-decoration: underline; }
 
+/* Back-to-home link shown above the auth card */
+.back-home {
+  position: fixed;
+  top: 16px;
+  left: 20px;
+  font-size: 13px;
+  color: var(--muted);
+  text-decoration: none;
+  background: var(--card);
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  z-index: 10;
+}
+.back-home:hover { color: var(--text); }
+
+/* Demo entry panel */
+.demo-blurb {
+  font-size: 14px;
+  color: var(--muted);
+  margin: 0 0 16px;
+  line-height: 1.5;
+}
+.demo-full-btn {
+  width: 100%;
+  padding: 14px;
+  font-size: 15px;
+  margin-bottom: 12px;
+  justify-content: center;
+}
+
 /* ---------- App shell ---------- */
 
 .app-body { min-height: 100vh; display: flex; flex-direction: column; }

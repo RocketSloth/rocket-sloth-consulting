@@ -7,12 +7,25 @@
     <link rel="stylesheet" href="/crm/assets/crm.css" />
   </head>
   <body class="auth-body">
+    <a href="/" class="back-home">&larr; rocketsloth.space</a>
+
     <main class="auth-card">
       <h1 id="auth-title">Sign in</h1>
-      <p class="auth-sub" id="auth-sub">Enter your email and we'll send you a sign-in link.</p>
+      <p class="auth-sub" id="auth-sub">Enter your email and we&rsquo;ll send you a sign-in link.</p>
 
-      <!-- Magic-link form (default) -->
-      <form id="magic-form" class="auth-form">
+      <!-- Demo one-click entry (shown only for tenant=demo) -->
+      <div id="demo-entry" hidden>
+        <p class="demo-blurb">
+          This is a live sandbox CRM — explore contacts, deals, and the AI deal summary feature.
+          No account needed.
+        </p>
+        <button id="demo-btn" class="primary-btn demo-full-btn">Enter the live demo &rarr;</button>
+        <p id="demo-error" class="auth-error" hidden></p>
+        <p class="auth-toggle"><a href="#" id="demo-has-account">I have an account</a></p>
+      </div>
+
+      <!-- Magic-link form (default for real tenants, toggled on for demo) -->
+      <form id="magic-form" class="auth-form" hidden>
         <input type="hidden" name="tenant" id="tenant" />
         <label>
           Email
@@ -38,10 +51,11 @@
         <p id="pw-error" class="auth-error" hidden></p>
       </form>
 
-      <p class="auth-toggle">
+      <p class="auth-toggle" id="toggle-row">
         <a href="#" id="toggle-mode">Use password instead</a>
       </p>
     </main>
+
     <script src="/crm/assets/crm.js"></script>
     <script>
       CRM.initLogin();

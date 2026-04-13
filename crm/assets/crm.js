@@ -109,15 +109,57 @@
     }
 
     const tenant = resolveTenant();
+    const isDemo = (tenant === "demo");
     const magicForm = document.getElementById("magic-form");
     const pwForm = document.getElementById("password-form");
+    const demoEntry = document.getElementById("demo-entry");
     const toggle = document.getElementById("toggle-mode");
+    const toggleRow = document.getElementById("toggle-row");
     const magicError = document.getElementById("magic-error");
     const magicStatus = document.getElementById("magic-status");
     const pwError = document.getElementById("pw-error");
 
     document.getElementById("tenant").value = tenant;
     document.getElementById("pw-tenant").value = tenant;
+
+    if (isDemo) {
+      // Demo tenant: show one-click entry, hide email form.
+      demoEntry.hidden = false;
+      magicForm.hidden = true;
+      toggleRow.hidden = true;
+
+      document.getElementById("demo-btn").addEventListener("click", async function () {
+        var btn = document.getElementById("demo-btn");
+        var errEl = document.getElementById("demo-error");
+        errEl.hidden = true;
+        btn.disabled = true;
+        btn.textContent = "Loading demo…";
+        try {
+          var result = await api("/api/crm/demo-session", {
+            method: "POST",
+            skipAuthRedirect: true
+          });
+          setSession(result);
+          window.location.href = "/crm";
+        } catch (err) {
+          errEl.textContent = err.message;
+          errEl.hidden = false;
+          btn.disabled = false;
+          btn.textContent = "Enter the live demo →";
+        }
+      });
+
+      // "I have an account" — switch to magic-link form.
+      document.getElementById("demo-has-account").addEventListener("click", function (e) {
+        e.preventDefault();
+        demoEntry.hidden = true;
+        magicForm.hidden = false;
+        toggleRow.hidden = false;
+      });
+    } else {
+      // Real tenant: show email form directly.
+      magicForm.hidden = false;
+    }
 
     let showingPassword = false;
     toggle.addEventListener("click", function (e) {
@@ -238,6 +280,12 @@
     var label = (session.user.fullName && session.user.fullName.length > 0)
       ? session.user.fullName : session.user.email;
     document.getElementById("user-label").textContent = label;
+
+    // Show "← Home" link only for demo tenant so real customers don't accidentally leave.
+    var homeLink = document.getElementById("home-link");
+    if (homeLink) {
+      homeLink.style.display = (session.tenant && session.tenant.slug === "demo") ? "" : "none";
+    }
 
     document.querySelectorAll(".nav-btn").forEach(function (btn) {
       btn.addEventListener("click", function () { switchView(btn.dataset.view); });
