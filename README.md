@@ -17,6 +17,7 @@ Optional environment variables:
 - `RESEND_FROM_EMAIL`
 - `LEADS_TO_EMAIL`
 - `SIGNUP_WEBHOOK_URL`
+- `DEMO_LOGIN_TENANT`
 
 The signup API always stores leads in Supabase first.
 
@@ -64,9 +65,9 @@ Fields:
 
 ### CRM API endpoints
 
-- `POST /api/crm/login` for tenant, email, and password to a session token
-- `POST /api/crm/demo-access` for the public read-only demo session
-- `GET/DELETE /api/crm/me` for current session info or logout
+- `POST /api/crm/login` — tenant + email + password → session token
+- `POST /api/crm/demo-view` — email-only instant demo session bootstrap
+- `GET/DELETE /api/crm/me` — current session / logout
 - `GET/POST/PATCH/DELETE /api/crm/contacts`
 - `GET/POST/PATCH/DELETE /api/crm/deals`
 - `GET/POST/PATCH/DELETE /api/crm/activities`
@@ -92,10 +93,9 @@ works cleanly.
 
 ### Live demo tenant
 
-The landing page demo CTA links to `/crm?tenant=demo&public=1`, which opens the
-`demo` tenant in a read-only public session. Staff can still use
-`/crm/login?tenant=demo` for the owner login.
-
+The landing page CTA "See a live demo →" links to `/#demo-access`.
+The instant demo-access flow (`POST /api/crm/demo-view`) also auto-populates
+the demo tenant with pool-service sample contacts/deals/activities on first use.
 To populate it, run:
 
 ```bash
@@ -106,9 +106,8 @@ CRM_BASE_URL=https://rocketsloth.space \
 node scripts/seed-demo.js
 ```
 
-This creates or refreshes tenant slug `demo` with branded config, sample
-contacts, deals across all pipeline stages, and activity history. The script
-prints the public demo URL plus the owner credentials at the end of the run.
+This creates (or refreshes) tenant slug `demo` with branded config, ~30 sample
+contacts, ~15 deals across all pipeline stages, and a few activities per deal.
 
 ### Helper scripts
 
@@ -122,5 +121,5 @@ prints the public demo URL plus the owner credentials at the end of the run.
 2. Add `CRM_ADMIN_TOKEN` and `ANTHROPIC_API_KEY` to Vercel env vars.
 3. Redeploy.
 4. Run `node scripts/seed-demo.js` to populate the demo tenant.
-5. Visit `/crm?tenant=demo&public=1` and click "Summarize with AI" on a deal.
-6. Use `scripts/provision-tenant.sh` to onboard real clients.
+5. Submit the demo access form on the homepage and verify you land in `/crm` with seeded demo data and working AI summary button.
+6. Use `scripts/provision-tenant.sh` to onboard each real customer.

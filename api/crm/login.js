@@ -29,6 +29,7 @@ module.exports = async function handler(req, res) {
       select: "*"
     });
     const user = users && users[0];
+
     if (!user || !verifyPassword(password, user.password_hash)) {
       return json(res, 401, { error: "Invalid credentials" });
     }

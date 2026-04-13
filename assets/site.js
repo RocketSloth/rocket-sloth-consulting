@@ -117,11 +117,12 @@
       }
 
       const rawEntries = Object.fromEntries(new FormData(form).entries());
+      const interestMessage = String(rawEntries.message || rawEntries.interest || "").trim();
       const payload = {
         name: String(rawEntries.name || "").trim(),
         email: String(rawEntries.email || "").trim(),
         company: String(rawEntries.company || "").trim() || "Discovery call lead",
-        interest: String(rawEntries.interest || "").trim() || "Workflow assessment request"
+        interest: interestMessage || "Workflow assessment request"
       };
 
       if (button) {
@@ -147,6 +148,25 @@
 
         if (!response.ok) {
           throw new Error(data.error || "Something went wrong. Please try again.");
+        }
+
+        if (form.dataset.demoAccess === "1") {
+          const demoResponse = await fetch("/api/crm/demo-view", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Accept": "application/json"
+            },
+            body: JSON.stringify({ email: payload.email })
+          });
+
+          const demoData = await demoResponse.json().catch(function () { return {}; });
+          if (!demoResponse.ok) {
+            throw new Error(demoData.error || "Unable to open demo right now. Please try again.");
+          }
+
+          window.location.href = demoData.redirectTo || "/crm";
+          return;
         }
 
         setStatus(form, "You are in. Redirecting...", "success");

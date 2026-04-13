@@ -450,17 +450,59 @@ h1 em {
   margin: 18px 0 24px;
 }
 
-.feature-list li {
-  display: flex;
-  gap: 12px;
-  align-items: flex-start;
+.field {
+  display: grid;
+  gap: 6px;
 }
 
-.feature-list li::before {
-  content: "+";
-  color: var(--brand);
-  font-weight: 800;
-  line-height: 1;
+.field label {
+  color: var(--text-faint);
+  font-size: 0.74rem;
+  font-family: var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.field input {
+  width: 100%;
+  min-height: 52px;
+  padding: 0 15px;
+  border: 1px solid rgba(150, 180, 219, 0.14);
+  background: rgba(6, 12, 20, 0.55);
+  color: var(--text);
+  border-radius: 14px;
+  font: inherit;
+  outline: none;
+}
+
+.field textarea {
+  width: 100%;
+  min-height: 110px;
+  padding: 12px 15px;
+  border: 1px solid rgba(150, 180, 219, 0.14);
+  background: rgba(6, 12, 20, 0.55);
+  color: var(--text);
+  border-radius: 14px;
+  font: inherit;
+  resize: vertical;
+  outline: none;
+}
+
+.field input:focus {
+  border-color: rgba(255, 122, 61, 0.8);
+  box-shadow: 0 0 0 3px rgba(255, 122, 61, 0.12);
+}
+
+.field textarea:focus {
+  border-color: rgba(255, 122, 61, 0.8);
+  box-shadow: 0 0 0 3px rgba(255, 122, 61, 0.12);
+}
+
+.form-status {
+  min-height: 1.4em;
+  margin-top: 2px;
+  color: var(--text-dim);
+  font-size: 0.86rem;
 }
 
 .fineprint {
@@ -645,6 +687,13 @@ h1 em {
   transform: translateY(0);
 }
 
+#services,
+#featured-report,
+#how,
+#pricing {
+  display: none;
+}
+
 @media (max-width: 980px) {
   .hero-grid,
   .feature-band,
@@ -715,10 +764,8 @@ h1 em {
       </a>
 
       <nav class="nav" aria-label="Primary">
-        <a href="#services">What We Build</a>
-        <a href="#how">How We Work</a>
-        <a href="#contact">Contact</a>
-        <a class="nav-cta" href="/crm?tenant=demo&public=1">Open Demo</a>
+        <a href="#demo-access">Live Demo</a>
+        <a class="nav-cta" href="#contact">Book a call</a>
       </nav>
     </div>
   </header>
@@ -735,8 +782,8 @@ h1 em {
           </p>
 
           <div class="cta-row">
-            <a class="btn btn-primary" href="/crm?tenant=demo&public=1">Open live demo</a>
-            <a class="btn btn-secondary" href="#contact">Talk to us</a>
+            <a class="btn btn-primary" href="#demo-access">See a live demo →</a>
+            <a class="btn btn-secondary" href="#contact">Book a discovery call</a>
           </div>
 
           <div class="mini-grid" aria-label="What you get">
@@ -755,19 +802,41 @@ h1 em {
           </div>
         </article>
 
-        <aside class="demo-panel reveal" id="demo">
-          <span class="section-kicker">Public CRM demo</span>
-          <h2>See the product before we ever ask for a meeting.</h2>
-          <p>
-            Explore a live sample tenant with read-only access. You can review the pipeline,
-            inspect contacts, open deals, and trigger the AI summary flow without entering credentials.
-          </p>
+        <aside class="signup-card reveal" id="contact">
+          <div>
+            <h2>Tell us what's slow, manual, or guesswork. We'll show you the AI-shaped fix.</h2>
+            <p>
+              Drop your email and a one-line description of what you'd want intelligent.
+              We reply within one business day with a free recommendation and a demo built around your use case.
+            </p>
+          </div>
 
-          <ul class="feature-list">
-            <li>Sample contacts, pipeline stages, and activity history already loaded.</li>
-            <li>White-label branding so you can see how this becomes your system.</li>
-            <li>Read-only demo mode, which means visitors can explore safely.</li>
-          </ul>
+          <form class="signup-form" data-signup-form method="POST" action="/api/signup" novalidate>
+            <input type="hidden" name="company" value="RocketSloth Discovery">
+
+            <div class="field">
+              <label for="home-name">Your name</label>
+              <input id="home-name" name="name" type="text" autocomplete="given-name" placeholder="Optional">
+            </div>
+
+            <div class="field">
+              <label for="home-email">Work email</label>
+              <input id="home-email" name="email" type="email" autocomplete="email" placeholder="you@yourcompany.com" required>
+            </div>
+
+            <div class="field">
+              <label for="home-company">Company</label>
+              <input id="home-company" name="company" type="text" autocomplete="organization" placeholder="Acme Inc">
+            </div>
+
+            <div class="field">
+              <label for="home-message">What should we improve?</label>
+              <textarea id="home-message" name="message" placeholder="Example: Our sales follow-up is manual and inconsistent."></textarea>
+            </div>
+
+            <button class="btn btn-primary" data-submit-button type="submit">Request a discovery call</button>
+            <p class="form-status" data-form-status aria-live="polite"></p>
+          </form>
 
           <a class="btn btn-primary full-width" href="/crm?tenant=demo&public=1">Enter the workspace</a>
           <p class="fineprint">Want a guided walkthrough instead? Use the form below and we will tailor one to your workflow.</p>
@@ -824,9 +893,9 @@ h1 em {
               <li>Review the overall product shape before we discuss branding, integrations, or custom fields.</li>
             </ul>
 
-            <div class="cta-row">
-              <a class="btn btn-primary" href="/crm?tenant=demo&public=1">Explore the demo</a>
-              <a class="btn btn-secondary" href="#contact">Request a guided walkthrough</a>
+            <div class="cta-row" style="margin-top: 22px; margin-bottom: 0;">
+              <a class="btn btn-primary" href="#demo-access">Get instant demo access →</a>
+              <a class="btn btn-secondary" href="#contact">Talk to us about your build</a>
             </div>
           </div>
 
@@ -852,7 +921,40 @@ h1 em {
       </div>
     </section>
 
-    <section class="section">
+    <section class="section" id="demo-access">
+      <div class="container">
+        <div class="cta-card reveal">
+          <div>
+            <span class="section-kicker">Demo Access</span>
+            <h2>Enter your email and jump straight into the live CRM demo.</h2>
+            <p>
+              No password required. We’ll save your request, start a secure demo session,
+              and drop you directly into the sample workspace.
+            </p>
+          </div>
+
+          <form class="signup-form" data-signup-form data-demo-access="1" method="POST" action="/api/signup" novalidate>
+            <input type="hidden" name="company" value="RocketSloth Demo Access">
+            <input type="hidden" name="interest" value="Requested CRM demo login">
+
+            <div class="field">
+              <label for="demo-name">Your name</label>
+              <input id="demo-name" name="name" type="text" autocomplete="given-name" placeholder="Optional">
+            </div>
+
+            <div class="field">
+              <label for="demo-email">Work email</label>
+              <input id="demo-email" name="email" type="email" autocomplete="email" placeholder="you@yourcompany.com" required>
+            </div>
+
+            <button class="btn btn-primary" data-submit-button type="submit">Open the live demo</button>
+            <p class="form-status" data-form-status aria-live="polite"></p>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="how">
       <div class="container">
         <div class="section-head reveal">
           <span class="section-kicker">How We Work</span>
@@ -897,7 +999,6 @@ h1 em {
 
           <form class="signup-form" data-signup-form method="POST" action="/api/signup" novalidate>
             <input type="hidden" name="company" value="RocketSloth Discovery">
-            <input type="hidden" name="interest" value="Homepage contact request">
 
             <div class="field">
               <label for="home-name">Your name</label>
@@ -910,11 +1011,11 @@ h1 em {
             </div>
 
             <div class="field">
-              <label for="home-company">Company</label>
-              <input id="home-company" name="company" type="text" autocomplete="organization" placeholder="Acme Inc">
+              <label for="footer-message">What should we improve?</label>
+              <textarea id="footer-message" name="message" placeholder="Tell us one workflow that's slow, manual, or guesswork."></textarea>
             </div>
 
-            <button class="btn btn-primary" data-submit-button type="submit">Request a walkthrough</button>
+            <button class="btn btn-primary" data-submit-button type="submit">Request a discovery call</button>
             <p class="form-status" data-form-status aria-live="polite"></p>
             <p class="fineprint">No spam. We only use this to follow up about your workflow.</p>
           </form>
@@ -932,11 +1033,12 @@ h1 em {
           <p>Custom CRMs, dashboards, and automation built around how your team already works.</p>
         </div>
 
-        <div class="footer-links">
-          <a href="#services">What We Build</a>
-          <a href="#how">How We Work</a>
-          <a href="/crm?tenant=demo&public=1">Open Demo</a>
-          <a href="mailto:hello@rocketsloth.space">hello@rocketsloth.space</a>
+        <div>
+          <div class="footer-links">
+            <a href="#demo-access">Live Demo</a>
+            <a href="#contact">Book a call</a>
+            <a href="mailto:hello@rocketsloth.space">hello@rocketsloth.space</a>
+          </div>
         </div>
       </div>
     </div>
