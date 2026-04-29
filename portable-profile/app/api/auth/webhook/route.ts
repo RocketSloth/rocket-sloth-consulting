@@ -1,1 +1,3 @@
-// Placeholder scaffold file matching agreed folder architecture.
+export async function POST() {
+  return Response.json({ message: 'TODO: handle Clerk webhook events' }, { status: 501 })
+}
