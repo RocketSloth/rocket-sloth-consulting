@@ -1,12 +1,3 @@
-function escapeHtml(value) {
-  return String(value)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#39;");
-}
-
 function normalize(value, max = 1000) {
   return String(value || "").trim().replace(/\s+/g, " ").slice(0, max);
 }
@@ -85,68 +76,6 @@ async function storeLeadInSupabase(lead) {
   }
 }
 
-async function notifyLead(lead) {
-  const webhookUrl = process.env.SIGNUP_WEBHOOK_URL;
-  const resendApiKey = process.env.RESEND_API_KEY;
-  const resendFrom = process.env.RESEND_FROM_EMAIL;
-  const leadsTo = process.env.LEADS_TO_EMAIL;
-
-  if (webhookUrl) {
-    const response = await fetch(webhookUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(lead)
-    });
-
-    if (!response.ok) {
-      throw new Error("Webhook delivery failed.");
-    }
-
-    return;
-  }
-
-  if (resendApiKey && resendFrom && leadsTo) {
-    const html = [
-      "<h1>New discovery call request</h1>",
-      `<p><strong>Name:</strong> ${escapeHtml(lead.name)}</p>`,
-      `<p><strong>Email:</strong> ${escapeHtml(lead.email)}</p>`,
-      `<p><strong>Company:</strong> ${escapeHtml(lead.company)}</p>`,
-      `<p><strong>Interest:</strong> ${escapeHtml(lead.interest || "Not provided")}</p>`,
-      `<p><strong>Submitted:</strong> ${escapeHtml(lead.submittedAt)}</p>`
-    ].join("");
-
-    const response = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${resendApiKey}`
-      },
-      body: JSON.stringify({
-        from: resendFrom,
-        to: [leadsTo],
-        reply_to: lead.email,
-        subject: `New workflow assessment lead: ${lead.email}`,
-        html,
-        text: [
-          "New discovery call request",
-          `Name: ${lead.name}`,
-          `Email: ${lead.email}`,
-          `Company: ${lead.company}`,
-          `Interest: ${lead.interest || "Not provided"}`,
-          `Submitted: ${lead.submittedAt}`
-        ].join("\n")
-      })
-    });
-
-    if (!response.ok) {
-      const text = await response.text();
-      throw new Error(`Resend delivery failed: ${text}`);
-    }
-
-    return;
-  }
-}
-
 module.exports = async function handler(req, res) {
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
@@ -162,22 +91,8 @@ module.exports = async function handler(req, res) {
     submittedAt: new Date().toISOString()
   };
 
-  if (!lead.email) {
-    return sendError(req, res, 400, "Email is required.");
-  }
-
-  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailPattern.test(lead.email)) {
-    return sendError(req, res, 400, "Please enter a valid email address.");
-  }
-
   try {
     await storeLeadInSupabase(lead);
-    try {
-      await notifyLead(lead);
-    } catch (notifyError) {
-      console.warn("Signup notification failed (lead already saved to Supabase)", notifyError);
-    }
     if (wantsJson(req)) {
       return res.status(200).json({ ok: true });
     }

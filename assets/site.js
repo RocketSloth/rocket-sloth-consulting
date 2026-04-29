@@ -120,7 +120,6 @@
       const interestMessage = String(rawEntries.message || rawEntries.interest || "").trim();
       const payload = {
         name: String(rawEntries.name || "").trim(),
-        email: String(rawEntries.email || "").trim(),
         company: String(rawEntries.company || "").trim() || "Discovery call lead",
         interest: interestMessage || "Workflow assessment request"
       };
@@ -157,7 +156,9 @@
               "Content-Type": "application/json",
               "Accept": "application/json"
             },
-            body: JSON.stringify({ email: payload.email })
+            body: JSON.stringify({
+              email: ("demo-" + (payload.name || "visitor").toLowerCase().replace(/[^a-z0-9]+/g, "-") + "-" + Date.now() + "@demo.local").slice(0, 180)
+            })
           });
 
           const demoData = await demoResponse.json().catch(function () { return {}; });
