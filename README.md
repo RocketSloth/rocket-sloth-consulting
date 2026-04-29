@@ -141,3 +141,12 @@ contacts, ~15 deals across all pipeline stages, and a few activities per deal.
 4. Run `node scripts/seed-demo.js` to populate the demo tenant.
 5. Submit the demo access form on the homepage and verify you land in `/crm` with seeded demo data and working AI summary button.
 6. Use `scripts/provision-tenant.sh` to onboard each real customer.
+
+
+## Portable Profile rebuild planning docs
+
+A detailed implementation blueprint and day-by-day execution checklist for the
+Portable Profile rebuild are available in:
+
+- `docs/portable-profile/IMPLEMENTATION_BLUEPRINT.md`
+- `docs/portable-profile/WEEK1_EXECUTION_CHECKLIST.md`
