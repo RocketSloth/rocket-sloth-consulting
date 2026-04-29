@@ -671,8 +671,9 @@
     const routeContext = getRouteContext();
     var session = getSession();
     if (!session) {
-      window.location.href = "/crm/login";
-      return;
+      session = startDemoMode();
+      session.user.role = "viewer";
+      setSession(session);
     }
 
     // Restore in-memory demo store if returning to the CRM in demo mode.
@@ -702,7 +703,7 @@
         try { await api("/api/crm/me", { method: "DELETE" }); } catch (ignored) {}
       }
       clearSession();
-      window.location.href = routeContext.wantsPublicDemo ? "/" : "/crm/login";
+      window.location.href = routeContext.wantsPublicDemo ? "/" : "/crm";
     });
 
     document.getElementById("new-contact-btn").addEventListener("click", function () { openContactModal(); });
@@ -714,6 +715,12 @@
     if (quickContact) quickContact.addEventListener("click", function () { createQuickSample("contact"); });
     if (quickDeal) quickDeal.addEventListener("click", function () { createQuickSample("deal"); });
     if (quickActivity) quickActivity.addEventListener("click", function () { createQuickSample("activity"); });
+    if (isReadOnlySession()) {
+      document.getElementById("logout-btn").textContent = "Restart examples";
+      document.getElementById("new-contact-btn").disabled = true;
+      document.getElementById("new-deal-btn").disabled = true;
+      document.getElementById("new-activity-btn").disabled = true;
+    }
 
     var searchInput = document.getElementById("contact-search");
     var searchTimer;
