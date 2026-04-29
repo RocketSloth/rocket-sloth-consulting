@@ -21,8 +21,7 @@
       "@type": "Organization",
       "@id": "https://rocketsloth.space/#organization",
       "name": "RocketSloth.Space",
-      "url": "https://rocketsloth.space/",
-      "email": "hello@rocketsloth.space"
+      "url": "https://rocketsloth.space/"
     },
     {
       "@type": "Service",
@@ -43,7 +42,7 @@
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -69,9 +68,9 @@
   --radius-lg: 26px;
   --radius-md: 18px;
   --radius-sm: 14px;
-  --serif: "Instrument Serif", Georgia, serif;
-  --sans: "Outfit", system-ui, sans-serif;
-  --mono: "JetBrains Mono", monospace;
+  --serif: "Fraunces", Georgia, serif;
+  --sans: "Manrope", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", monospace;
 }
 
 html { scroll-behavior: smooth; overflow-x: hidden; }
@@ -753,6 +752,9 @@ h1 em {
 <div id="starfield"><canvas></canvas></div>
 
 <div class="shell">
+  <div style="position:relative;z-index:25;background:rgba(132,221,185,.12);border-bottom:1px solid rgba(132,221,185,.28);text-align:center;padding:10px 14px;font:600 .85rem 'Manrope',system-ui,sans-serif;color:#d9ffe9;">
+    Now booking new AI and CRM builds for <strong>May 2026</strong>.
+  </div>
   <header class="topbar" id="nav">
     <div class="container topbar-inner">
       <a class="brandmark" href="#top">
@@ -806,7 +808,7 @@ h1 em {
           <div>
             <h2>Tell us what's slow, manual, or guesswork. We'll show you the AI-shaped fix.</h2>
             <p>
-              Drop your email and a one-line description of what you'd want intelligent.
+              Drop a one-line description of what you'd want intelligent.
               We reply within one business day with a free recommendation and a demo built around your use case.
             </p>
           </div>
@@ -817,11 +819,6 @@ h1 em {
             <div class="field">
               <label for="home-name">Your name</label>
               <input id="home-name" name="name" type="text" autocomplete="given-name" placeholder="Optional">
-            </div>
-
-            <div class="field">
-              <label for="home-email">Work email</label>
-              <input id="home-email" name="email" type="email" autocomplete="email" placeholder="you@yourcompany.com" required>
             </div>
 
             <div class="field">
@@ -926,7 +923,7 @@ h1 em {
         <div class="cta-card reveal">
           <div>
             <span class="section-kicker">Demo Access</span>
-            <h2>Enter your email and jump straight into the live CRM demo.</h2>
+            <h2>Enter your name and jump straight into the live CRM demo.</h2>
             <p>
               No password required. We’ll save your request, start a secure demo session,
               and drop you directly into the sample workspace.
@@ -943,8 +940,8 @@ h1 em {
             </div>
 
             <div class="field">
-              <label for="demo-email">Work email</label>
-              <input id="demo-email" name="email" type="email" autocomplete="email" placeholder="you@yourcompany.com" required>
+              <label for="demo-company">Company (optional)</label>
+              <input id="demo-company" name="company" type="text" autocomplete="organization" placeholder="Acme Inc">
             </div>
 
             <button class="btn btn-primary" data-submit-button type="submit">Open the live demo</button>
@@ -1006,11 +1003,7 @@ h1 em {
             </div>
 
             <div class="field">
-              <label for="home-email">Work email</label>
-              <input id="home-email" name="email" type="email" autocomplete="email" placeholder="you@yourcompany.com" required>
-            </div>
-
-            <div class="field">
+            
               <label for="footer-message">What should we improve?</label>
               <textarea id="footer-message" name="message" placeholder="Tell us one workflow that's slow, manual, or guesswork."></textarea>
             </div>
@@ -1037,7 +1030,7 @@ h1 em {
           <div class="footer-links">
             <a href="#demo-access">Live Demo</a>
             <a href="#contact">Book a call</a>
-            <a href="mailto:hello@rocketsloth.space">hello@rocketsloth.space</a>
+            <a href="#contact">Send project details</a>
           </div>
         </div>
       </div>
