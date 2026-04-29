@@ -492,7 +492,8 @@
     if (pathMatch) return pathMatch[1].toLowerCase();
     const params = new URLSearchParams(window.location.search);
     if (params.get("tenant")) return params.get("tenant").toLowerCase();
-    return getLastTenant();
+    const rememberedTenant = getLastTenant();
+    return rememberedTenant || PUBLIC_DEMO_TENANT;
   }
 
   // ---------- Login page ----------
