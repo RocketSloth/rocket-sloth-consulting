@@ -804,39 +804,24 @@ h1 em {
           </div>
         </article>
 
-        <aside class="signup-card reveal" id="contact">
+        <aside class="demo-panel reveal" id="hero-demo">
           <div>
-            <h2>Tell us what's slow, manual, or guesswork. We'll show you the AI-shaped fix.</h2>
+            <span class="section-kicker">Live Demo</span>
+            <h2>Open the workspace and look around.</h2>
             <p>
-              Drop a one-line description of what you'd want intelligent.
-              We reply within one business day with a free recommendation and a demo built around your use case.
+              The public demo is the same CRM we customize for clients. No login. Read-only.
+              Browse the pipeline, open a deal, and try the AI summary button.
             </p>
           </div>
 
-          <form class="signup-form" data-signup-form method="POST" action="/api/signup" novalidate>
-            <input type="hidden" name="company" value="RocketSloth Discovery">
+          <ul class="feature-list" style="margin: 18px 0 22px;">
+            <li>~30 sample contacts and ~15 deals across every pipeline stage.</li>
+            <li>Activity history, search, dashboards, and AI deal summaries.</li>
+            <li>Safe to share with your team — nothing you do affects real data.</li>
+          </ul>
 
-            <div class="field">
-              <label for="home-name">Your name</label>
-              <input id="home-name" name="name" type="text" autocomplete="given-name" placeholder="Optional">
-            </div>
-
-            <div class="field">
-              <label for="home-company">Company</label>
-              <input id="home-company" name="company" type="text" autocomplete="organization" placeholder="Acme Inc">
-            </div>
-
-            <div class="field">
-              <label for="home-message">What should we improve?</label>
-              <textarea id="home-message" name="message" placeholder="Example: Our sales follow-up is manual and inconsistent."></textarea>
-            </div>
-
-            <button class="btn btn-primary" data-submit-button type="submit">Request a discovery call</button>
-            <p class="form-status" data-form-status aria-live="polite"></p>
-          </form>
-
-          <a class="btn btn-primary full-width" href="/crm?tenant=demo&public=1">Enter the workspace</a>
-          <p class="fineprint">Want a guided walkthrough instead? Use the form below and we will tailor one to your workflow.</p>
+          <a class="btn btn-primary full-width" href="/crm?tenant=demo&public=1">Enter the workspace →</a>
+          <p class="fineprint" style="margin-top: 12px;">Prefer a guided walkthrough? <a href="#contact" style="color: var(--text); text-decoration: underline;">Book a discovery call</a>.</p>
         </aside>
       </div>
     </section>
@@ -874,7 +859,7 @@ h1 em {
       </div>
     </section>
 
-    <section class="section" id="how">
+    <section class="section" id="demo-shows">
       <div class="container">
         <article class="feature-band reveal">
           <div>
@@ -920,7 +905,7 @@ h1 em {
 
     <section class="section" id="demo-access">
       <div class="container">
-        <div class="cta-card reveal">
+        <div class="contact-panel reveal">
           <div>
             <span class="section-kicker">Demo Access</span>
             <h2>Enter your name and jump straight into the live CRM demo.</h2>
@@ -998,14 +983,18 @@ h1 em {
             <input type="hidden" name="company" value="RocketSloth Discovery">
 
             <div class="field">
-              <label for="home-name">Your name</label>
-              <input id="home-name" name="name" type="text" autocomplete="given-name" placeholder="Optional">
+              <label for="contact-name">Your name</label>
+              <input id="contact-name" name="name" type="text" autocomplete="given-name" placeholder="Optional">
             </div>
 
             <div class="field">
-            
-              <label for="footer-message">What should we improve?</label>
-              <textarea id="footer-message" name="message" placeholder="Tell us one workflow that's slow, manual, or guesswork."></textarea>
+              <label for="contact-company">Company</label>
+              <input id="contact-company" name="company" type="text" autocomplete="organization" placeholder="Acme Inc">
+            </div>
+
+            <div class="field">
+              <label for="contact-message">What should we improve?</label>
+              <textarea id="contact-message" name="message" placeholder="Tell us one workflow that's slow, manual, or guesswork."></textarea>
             </div>
 
             <button class="btn btn-primary" data-submit-button type="submit">Request a discovery call</button>
