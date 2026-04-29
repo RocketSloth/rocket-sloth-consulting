@@ -6,6 +6,9 @@
 (function () {
   const STORAGE_KEY = "rs_crm_session";
   const TENANT_KEY = "rs_crm_last_tenant";
+  const MIGRATION_FLAG_KEY = "rs_crm_session_migrated_v1";
+  const PUBLIC_DEMO_TENANT = "demo";
+  const READ_ONLY_ROLES = new Set(["viewer", "read_only", "readonly"]);
 
   // ---------- Client-side demo mode ----------
   // When the backend isn't configured, the demo runs entirely in the browser
@@ -211,10 +214,19 @@
   }
 
   function getSession() {
+    if (!state.session) {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          state.session = JSON.parse(raw);
+        }
+      } catch {}
+    }
     return state.session;
   }
 
   function setSession(data) {
+    state.session = data || null;
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     if (data && data.tenant && data.tenant.slug) {
       localStorage.setItem(TENANT_KEY, data.tenant.slug);
@@ -480,12 +492,15 @@
     if (pathMatch) return pathMatch[1].toLowerCase();
     const params = new URLSearchParams(window.location.search);
     if (params.get("tenant")) return params.get("tenant").toLowerCase();
-    return getLastTenant();
+    const rememberedTenant = getLastTenant();
+    return rememberedTenant || PUBLIC_DEMO_TENANT;
   }
 
   // ---------- Login page ----------
 
   function initLogin() {
+    runSessionMigrationGuard();
+
     if (getSession()) {
       window.location.href = "/crm";
       return;
@@ -609,20 +624,6 @@
       }
     });
 
-    if (demoButton) {
-      demoButton.addEventListener("click", async () => {
-        errorEl.hidden = true;
-        demoButton.disabled = true;
-        try {
-          await createPublicDemoSession();
-          window.location.href = demoHref;
-        } catch (err) {
-          errorEl.textContent = err.message;
-          errorEl.hidden = false;
-          demoButton.disabled = false;
-        }
-      });
-    }
   }
 
   // ---------- Auth page (magic link token exchange) ----------
@@ -666,6 +667,8 @@
   };
 
   function initApp() {
+    runSessionMigrationGuard();
+    const routeContext = getRouteContext();
     var session = getSession();
     if (!session) {
       window.location.href = "/crm/login";
