@@ -708,6 +708,12 @@
     document.getElementById("new-contact-btn").addEventListener("click", function () { openContactModal(); });
     document.getElementById("new-deal-btn").addEventListener("click", function () { openDealModal(); });
     document.getElementById("new-activity-btn").addEventListener("click", function () { openActivityModal(); });
+    var quickContact = document.getElementById("quick-add-contact");
+    var quickDeal = document.getElementById("quick-add-deal");
+    var quickActivity = document.getElementById("quick-add-activity");
+    if (quickContact) quickContact.addEventListener("click", function () { createQuickSample("contact"); });
+    if (quickDeal) quickDeal.addEventListener("click", function () { createQuickSample("deal"); });
+    if (quickActivity) quickActivity.addEventListener("click", function () { createQuickSample("activity"); });
 
     var searchInput = document.getElementById("contact-search");
     var searchTimer;
@@ -793,12 +799,64 @@
 
     var recent = state.activities.slice(0, 10);
     var list = document.getElementById("recent-activities");
+    var emptyState = document.getElementById("dashboard-empty-state");
+    if (emptyState) {
+      emptyState.hidden = !(state.contacts.length === 0 && state.activities.length === 0);
+    }
     list.innerHTML = "";
     if (recent.length === 0) {
       list.innerHTML = '<li class="empty">No activity yet.</li>';
       return;
     }
     recent.forEach(function (a) { list.appendChild(renderActivityItem(a)); });
+  }
+
+  async function createQuickSample(kind) {
+    if (isReadOnlySession()) return;
+    if (kind === "contact") {
+      var contactPayload = {
+        first_name: "Demo",
+        last_name: "Lead",
+        email: "demo.lead@sample.local",
+        company: "Sample Company",
+        status: "lead"
+      };
+      if (isDemo()) mockApi("/api/crm/contacts", { method: "POST", body: contactPayload });
+      else await api("/api/crm/contacts", { method: "POST", body: contactPayload });
+      await loadContacts();
+      renderDashboard();
+      return;
+    }
+
+    if (kind === "deal") {
+      var dealPayload = {
+        title: "Sample onboarding package",
+        contact_id: (state.contacts[0] && state.contacts[0].id) || null,
+        stage: "new",
+        amount: 2500,
+        currency: "USD",
+        expected_close_date: new Date(Date.now() + 14 * 86400000).toISOString().slice(0, 10)
+      };
+      if (isDemo()) mockApi("/api/crm/deals", { method: "POST", body: dealPayload });
+      else await api("/api/crm/deals", { method: "POST", body: dealPayload });
+      await loadDeals();
+      renderDashboard();
+      return;
+    }
+
+    if (kind === "activity") {
+      var activityPayload = {
+        type: "note",
+        subject: "Sample follow-up logged",
+        body: "Customer asked for service package details and timeline options.",
+        contact_id: (state.contacts[0] && state.contacts[0].id) || null,
+        deal_id: (state.deals[0] && state.deals[0].id) || null
+      };
+      if (isDemo()) mockApi("/api/crm/activities", { method: "POST", body: activityPayload });
+      else await api("/api/crm/activities", { method: "POST", body: activityPayload });
+      await loadActivities();
+      renderDashboard();
+    }
   }
 
   // ---------- Contacts ----------
