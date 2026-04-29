@@ -7,6 +7,9 @@
     <link rel="stylesheet" href="/crm/assets/crm.css" />
   </head>
   <body class="app-body">
+    <div class="demo-banner" style="margin:0;border-radius:0;border-left:none;border-right:none;">
+      🚀 RocketSloth is currently booking new AI + CRM projects for May 2026.
+    </div>
     <header class="app-header">
       <div class="brand">
         <img id="brand-logo" alt="" hidden />
@@ -32,6 +35,14 @@
 
       <section id="view-dashboard" class="view">
         <h1>Dashboard</h1>
+        <div id="dashboard-empty-state" class="demo-banner" hidden>
+          <strong>Try the CRM:</strong> create a contact, then add a deal and activity to see the dashboard come to life.
+          <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
+            <button id="quick-add-contact" class="primary-btn" type="button">Add sample contact</button>
+            <button id="quick-add-deal" class="ghost-btn" type="button">Add sample deal</button>
+            <button id="quick-add-activity" class="ghost-btn" type="button">Log sample activity</button>
+          </div>
+        </div>
         <div class="stat-grid">
           <div class="stat"><span class="stat-label">Contacts</span><span id="stat-contacts" class="stat-value">-</span></div>
           <div class="stat"><span class="stat-label">Open deals</span><span id="stat-open" class="stat-value">-</span></div>
