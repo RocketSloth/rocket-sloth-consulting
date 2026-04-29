@@ -1,1 +1,1 @@
-// Placeholder scaffold file matching agreed folder architecture.
+export * from '../../drizzle/schema'
