@@ -6,7 +6,10 @@
     { "source": "/crm/login", "destination": "/crm/login.html" },
     { "source": "/crm/auth", "destination": "/crm/auth.html" },
     { "source": "/crm/t/:slug", "destination": "/crm/login.html" },
-    { "source": "/portable-profile", "destination": "/portable-profile.html" }
+    { "source": "/consulting", "destination": "/consulting.html" }
+  ],
+  "redirects": [
+    { "source": "/portable-profile", "destination": "/", "permanent": true }
   ],
   "headers": [
     {
