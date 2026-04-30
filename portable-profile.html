@@ -178,27 +178,29 @@ a { color: inherit; }
   box-shadow: var(--shadow); padding: 44px;
 }
 .cta-panel h2 { margin-top: 0; }
-.cta-form {
-  display: grid; gap: 12px; max-width: 520px; margin-top: 18px;
+
+.mock-grid {
+  display: grid; gap: 18px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
-.cta-form label {
-  font-family: var(--mono); font-size: 0.72rem;
-  letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-faint);
+.mock-grid .mock-wide { grid-column: 1 / -1; }
+@media (max-width: 760px) { .mock-grid { grid-template-columns: 1fr; } }
+.mock { margin: 0; }
+.mock-frame {
+  background: rgba(10, 10, 10, 0.9);
+  border: 1px solid var(--line-strong);
+  border-radius: 14px;
+  padding: 14px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
 }
-.cta-form input, .cta-form textarea {
-  width: 100%; padding: 12px 14px;
-  background: rgba(7, 17, 31, 0.6);
-  border: 1px solid var(--line-strong); border-radius: 12px;
-  color: var(--text); font-family: inherit; font-size: 0.95rem;
+.mock-frame svg { width: 100%; height: auto; display: block; border-radius: 6px; }
+.mock figcaption {
+  margin-top: 10px;
+  font-family: var(--mono); font-size: 0.74rem;
+  letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--text-faint);
 }
-.cta-form input:focus, .cta-form textarea:focus {
-  outline: 2px solid var(--brand); outline-offset: 1px;
-}
-.form-row { display: grid; gap: 12px; grid-template-columns: 1fr 1fr; }
-@media (max-width: 600px) { .form-row { grid-template-columns: 1fr; } }
-.form-status { font-size: 0.88rem; color: var(--text-dim); min-height: 1.4em; }
-.form-status.ok { color: var(--mint); }
-.form-status.err { color: #ff9a8a; }
 
 .footer {
   padding: 48px 0 64px; color: var(--text-faint);
@@ -251,8 +253,8 @@ a { color: inherit; }
           next — to bring your context with you.
         </p>
         <div class="hero-actions">
-          <a class="btn btn-primary" href="#early-access">Get early access →</a>
-          <a class="btn btn-secondary" href="#how-it-works">How it works</a>
+          <a class="btn btn-primary" href="/#contact">Request a consult →</a>
+          <a class="btn btn-secondary" href="#preview">See what it looks like</a>
         </div>
       </div>
     </div>
@@ -294,41 +296,228 @@ a { color: inherit; }
     </div>
   </section>
 
-  <section class="section" id="early-access">
+  <section class="section" id="preview">
+    <div class="container">
+      <span class="eyebrow">※ A peek at what it looks like</span>
+      <h2>Three views from inside the builder.</h2>
+      <p class="lead">
+        Mockups of the wizard, the review/export screen, and the multi-profile dashboard.
+        Like what you see? Book a consult and we'll set you up with a hands-on walkthrough.
+      </p>
+
+      <div class="mock-grid">
+        <figure class="mock">
+          <div class="mock-frame">
+            <svg viewBox="0 0 600 380" role="img" aria-labelledby="mock1-title" preserveAspectRatio="xMidYMid meet">
+              <title id="mock1-title">Wizard step — capturing recurring workflows</title>
+              <rect width="600" height="380" rx="6" fill="#0a0a0a"/>
+              <!-- top bar -->
+              <rect x="20" y="20" width="560" height="34" rx="2" fill="#161616" stroke="#2a2a2a"/>
+              <circle cx="36" cy="37" r="7" fill="#d97757"/>
+              <rect x="50" y="32" width="92" height="10" rx="2" fill="#ededed"/>
+              <rect x="470" y="28" width="50" height="18" rx="2" fill="#2a1f17" stroke="#d97757"/>
+              <rect x="528" y="28" width="50" height="18" rx="2" fill="none" stroke="#2a2a2a"/>
+              <!-- step pills -->
+              <g font-family="monospace" font-size="8" fill="#999">
+                <rect x="20" y="68" width="58" height="20" rx="2" fill="#d97757"/>
+                <text x="28" y="81" fill="#0a0a0a">01 IDENTITY</text>
+                <rect x="84" y="68" width="48" height="20" rx="2" fill="none" stroke="#d97757"/>
+                <text x="92" y="81" fill="#d97757">02 STYLE</text>
+                <rect x="138" y="68" width="74" height="20" rx="2" fill="#ededed"/>
+                <text x="146" y="81" fill="#0a0a0a">03 WORKFLOWS</text>
+                <rect x="218" y="68" width="60" height="20" rx="2" fill="none" stroke="#2a2a2a"/>
+                <text x="226" y="81" fill="#666">04 CONTEXT</text>
+                <rect x="284" y="68" width="74" height="20" rx="2" fill="none" stroke="#2a2a2a"/>
+                <text x="292" y="81" fill="#666">05 BOUNDARIES</text>
+              </g>
+              <line x1="20" y1="98" x2="580" y2="98" stroke="#2a2a2a"/>
+              <line x1="20" y1="98" x2="220" y2="98" stroke="#d97757" stroke-width="2"/>
+
+              <!-- title -->
+              <text x="20" y="130" fill="#d97757" font-family="monospace" font-size="9" letter-spacing="2">SECTION 03</text>
+              <text x="20" y="162" fill="#ededed" font-family="serif" font-size="26" font-style="italic">What do you use AI for?</text>
+              <text x="20" y="184" fill="#999" font-family="serif" font-size="11">The recurring tasks. Things you've done with AI more than once.</text>
+
+              <!-- list items -->
+              <g>
+                <rect x="20" y="206" width="560" height="32" rx="2" fill="#161616" stroke="#2a2a2a"/>
+                <text x="32" y="225" fill="#666" font-family="monospace" font-size="8">01</text>
+                <text x="56" y="225" fill="#ededed" font-size="11">Drafting follow-up emails to prospects after sales calls</text>
+                <text x="566" y="225" fill="#666" font-size="11" text-anchor="end">×</text>
+
+                <rect x="20" y="244" width="560" height="32" rx="2" fill="#161616" stroke="#2a2a2a"/>
+                <text x="32" y="263" fill="#666" font-family="monospace" font-size="8">02</text>
+                <text x="56" y="263" fill="#ededed" font-size="11">Summarizing customer interview notes into action items</text>
+                <text x="566" y="263" fill="#666" font-size="11" text-anchor="end">×</text>
+
+                <rect x="20" y="282" width="560" height="32" rx="2" fill="#161616" stroke="#2a2a2a"/>
+                <text x="32" y="301" fill="#666" font-family="monospace" font-size="8">03</text>
+                <text x="56" y="301" fill="#ededed" font-size="11">Stress-testing pricing &amp; package positioning</text>
+                <text x="566" y="301" fill="#666" font-size="11" text-anchor="end">×</text>
+              </g>
+
+              <!-- add new -->
+              <rect x="20" y="320" width="560" height="44" rx="2" fill="#161616" stroke="#2a2a2a" stroke-dasharray="3 3"/>
+              <text x="32" y="346" fill="#d97757" font-family="monospace" font-size="9">+ ADD WORKFLOW</text>
+            </svg>
+          </div>
+          <figcaption>Wizard — Workflows step</figcaption>
+        </figure>
+
+        <figure class="mock">
+          <div class="mock-frame">
+            <svg viewBox="0 0 600 380" role="img" aria-labelledby="mock2-title" preserveAspectRatio="xMidYMid meet">
+              <title id="mock2-title">Review &amp; export — three formats, one source of truth</title>
+              <rect width="600" height="380" rx="6" fill="#0a0a0a"/>
+              <text x="20" y="38" fill="#d97757" font-family="monospace" font-size="9" letter-spacing="2">SECTION 07</text>
+              <text x="20" y="70" fill="#ededed" font-family="serif" font-size="24" font-style="italic">Your portable profile</text>
+
+              <!-- section pills -->
+              <g font-family="monospace" font-size="7">
+                <rect x="20" y="88" width="86" height="42" rx="2" fill="#161616" stroke="#2a2a2a"/>
+                <text x="28" y="103" fill="#999">IDENTITY</text>
+                <text x="92" y="103" fill="#d97757">✓</text>
+                <text x="28" y="120" fill="#666" font-size="6">EDIT ›</text>
+
+                <rect x="112" y="88" width="86" height="42" rx="2" fill="#161616" stroke="#2a2a2a"/>
+                <text x="120" y="103" fill="#999">STYLE</text>
+                <text x="184" y="103" fill="#d97757">✓</text>
+
+                <rect x="204" y="88" width="86" height="42" rx="2" fill="#161616" stroke="#2a2a2a"/>
+                <text x="212" y="103" fill="#999">WORKFLOWS</text>
+                <text x="276" y="103" fill="#d97757">✓</text>
+
+                <rect x="296" y="88" width="86" height="42" rx="2" fill="#161616" stroke="#2a2a2a"/>
+                <text x="304" y="103" fill="#999">CONTEXT</text>
+                <text x="360" y="103" fill="#d97757">✓</text>
+
+                <rect x="388" y="88" width="86" height="42" rx="2" fill="#161616" stroke="#2a2a2a"/>
+                <text x="396" y="103" fill="#999">BOUNDARIES</text>
+                <text x="452" y="103" fill="#d97757">✓</text>
+
+                <rect x="480" y="88" width="86" height="42" rx="2" fill="#161616" stroke="#2a2a2a"/>
+                <text x="488" y="103" fill="#999">GOALS</text>
+                <text x="552" y="103" fill="#666">empty</text>
+              </g>
+
+              <!-- format selector -->
+              <text x="20" y="156" fill="#d97757" font-family="monospace" font-size="8" letter-spacing="2">※ EXPORT FORMAT</text>
+              <g font-family="monospace" font-size="8">
+                <rect x="20" y="166" width="180" height="36" rx="2" fill="#ededed"/>
+                <text x="30" y="183" fill="#0a0a0a" font-family="serif" font-size="11">Universal markdown</text>
+                <text x="30" y="195" fill="#666" font-size="7">Portable. Paste anywhere.</text>
+
+                <rect x="206" y="166" width="180" height="36" rx="2" fill="#161616" stroke="#2a2a2a"/>
+                <text x="216" y="183" fill="#ededed" font-family="serif" font-size="11">ChatGPT instructions</text>
+                <text x="216" y="195" fill="#999" font-size="7">Two boxes. Counted.</text>
+
+                <rect x="392" y="166" width="180" height="36" rx="2" fill="#161616" stroke="#2a2a2a"/>
+                <text x="402" y="183" fill="#ededed" font-family="serif" font-size="11">First-message paste</text>
+                <text x="402" y="195" fill="#999" font-size="7">For tools w/o memory.</text>
+              </g>
+
+              <!-- markdown preview -->
+              <rect x="20" y="218" width="560" height="142" rx="2" fill="#161616" stroke="#2a2a2a"/>
+              <g font-family="monospace" font-size="8" fill="#ededed">
+                <text x="32" y="236"># AI Context Profile</text>
+                <text x="32" y="252" fill="#666">&gt; Last updated: April 30, 2026.</text>
+                <text x="32" y="272" fill="#d97757">## About me</text>
+                <text x="32" y="286">**Name:** Alex</text>
+                <text x="32" y="298">**Role:** Marketing director</text>
+                <text x="32" y="318" fill="#d97757">## How I like to communicate</text>
+                <text x="32" y="332">- **Tone:** Friendly but professional</text>
+                <text x="32" y="346">- **Length:** Match the question</text>
+              </g>
+
+              <!-- copy button -->
+              <rect x="480" y="226" width="86" height="22" rx="2" fill="#d97757"/>
+              <text x="494" y="241" fill="#0a0a0a" font-family="monospace" font-size="8">COPY</text>
+            </svg>
+          </div>
+          <figcaption>Review &amp; export</figcaption>
+        </figure>
+
+        <figure class="mock mock-wide">
+          <div class="mock-frame">
+            <svg viewBox="0 0 1200 380" role="img" aria-labelledby="mock3-title" preserveAspectRatio="xMidYMid meet">
+              <title id="mock3-title">Multi-profile dashboard — switch hats with one click</title>
+              <rect width="1200" height="380" rx="6" fill="#0a0a0a"/>
+              <!-- header -->
+              <text x="30" y="44" fill="#d97757" font-family="monospace" font-size="9" letter-spacing="2">※ ACTIVE PROFILE</text>
+              <text x="30" y="76" fill="#ededed" font-family="serif" font-size="22" font-style="italic">Engineering</text>
+              <text x="174" y="76" fill="#666" font-family="monospace" font-size="10">4 profiles</text>
+
+              <rect x="1010" y="50" width="160" height="36" rx="2" fill="#ededed"/>
+              <text x="1090" y="73" fill="#0a0a0a" font-family="monospace" font-size="9" text-anchor="middle">+ NEW PROFILE</text>
+
+              <!-- profile cards -->
+              <g>
+                <rect x="30" y="110" width="280" height="240" rx="2" fill="#161616" stroke="#d97757" stroke-width="2"/>
+                <text x="46" y="138" fill="#d97757" font-family="monospace" font-size="8" letter-spacing="2">ACTIVE</text>
+                <text x="46" y="166" fill="#ededed" font-family="serif" font-size="20">Engineering</text>
+                <text x="46" y="186" fill="#999" font-size="10">Software engineer · TypeScript &amp;</text>
+                <text x="46" y="200" fill="#999" font-size="10">backend systems</text>
+                <line x1="46" y1="218" x2="294" y2="218" stroke="#2a2a2a"/>
+                <text x="46" y="240" fill="#999" font-family="monospace" font-size="8">5 WORKFLOWS · 3 BOUNDARIES</text>
+                <text x="46" y="258" fill="#999" font-family="monospace" font-size="8">12 TERMS · 4 PROJECTS</text>
+                <rect x="46" y="294" width="100" height="32" rx="2" fill="#d97757"/>
+                <text x="96" y="315" fill="#0a0a0a" font-family="monospace" font-size="8" text-anchor="middle">EDIT</text>
+                <rect x="156" y="294" width="100" height="32" rx="2" fill="none" stroke="#2a2a2a"/>
+                <text x="206" y="315" fill="#999" font-family="monospace" font-size="8" text-anchor="middle">EXPORT</text>
+              </g>
+
+              <g>
+                <rect x="326" y="110" width="280" height="240" rx="2" fill="#161616" stroke="#2a2a2a"/>
+                <text x="342" y="138" fill="#666" font-family="monospace" font-size="8" letter-spacing="2">PERSONAL</text>
+                <text x="342" y="166" fill="#ededed" font-family="serif" font-size="20">Side project</text>
+                <text x="342" y="186" fill="#999" font-size="10">Indie game dev · Godot, pixel art</text>
+                <line x1="342" y1="218" x2="590" y2="218" stroke="#2a2a2a"/>
+                <text x="342" y="240" fill="#999" font-family="monospace" font-size="8">3 WORKFLOWS · 1 BOUNDARY</text>
+                <text x="342" y="258" fill="#999" font-family="monospace" font-size="8">5 TERMS · 2 PROJECTS</text>
+                <rect x="342" y="294" width="100" height="32" rx="2" fill="none" stroke="#2a2a2a"/>
+                <text x="392" y="315" fill="#999" font-family="monospace" font-size="8" text-anchor="middle">SWITCH TO</text>
+              </g>
+
+              <g>
+                <rect x="622" y="110" width="280" height="240" rx="2" fill="#161616" stroke="#2a2a2a"/>
+                <text x="638" y="138" fill="#666" font-family="monospace" font-size="8" letter-spacing="2">WRITING</text>
+                <text x="638" y="166" fill="#ededed" font-family="serif" font-size="20">Newsletter</text>
+                <text x="638" y="186" fill="#999" font-size="10">Weekly essays · longform editing</text>
+                <line x1="638" y1="218" x2="886" y2="218" stroke="#2a2a2a"/>
+                <text x="638" y="240" fill="#999" font-family="monospace" font-size="8">4 WORKFLOWS · 5 BOUNDARIES</text>
+                <text x="638" y="258" fill="#999" font-family="monospace" font-size="8">3 TERMS · 1 PROJECT</text>
+                <rect x="638" y="294" width="100" height="32" rx="2" fill="none" stroke="#2a2a2a"/>
+                <text x="688" y="315" fill="#999" font-family="monospace" font-size="8" text-anchor="middle">SWITCH TO</text>
+              </g>
+
+              <g>
+                <rect x="918" y="110" width="252" height="240" rx="2" fill="#161616" stroke="#2a2a2a" stroke-dasharray="4 4"/>
+                <text x="1044" y="218" fill="#666" font-family="monospace" font-size="9" text-anchor="middle">+</text>
+                <text x="1044" y="244" fill="#999" font-family="serif" font-size="13" text-anchor="middle">New profile</text>
+                <text x="1044" y="262" fill="#666" font-family="monospace" font-size="8" text-anchor="middle">FROM TEMPLATE</text>
+              </g>
+            </svg>
+          </div>
+          <figcaption>Multi-profile dashboard</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="consult">
     <div class="container">
       <div class="cta-panel">
-        <span class="eyebrow">※ Early access</span>
-        <h2>Be the first to use it.</h2>
+        <span class="eyebrow">※ Want a hands-on walkthrough?</span>
+        <h2>Book a consult and we'll set up a live demo for you.</h2>
         <p class="lead">
-          Portable Profile is in active development. Sign up and we'll send you an invite the
-          moment the builder is ready — plus the universal markdown template so you can start
-          drafting today.
+          Portable Profile is in active development. Tell us what you'd use it for —
+          we'll spin up a tailored demo, walk you through the builder, and help you
+          ship a profile your team can use today.
         </p>
-        <form class="cta-form" id="early-access-form" novalidate>
-          <div>
-            <label for="ea-email">Email</label>
-            <input id="ea-email" name="email" type="email" required autocomplete="email" placeholder="you@company.com">
-          </div>
-          <div class="form-row">
-            <div>
-              <label for="ea-name">Name <span style="opacity:0.6">(optional)</span></label>
-              <input id="ea-name" name="name" type="text" autocomplete="given-name" placeholder="Optional">
-            </div>
-            <div>
-              <label for="ea-company">Company <span style="opacity:0.6">(optional)</span></label>
-              <input id="ea-company" name="company" type="text" autocomplete="organization" placeholder="Optional">
-            </div>
-          </div>
-          <div>
-            <label for="ea-message">What would you use it for? <span style="opacity:0.6">(optional)</span></label>
-            <textarea id="ea-message" name="message" rows="3" placeholder="One sentence is plenty."></textarea>
-          </div>
-          <input type="hidden" name="source" value="portable-profile">
-          <div style="display: flex; gap: 12px; align-items: center; margin-top: 6px;">
-            <button type="submit" class="btn btn-primary">Request early access →</button>
-            <span class="form-status" id="ea-status" role="status" aria-live="polite"></span>
-          </div>
-        </form>
+        <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 12px;">
+          <a class="btn btn-primary" href="/#contact">Request a consult →</a>
+          <a class="btn btn-secondary" href="/#services">See our other work</a>
+        </div>
       </div>
     </div>
   </section>
@@ -346,46 +535,6 @@ a { color: inherit; }
     <p style="margin-top: 14px; opacity: 0.6;">© RocketSloth.Space — Portable Profile is a RocketSloth product.</p>
   </div>
 </footer>
-
-<script>
-  (function () {
-    var form = document.getElementById('early-access-form');
-    var status = document.getElementById('ea-status');
-    if (!form) return;
-    form.addEventListener('submit', function (e) {
-      e.preventDefault();
-      status.className = 'form-status';
-      status.textContent = 'Sending…';
-      var msg = form.message.value.trim();
-      var data = {
-        email: form.email.value.trim(),
-        name: form.name.value.trim(),
-        company: form.company.value.trim(),
-        interest: 'Portable Profile early access' + (msg ? ' — ' + msg : '')
-      };
-      if (!data.email) {
-        status.className = 'form-status err';
-        status.textContent = 'Please enter your email.';
-        return;
-      }
-      fetch('/api/signup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        body: JSON.stringify(data)
-      }).then(function (r) {
-        if (!r.ok) throw new Error('Request failed');
-        return r.json().catch(function () { return {}; });
-      }).then(function () {
-        status.className = 'form-status ok';
-        status.textContent = "Thanks — we'll be in touch the moment it's ready.";
-        form.reset();
-      }).catch(function () {
-        status.className = 'form-status err';
-        status.textContent = 'Something went wrong. Email hello@rocketsloth.space and we will sort it.';
-      });
-    });
-  })();
-</script>
 
 </body>
 </html>
