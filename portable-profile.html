@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portable Profile by RocketSloth | A futureproof companion for working with AI</title>
+<meta name="description" content="Build an AI context profile that outlasts the tool. A guided builder from RocketSloth.Space — bring your voice, workflows, and boundaries to any AI: Claude, ChatGPT, Gemini, whatever comes next.">
+<meta name="theme-color" content="#07111f">
+<meta property="og:title" content="Portable Profile by RocketSloth">
+<meta property="og:description" content="A guided builder for an AI context profile that outlasts the tool. From RocketSloth.Space.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://rocketsloth.space/portable-profile">
+<meta property="og:image" content="https://rocketsloth.space/assets/og-share-card.svg">
+<link rel="canonical" href="https://rocketsloth.space/portable-profile">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #07111f;
+  --bg-deep: #0b1423;
+  --panel: rgba(12, 21, 35, 0.82);
+  --panel-strong: rgba(15, 26, 43, 0.94);
+  --line: rgba(150, 180, 219, 0.14);
+  --line-strong: rgba(150, 180, 219, 0.24);
+  --text: #ebf2ff;
+  --text-dim: #afbdd5;
+  --text-faint: #8192ad;
+  --brand: #f58f4c;
+  --brand-deep: #d46b2e;
+  --brand-soft: rgba(245, 143, 76, 0.12);
+  --sky: #8fc6ff;
+  --mint: #84ddb9;
+  --shadow: 0 28px 70px rgba(0, 0, 0, 0.28);
+  --serif: "Fraunces", Georgia, serif;
+  --sans: "Manrope", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", monospace;
+}
+html { scroll-behavior: smooth; }
+body {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 14% 12%, rgba(143, 198, 255, 0.16), transparent 22%),
+    radial-gradient(circle at 86% 10%, rgba(245, 143, 76, 0.14), transparent 20%),
+    radial-gradient(circle at 50% 120%, rgba(132, 221, 185, 0.08), transparent 28%),
+    linear-gradient(180deg, #07111f 0%, #091423 48%, #07111f 100%);
+  color: var(--text);
+  font-family: var(--sans);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; }
+.container { width: min(1120px, calc(100% - 40px)); margin: 0 auto; }
+
+.topbar {
+  position: sticky; top: 0; z-index: 20;
+  backdrop-filter: blur(18px);
+  background: rgba(7, 17, 31, 0.68);
+  border-bottom: 1px solid rgba(150, 180, 219, 0.08);
+}
+.topbar-inner { min-height: 78px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+.brandmark { display: inline-flex; align-items: center; gap: 12px; text-decoration: none; }
+.brandmark-badge {
+  width: 42px; height: 42px; border-radius: 50%;
+  display: grid; place-items: center; color: #16100c;
+  font-size: 0.84rem; font-weight: 800; letter-spacing: 0.06em;
+  background: radial-gradient(circle at 35% 35%, #ffd2b1, transparent 24%),
+              radial-gradient(circle at 35% 35%, var(--brand), var(--brand-deep));
+  box-shadow: 0 0 28px rgba(245, 143, 76, 0.22);
+}
+.brandmark-copy strong { display: block; color: var(--text); font-size: 0.95rem; letter-spacing: -0.02em; }
+.brandmark-copy span { display: block; color: var(--text-faint); font-size: 0.74rem; font-family: var(--mono); text-transform: uppercase; letter-spacing: 0.08em; }
+.nav { display: flex; align-items: center; gap: 22px; }
+.nav a { color: var(--text-dim); text-decoration: none; font-size: 0.92rem; }
+.nav a:hover { color: var(--text); }
+.nav-cta {
+  min-height: 44px; padding: 0 16px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 999px; background: rgba(245, 143, 76, 0.16);
+  color: #ffd8bf !important; font-weight: 800;
+  border: 1px solid rgba(245, 143, 76, 0.22);
+}
+
+.eyebrow {
+  font-family: var(--mono); font-size: 0.72rem; text-transform: uppercase;
+  letter-spacing: 0.32em; color: var(--brand);
+}
+
+.hero { padding: 84px 0 42px; }
+.hero-panel {
+  background: linear-gradient(180deg, rgba(15, 24, 39, 0.84), rgba(10, 18, 30, 0.82));
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+  border-radius: 34px;
+  padding: 54px;
+  position: relative; overflow: hidden;
+}
+.hero-panel::before {
+  content: ""; position: absolute;
+  width: 420px; height: 420px; right: -220px; top: -180px;
+  background: radial-gradient(circle, rgba(143, 198, 255, 0.12), transparent 68%);
+  border: 1px solid rgba(143, 198, 255, 0.12);
+  border-radius: 50%; pointer-events: none;
+}
+.hero h1 {
+  font-family: var(--serif); font-weight: 600;
+  font-size: clamp(2.4rem, 5vw, 3.8rem);
+  line-height: 1.04; letter-spacing: -0.02em;
+  margin: 18px 0 22px; max-width: 22ch;
+}
+.hero h1 em { font-style: italic; color: var(--brand); }
+.hero-sub { font-size: 1.08rem; color: var(--text-dim); max-width: 60ch; margin-bottom: 28px; }
+.hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+.btn {
+  min-height: 48px; padding: 0 22px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  border-radius: 999px; font-weight: 700; font-size: 0.95rem;
+  text-decoration: none; cursor: pointer; border: 1px solid transparent;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+.btn:hover { transform: translateY(-1px); }
+.btn-primary { background: var(--brand); color: #16100c; }
+.btn-primary:hover { background: #ffa56a; }
+.btn-secondary { background: transparent; color: var(--text); border-color: var(--line-strong); }
+.btn-secondary:hover { background: rgba(255,255,255,0.04); }
+
+.section { padding: 56px 0; }
+.section h2 {
+  font-family: var(--serif); font-weight: 600;
+  font-size: clamp(1.7rem, 3vw, 2.4rem); letter-spacing: -0.01em;
+  margin: 12px 0 14px;
+}
+.section p.lead { color: var(--text-dim); max-width: 62ch; margin-bottom: 32px; }
+
+.feature-grid {
+  display: grid; gap: 18px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+.feature-card {
+  background: rgba(15, 24, 39, 0.78);
+  border: 1px solid var(--line);
+  border-radius: 22px; padding: 26px;
+  position: relative;
+}
+.feature-card .num {
+  font-family: var(--mono); color: var(--brand); font-size: 0.78rem;
+  letter-spacing: 0.18em; margin-bottom: 12px;
+}
+.feature-card h3 {
+  font-family: var(--serif); font-weight: 600; font-size: 1.25rem;
+  margin-bottom: 8px; letter-spacing: -0.01em;
+}
+.feature-card p { color: var(--text-dim); font-size: 0.95rem; }
+
+.steps {
+  display: grid; gap: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+.step {
+  border-left: 2px solid var(--brand-soft);
+  padding: 6px 0 6px 18px;
+}
+.step .step-num {
+  font-family: var(--mono); font-size: 0.72rem;
+  letter-spacing: 0.24em; color: var(--brand);
+  text-transform: uppercase;
+}
+.step h4 {
+  font-family: var(--serif); font-weight: 600;
+  font-size: 1.08rem; margin: 6px 0;
+}
+.step p { color: var(--text-dim); font-size: 0.92rem; }
+
+.cta-panel {
+  background: linear-gradient(180deg, rgba(15, 24, 39, 0.92), rgba(10, 18, 30, 0.94));
+  border: 1px solid var(--line); border-radius: 34px;
+  box-shadow: var(--shadow); padding: 44px;
+}
+.cta-panel h2 { margin-top: 0; }
+.cta-form {
+  display: grid; gap: 12px; max-width: 520px; margin-top: 18px;
+}
+.cta-form label {
+  font-family: var(--mono); font-size: 0.72rem;
+  letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-faint);
+}
+.cta-form input, .cta-form textarea {
+  width: 100%; padding: 12px 14px;
+  background: rgba(7, 17, 31, 0.6);
+  border: 1px solid var(--line-strong); border-radius: 12px;
+  color: var(--text); font-family: inherit; font-size: 0.95rem;
+}
+.cta-form input:focus, .cta-form textarea:focus {
+  outline: 2px solid var(--brand); outline-offset: 1px;
+}
+.form-row { display: grid; gap: 12px; grid-template-columns: 1fr 1fr; }
+@media (max-width: 600px) { .form-row { grid-template-columns: 1fr; } }
+.form-status { font-size: 0.88rem; color: var(--text-dim); min-height: 1.4em; }
+.form-status.ok { color: var(--mint); }
+.form-status.err { color: #ff9a8a; }
+
+.footer {
+  padding: 48px 0 64px; color: var(--text-faint);
+  font-size: 0.86rem; text-align: center;
+}
+.footer a { color: var(--text-dim); text-decoration: none; margin: 0 10px; }
+.footer a:hover { color: var(--text); }
+
+.tag {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--brand-soft);
+  border: 1px solid rgba(245, 143, 76, 0.28);
+  color: #ffd8bf;
+  font-family: var(--mono); font-size: 0.72rem;
+  letter-spacing: 0.16em; text-transform: uppercase;
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="container topbar-inner">
+    <a class="brandmark" href="/">
+      <span class="brandmark-badge">RS</span>
+      <span class="brandmark-copy">
+        <strong>RocketSloth.Space</strong>
+        <span>AI &amp; BI Consulting</span>
+      </span>
+    </a>
+    <nav class="nav" aria-label="Primary">
+      <a href="/#services">Services</a>
+      <a href="/#demo-access">CRM Demo</a>
+      <a class="nav-cta" href="/#contact">Book a call</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="container">
+      <div class="hero-panel">
+        <span class="tag">New from RocketSloth</span>
+        <h1>Build a profile <em>that outlasts</em> the tool.</h1>
+        <p class="hero-sub">
+          AI tools change every month. Your context, your voice, your way of working
+          shouldn't have to. <strong>Portable Profile</strong> is a guided builder for an
+          AI context profile you can paste into Claude, ChatGPT, Gemini — whatever comes
+          next — to bring your context with you.
+        </p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#early-access">Get early access →</a>
+          <a class="btn btn-secondary" href="#how-it-works">How it works</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="how-it-works">
+    <div class="container">
+      <span class="eyebrow">※ A guided builder, not another chatbot</span>
+      <h2>Seven sections. Eight to twelve minutes.<br>One profile that travels with you.</h2>
+      <p class="lead">
+        We walk you through who you are, how you communicate, the workflows you do every week,
+        the people and projects that come up again and again, the things you don't want, and
+        the goals worth keeping in view.
+      </p>
+      <div class="steps">
+        <div class="step"><div class="step-num">01 · Identity</div><h4>Who you are</h4><p>Name, role, field, and a short paragraph that captures the work you do.</p></div>
+        <div class="step"><div class="step-num">02 · Style</div><h4>How it should talk to you</h4><p>Tone, length, formatting, whether to ask before assuming.</p></div>
+        <div class="step"><div class="step-num">03 · Workflows</div><h4>What you use AI for</h4><p>The recurring tasks you've done more than once.</p></div>
+        <div class="step"><div class="step-num">04 · Context</div><h4>Your recurring world</h4><p>Projects, key people, terms and acronyms you use.</p></div>
+        <div class="step"><div class="step-num">05 · Boundaries</div><h4>What to avoid</h4><p>Topics to skip, phrases that grate, suggestions that miss.</p></div>
+        <div class="step"><div class="step-num">06 · Goals</div><h4>The bigger picture</h4><p>What you're working toward, so suggestions land sharper.</p></div>
+        <div class="step"><div class="step-num">07 · Export</div><h4>Take it anywhere</h4><p>Universal markdown, ChatGPT custom instructions, or first-message paste.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <span class="eyebrow">※ What's in the toolkit</span>
+      <h2>Five features that earn the keep.</h2>
+      <div class="feature-grid">
+        <div class="feature-card"><div class="num">01</div><h3>Multiple profiles</h3><p>One for work, one for personal, one for the side project. Switch with a click.</p></div>
+        <div class="feature-card"><div class="num">02</div><h3>Templates</h3><p>Engineer, writer, marketer, small-business owner, student, everyday — sensible defaults you can edit.</p></div>
+        <div class="feature-card"><div class="num">03</div><h3>Smart import</h3><p>Paste a LinkedIn About or CV — Claude extracts a structured starting profile in seconds.</p></div>
+        <div class="feature-card"><div class="num">04</div><h3>Live test</h3><p>Multi-turn chat with your profile loaded as the system prompt. Iterate before you ship.</p></div>
+        <div class="feature-card"><div class="num">05</div><h3>AI profile coach</h3><p>Specific, paste-ready suggestions to make your profile sharper. Each with one-click navigation.</p></div>
+        <div class="feature-card"><div class="num">06</div><h3>Auto-save &amp; portable</h3><p>Stored locally; exports as a single markdown file you can re-import anytime.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="early-access">
+    <div class="container">
+      <div class="cta-panel">
+        <span class="eyebrow">※ Early access</span>
+        <h2>Be the first to use it.</h2>
+        <p class="lead">
+          Portable Profile is in active development. Sign up and we'll send you an invite the
+          moment the builder is ready — plus the universal markdown template so you can start
+          drafting today.
+        </p>
+        <form class="cta-form" id="early-access-form" novalidate>
+          <div>
+            <label for="ea-email">Email</label>
+            <input id="ea-email" name="email" type="email" required autocomplete="email" placeholder="you@company.com">
+          </div>
+          <div class="form-row">
+            <div>
+              <label for="ea-name">Name <span style="opacity:0.6">(optional)</span></label>
+              <input id="ea-name" name="name" type="text" autocomplete="given-name" placeholder="Optional">
+            </div>
+            <div>
+              <label for="ea-company">Company <span style="opacity:0.6">(optional)</span></label>
+              <input id="ea-company" name="company" type="text" autocomplete="organization" placeholder="Optional">
+            </div>
+          </div>
+          <div>
+            <label for="ea-message">What would you use it for? <span style="opacity:0.6">(optional)</span></label>
+            <textarea id="ea-message" name="message" rows="3" placeholder="One sentence is plenty."></textarea>
+          </div>
+          <input type="hidden" name="source" value="portable-profile">
+          <div style="display: flex; gap: 12px; align-items: center; margin-top: 6px;">
+            <button type="submit" class="btn btn-primary">Request early access →</button>
+            <span class="form-status" id="ea-status" role="status" aria-live="polite"></span>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <p>
+      <a href="/">RocketSloth.Space</a> ·
+      <a href="/#services">Consulting</a> ·
+      <a href="/#demo-access">CRM Demo</a> ·
+      <a href="/portable-profile">Portable Profile</a> ·
+      <a href="/#contact">Contact</a>
+    </p>
+    <p style="margin-top: 14px; opacity: 0.6;">© RocketSloth.Space — Portable Profile is a RocketSloth product.</p>
+  </div>
+</footer>
+
+<script>
+  (function () {
+    var form = document.getElementById('early-access-form');
+    var status = document.getElementById('ea-status');
+    if (!form) return;
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      status.className = 'form-status';
+      status.textContent = 'Sending…';
+      var msg = form.message.value.trim();
+      var data = {
+        email: form.email.value.trim(),
+        name: form.name.value.trim(),
+        company: form.company.value.trim(),
+        interest: 'Portable Profile early access' + (msg ? ' — ' + msg : '')
+      };
+      if (!data.email) {
+        status.className = 'form-status err';
+        status.textContent = 'Please enter your email.';
+        return;
+      }
+      fetch('/api/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify(data)
+      }).then(function (r) {
+        if (!r.ok) throw new Error('Request failed');
+        return r.json().catch(function () { return {}; });
+      }).then(function () {
+        status.className = 'form-status ok';
+        status.textContent = "Thanks — we'll be in touch the moment it's ready.";
+        form.reset();
+      }).catch(function () {
+        status.className = 'form-status err';
+        status.textContent = 'Something went wrong. Email hello@rocketsloth.space and we will sort it.';
+      });
+    });
+  })();
+</script>
+
+</body>
+</html>
