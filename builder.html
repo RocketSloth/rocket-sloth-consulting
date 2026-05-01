@@ -1,0 +1,1347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Build your profile · Portable Profile by RocketSloth</title>
+<meta name="description" content="A guided builder for an AI context profile that outlasts the tool. Fill in seven short sections, export, and paste into any LLM.">
+<meta name="theme-color" content="#07111f">
+<meta property="og:title" content="Build your Portable Profile">
+<meta property="og:description" content="A guided builder for an AI context profile. Auto-saves locally. Export as markdown, ChatGPT instructions, or first-message paste.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://rocketsloth.space/builder">
+<meta property="og:image" content="https://rocketsloth.space/assets/og-share-card.svg">
+<link rel="canonical" href="https://rocketsloth.space/builder">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #07111f;
+  --bg-deep: #0b1423;
+  --panel: rgba(12, 21, 35, 0.82);
+  --panel-strong: rgba(15, 26, 43, 0.94);
+  --line: rgba(150, 180, 219, 0.14);
+  --line-strong: rgba(150, 180, 219, 0.24);
+  --text: #ebf2ff;
+  --text-dim: #afbdd5;
+  --text-faint: #8192ad;
+  --brand: #f58f4c;
+  --brand-deep: #d46b2e;
+  --brand-soft: rgba(245, 143, 76, 0.12);
+  --mint: #84ddb9;
+  --warn: #e8a960;
+  --shadow: 0 28px 70px rgba(0, 0, 0, 0.28);
+  --serif: "Fraunces", Georgia, serif;
+  --sans: "Manrope", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", monospace;
+}
+html { scroll-behavior: smooth; }
+body {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 14% 12%, rgba(143, 198, 255, 0.16), transparent 22%),
+    radial-gradient(circle at 86% 10%, rgba(245, 143, 76, 0.14), transparent 20%),
+    radial-gradient(circle at 50% 120%, rgba(132, 221, 185, 0.08), transparent 28%),
+    linear-gradient(180deg, #07111f 0%, #091423 48%, #07111f 100%);
+  color: var(--text);
+  font-family: var(--sans);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; }
+input, textarea, button { font-family: inherit; color: inherit; }
+button { cursor: pointer; }
+.container { width: min(900px, calc(100% - 40px)); margin: 0 auto; }
+.eyebrow { font-family: var(--mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.32em; color: var(--brand); }
+
+.topbar {
+  position: sticky; top: 0; z-index: 20;
+  backdrop-filter: blur(18px);
+  background: rgba(7, 17, 31, 0.68);
+  border-bottom: 1px solid rgba(150, 180, 219, 0.08);
+}
+.topbar-inner { min-height: 70px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.brandmark { display: inline-flex; align-items: center; gap: 12px; text-decoration: none; }
+.brandmark-badge {
+  width: 38px; height: 38px; border-radius: 50%;
+  display: grid; place-items: center; color: #16100c;
+  font-size: 0.78rem; font-weight: 800; letter-spacing: 0.06em;
+  background: radial-gradient(circle at 35% 35%, #ffd2b1, transparent 24%),
+              radial-gradient(circle at 35% 35%, var(--brand), var(--brand-deep));
+}
+.brandmark-copy strong { display: block; font-size: 0.92rem; }
+.brandmark-copy span { display: block; color: var(--text-faint); font-size: 0.7rem; font-family: var(--mono); text-transform: uppercase; letter-spacing: 0.08em; }
+.topbar-actions { display: flex; align-items: center; gap: 10px; }
+.savestate { font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-faint); }
+.savestate.ok { color: var(--mint); }
+.iconbtn {
+  background: transparent; border: 1px solid var(--line-strong);
+  color: var(--text-dim); padding: 8px 12px; border-radius: 999px;
+  font-size: 0.78rem; font-family: var(--mono); letter-spacing: 0.12em; text-transform: uppercase;
+}
+.iconbtn:hover { color: var(--text); border-color: var(--brand); }
+
+main { padding: 36px 0 80px; }
+
+/* Step navigator */
+.stepnav {
+  display: flex; gap: 8px; overflow-x: auto;
+  padding-bottom: 12px;
+  scrollbar-width: thin;
+}
+.stepnav-pill {
+  white-space: nowrap;
+  font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--text-faint);
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.stepnav-pill.active { background: var(--text); color: var(--bg); border-color: var(--text); }
+.stepnav-pill.done { color: var(--brand); border-color: var(--brand); }
+.stepnav-pill .num { opacity: 0.55; font-weight: 600; }
+.progress {
+  height: 2px; background: var(--line); position: relative; margin: 6px 0 28px;
+}
+.progress-bar { position: absolute; left: 0; top: 0; height: 2px; background: var(--brand); transition: width 0.4s ease; }
+
+/* Step content */
+.step { animation: fadeUp 0.32s ease-out; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.step h1 {
+  font-family: var(--serif); font-weight: 600;
+  font-size: clamp(2rem, 4.4vw, 2.8rem);
+  letter-spacing: -0.01em; line-height: 1.04;
+  margin: 18px 0 14px; max-width: 22ch;
+}
+.step h1 em { font-style: italic; color: var(--brand); }
+.step .lead {
+  font-size: 1.05rem; color: var(--text-dim); max-width: 60ch; margin-bottom: 28px;
+}
+.step h2 {
+  font-family: var(--serif); font-weight: 600; font-size: 1.4rem;
+  margin: 30px 0 6px;
+}
+.step h2 + p { color: var(--text-dim); font-size: 0.92rem; margin-bottom: 16px; }
+.field { margin-bottom: 22px; }
+.field-label {
+  display: flex; align-items: baseline; justify-content: space-between;
+  margin-bottom: 8px;
+}
+.field-label > span:first-child {
+  font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase;
+}
+.field-label .opt {
+  font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--text-faint);
+}
+.field-hint { font-size: 0.86rem; color: var(--text-faint); margin-top: 6px; line-height: 1.5; }
+input[type="text"], textarea {
+  width: 100%; padding: 12px 14px;
+  background: rgba(7, 17, 31, 0.6);
+  border: 1px solid var(--line-strong); border-radius: 12px;
+  color: var(--text); font-size: 0.96rem; line-height: 1.5;
+}
+textarea { resize: vertical; min-height: 88px; }
+input[type="text"]:focus, textarea:focus {
+  outline: 2px solid var(--brand); outline-offset: 1px; border-color: var(--brand);
+}
+
+/* Chip choice */
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  background: rgba(7, 17, 31, 0.6);
+  border: 1px solid var(--line-strong);
+  color: var(--text); padding: 8px 14px;
+  border-radius: 999px; font-size: 0.88rem;
+}
+.chip:hover { border-color: var(--brand); }
+.chip.active { background: var(--text); color: var(--bg); border-color: var(--text); }
+
+/* List editor */
+.listitem {
+  display: flex; gap: 12px; align-items: flex-start;
+  padding: 12px 14px; margin-bottom: 8px;
+  background: rgba(15, 24, 39, 0.7); border: 1px solid var(--line);
+  border-radius: 10px;
+}
+.listitem-num { font-family: var(--mono); font-size: 0.72rem; color: var(--text-faint); padding-top: 3px; min-width: 24px; }
+.listitem-body { flex: 1; min-width: 0; font-size: 0.95rem; line-height: 1.5; }
+.listitem-body .label { font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-faint); margin-right: 6px; }
+.listitem-remove {
+  background: transparent; border: none; color: var(--text-faint);
+  padding: 4px 8px; font-size: 1.1rem; line-height: 1;
+}
+.listitem-remove:hover { color: var(--brand); }
+.adder {
+  padding: 14px;
+  background: rgba(15, 24, 39, 0.5);
+  border: 1px dashed var(--line-strong);
+  border-radius: 12px;
+}
+.adder-fields { display: grid; gap: 8px; }
+.adder input[type="text"], .adder textarea {
+  background: transparent; border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px;
+}
+.adder-add {
+  margin-top: 10px;
+  background: transparent; border: none;
+  color: var(--brand); font-family: var(--mono); font-size: 0.78rem;
+  letter-spacing: 0.16em; text-transform: uppercase;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.adder-add:hover { color: var(--text); }
+
+/* Buttons */
+.btn {
+  min-height: 44px; padding: 0 20px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  border-radius: 999px; font-weight: 700; font-size: 0.9rem;
+  text-decoration: none; border: 1px solid transparent;
+  font-family: var(--mono); letter-spacing: 0.16em; text-transform: uppercase;
+}
+.btn-primary { background: var(--brand); color: #16100c; }
+.btn-primary:hover { background: #ffa56a; }
+.btn-secondary { background: transparent; color: var(--text); border-color: var(--line-strong); }
+.btn-secondary:hover { background: rgba(255,255,255,0.04); }
+.btn-ghost { background: transparent; color: var(--text-dim); border: none; }
+.btn-ghost:hover { color: var(--text); }
+
+/* Footer nav */
+.footernav {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--line);
+  gap: 12px; flex-wrap: wrap;
+}
+.footernav .stepcount { font-family: var(--mono); font-size: 0.74rem; letter-spacing: 0.16em; color: var(--text-faint); }
+
+/* Welcome */
+.welcome { padding: 40px 0 0; }
+.welcome h1 {
+  font-family: var(--serif); font-weight: 600;
+  font-size: clamp(2.4rem, 5.4vw, 3.6rem);
+  letter-spacing: -0.02em; line-height: 1.04;
+  margin: 16px 0 18px; max-width: 18ch;
+}
+.welcome h1 em { font-style: italic; color: var(--brand); }
+.welcome p.intro { font-size: 1.08rem; color: var(--text-dim); max-width: 60ch; margin-bottom: 26px; }
+.template-grid {
+  display: grid; gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  margin-bottom: 26px;
+}
+.template-card {
+  text-align: left; padding: 16px;
+  background: rgba(15, 24, 39, 0.78);
+  border: 1px solid var(--line);
+  border-radius: 14px; color: var(--text);
+}
+.template-card:hover { border-color: var(--brand); }
+.template-card.active { border-color: var(--brand); background: var(--brand-soft); }
+.template-card .name { font-family: var(--serif); font-weight: 600; font-size: 1.05rem; margin-bottom: 4px; }
+.template-card .blurb { font-size: 0.84rem; color: var(--text-dim); line-height: 1.45; }
+
+/* Review */
+.review-grid {
+  display: grid; gap: 8px;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  margin-bottom: 24px;
+}
+.review-card {
+  text-align: left;
+  padding: 14px;
+  background: rgba(15, 24, 39, 0.78);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  color: var(--text); font-size: 0.86rem;
+}
+.review-card:hover { border-color: var(--brand); }
+.review-card .name { font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-faint); margin-bottom: 6px; }
+.review-card .filled { color: var(--brand); font-family: var(--mono); font-size: 0.7rem; }
+.review-card .empty { color: var(--text-faint); font-family: var(--mono); font-size: 0.7rem; }
+.review-card .edit { font-family: var(--mono); font-size: 0.7rem; color: var(--text-faint); margin-top: 8px; letter-spacing: 0.1em; text-transform: uppercase; }
+
+.format-grid {
+  display: grid; gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  margin-bottom: 18px;
+}
+.format-card {
+  text-align: left;
+  padding: 14px 16px;
+  background: rgba(15, 24, 39, 0.78);
+  border: 1px solid var(--line-strong);
+  border-radius: 12px;
+  color: var(--text);
+}
+.format-card.active { background: var(--text); color: var(--bg); border-color: var(--text); }
+.format-card .label { font-family: var(--serif); font-weight: 600; font-size: 1rem; margin-bottom: 4px; }
+.format-card .blurb { font-size: 0.82rem; color: var(--text-dim); }
+.format-card.active .blurb { color: rgba(0,0,0,0.62); }
+
+.preview-actions { display: flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+.preview-tip { font-size: 0.84rem; color: var(--text-faint); margin-bottom: 14px; line-height: 1.5; }
+.preview-pre {
+  font-family: var(--mono); font-size: 0.84rem; line-height: 1.6;
+  background: rgba(7, 17, 31, 0.6); border: 1px solid var(--line-strong);
+  border-radius: 12px; padding: 18px;
+  white-space: pre-wrap; word-break: break-word;
+  max-height: 480px; overflow-y: auto;
+}
+.gpt-box {
+  background: rgba(15, 24, 39, 0.78);
+  border: 1px solid var(--line-strong); border-radius: 12px;
+  margin-bottom: 12px; overflow: hidden;
+}
+.gpt-box-head {
+  display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  padding: 12px 16px; border-bottom: 1px solid var(--line); flex-wrap: wrap;
+}
+.gpt-box-label { font-family: var(--mono); font-size: 0.76rem; letter-spacing: 0.14em; text-transform: uppercase; }
+.gpt-box-meta { display: flex; align-items: center; gap: 10px; }
+.gpt-box-count { font-family: var(--mono); font-size: 0.74rem; color: var(--text-faint); }
+.gpt-box-count.over { color: var(--brand); }
+.gpt-box-pre {
+  font-family: var(--mono); font-size: 0.84rem; line-height: 1.6;
+  padding: 16px;
+  white-space: pre-wrap; word-break: break-word;
+  max-height: 320px; overflow-y: auto;
+}
+.gpt-warn {
+  background: var(--brand-soft); color: #ffd8bf;
+  padding: 10px 16px;
+  font-size: 0.82rem;
+  border-top: 1px solid var(--line);
+}
+
+.copybtn-mini {
+  background: var(--text); color: var(--bg);
+  font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase;
+  padding: 6px 12px; border-radius: 999px; border: none;
+}
+.copybtn-mini.ok { background: var(--brand); color: #16100c; }
+
+.keepit {
+  margin-top: 26px; padding: 18px;
+  background: var(--brand-soft);
+  border: 1px solid rgba(245, 143, 76, 0.28);
+  border-radius: 14px;
+  color: var(--text);
+}
+.keepit strong { font-family: var(--serif); font-weight: 600; font-size: 1.05rem; display: block; margin-bottom: 4px; }
+.keepit p { font-size: 0.92rem; color: var(--text-dim); }
+
+.muted { color: var(--text-faint); font-size: 0.84rem; }
+
+@media (max-width: 600px) {
+  .footernav { flex-direction: column; align-items: stretch; }
+  .footernav .stepcount { text-align: center; }
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="container topbar-inner">
+    <a class="brandmark" href="/">
+      <span class="brandmark-badge">RS</span>
+      <span class="brandmark-copy">
+        <strong>Portable Profile</strong>
+        <span>by RocketSloth</span>
+      </span>
+    </a>
+    <div class="topbar-actions">
+      <span class="savestate" id="savestate"></span>
+      <button class="iconbtn" id="resetbtn" title="Reset all answers">Reset</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="container">
+    <nav class="stepnav" id="stepnav" aria-label="Steps"></nav>
+    <div class="progress"><div class="progress-bar" id="progressbar"></div></div>
+    <div id="stepbody"></div>
+  </div>
+</main>
+
+<script>
+(function () {
+  'use strict';
+
+  // ============================================================================
+  // Constants & state
+  // ============================================================================
+  var STORAGE_KEY = 'rs_portable_profile_v1';
+  var CHATGPT_LIMIT = 1500;
+
+  var STEPS = [
+    { id: 'welcome',   title: 'Begin' },
+    { id: 'identity',  title: 'Identity' },
+    { id: 'style',     title: 'Style' },
+    { id: 'workflows', title: 'Workflows' },
+    { id: 'context',   title: 'Context' },
+    { id: 'avoid',     title: 'Boundaries' },
+    { id: 'goals',     title: 'Goals' },
+    { id: 'review',    title: 'Export' }
+  ];
+
+  function emptyData() {
+    return {
+      identity:  { name: '', role: '', field: '', description: '' },
+      style:     { tone: '', length: '', formatting: '', clarification: '', extras: '' },
+      workflows: [],
+      context:   { projects: [], people: [], terms: [] },
+      avoid:     [],
+      goals:     '',
+      meta:      { createdAt: null, updatedAt: null }
+    };
+  }
+
+  var TEMPLATES = [
+    {
+      id: 'blank', name: 'Start blank',
+      blurb: 'Begin from scratch. No assumptions, just an empty wizard.',
+      build: emptyData
+    },
+    {
+      id: 'developer', name: 'Developer / Engineer',
+      blurb: 'Code review, debugging, technical writing, learning new tech.',
+      build: function () {
+        var d = emptyData();
+        d.identity.role = 'Software engineer';
+        d.identity.description = "I'm a software engineer. I tend to use AI for code review, debugging tricky issues, learning new technologies, drafting technical docs, and rubber-ducking design decisions. I write code that other engineers will read and maintain.";
+        d.style = { tone: 'balanced', length: 'adaptive', formatting: 'mix', clarification: 'attempt', extras: '' };
+        d.workflows = [
+          { id: mkId(), task: 'Code review — explain what code does, suggest improvements, catch bugs' },
+          { id: mkId(), task: 'Debugging — help me trace through error messages and unexpected behavior' },
+          { id: mkId(), task: 'Learning new tech — explain concepts with examples relevant to my domain' },
+          { id: mkId(), task: 'Drafting technical docs — READMEs, API docs, design docs' },
+          { id: mkId(), task: 'Writing commit messages and PR descriptions' }
+        ];
+        d.avoid = [
+          { id: mkId(), item: "Don't add code comments explaining obvious things" },
+          { id: mkId(), item: "Don't apologize before answering — get to the point" },
+          { id: mkId(), item: "Don't recommend frameworks or libraries I didn't ask about" }
+        ];
+        d.goals = 'Ship better code faster. Learn new things deeply, not superficially.';
+        return d;
+      }
+    },
+    {
+      id: 'writer', name: 'Writer / Content creator',
+      blurb: 'Brainstorming, drafting, editing, finding the right word.',
+      build: function () {
+        var d = emptyData();
+        d.identity.role = 'Writer';
+        d.identity.description = "I'm a writer. I tend to use AI for brainstorming angles, drafting first passes I can rewrite in my voice, editing for clarity, and finding the right word when one's eluding me. I have a strong voice — I want help, not replacement.";
+        d.style = { tone: 'balanced', length: 'medium', formatting: 'prose', clarification: 'ask', extras: '' };
+        d.workflows = [
+          { id: mkId(), task: 'Brainstorming angles, hooks, and structures for a piece' },
+          { id: mkId(), task: 'Drafting a rough first pass I can rewrite in my voice' },
+          { id: mkId(), task: 'Editing — flagging confusing sentences, weak transitions' },
+          { id: mkId(), task: 'Finding the right word — synonyms, connotations, etymology' }
+        ];
+        d.avoid = [
+          { id: mkId(), item: "Don't write in a generic AI voice — flat, cliché-laden" },
+          { id: mkId(), item: 'Avoid surface-level or obvious angles — push for something sharper' }
+        ];
+        d.goals = "Write pieces I'm proud of. Find my voice on harder topics.";
+        return d;
+      }
+    },
+    {
+      id: 'small_biz', name: 'Small business owner',
+      blurb: 'Customer emails, marketing, ops, all the hats at once.',
+      build: function () {
+        var d = emptyData();
+        d.identity.role = 'Small business owner';
+        d.identity.description = "I run a small business. I'm a one-person team (or close to it) and wear all the hats — marketing, ops, finance, customer service. I want practical, specific advice, not consulting jargon.";
+        d.style = { tone: 'casual', length: 'short', formatting: 'lists', clarification: 'attempt', extras: '' };
+        d.workflows = [
+          { id: mkId(), task: 'Drafting customer emails — replies, follow-ups, apologies' },
+          { id: mkId(), task: 'Writing social media posts and captions' },
+          { id: mkId(), task: 'Thinking through pricing, offers, and packages' },
+          { id: mkId(), task: 'Summarizing meetings into action items' }
+        ];
+        d.avoid = [
+          { id: mkId(), item: "Don't suggest I hire a consultant or agency — I'm doing this myself" },
+          { id: mkId(), item: "Don't recommend expensive software when free or cheap alternatives work" }
+        ];
+        d.goals = 'Grow without burning out. Spend more time on the work I love and less on admin.';
+        return d;
+      }
+    },
+    {
+      id: 'student', name: 'Student / Researcher',
+      blurb: 'Understand hard ideas. Get your thinking challenged.',
+      build: function () {
+        var d = emptyData();
+        d.identity.role = 'Student';
+        d.identity.description = "I'm a student. I use AI to help me learn, not to do the work for me. I want to understand things deeply, explain them back, and have my thinking challenged.";
+        d.style = { tone: 'balanced', length: 'medium', formatting: 'prose', clarification: 'ask', extras: '' };
+        d.workflows = [
+          { id: mkId(), task: 'Explaining hard concepts with examples and analogies' },
+          { id: mkId(), task: 'Quizzing me on material I want to learn' },
+          { id: mkId(), task: 'Helping me outline papers and structure arguments' },
+          { id: mkId(), task: 'Pointing out weak spots in my reasoning' }
+        ];
+        d.avoid = [
+          { id: mkId(), item: "Don't write papers or assignments for me — help me write them" },
+          { id: mkId(), item: "Don't be sycophantic — push back when I'm wrong" }
+        ];
+        d.goals = 'Build deep understanding of my field. Become a better thinker, not just a better student.';
+        return d;
+      }
+    }
+  ];
+
+  var TONE_OPTIONS = [
+    { value: 'casual',       label: 'Casual & warm' },
+    { value: 'balanced',     label: 'Friendly but professional' },
+    { value: 'professional', label: 'Crisp & professional' },
+    { value: 'direct',       label: 'Direct, no fluff' },
+    { value: 'playful',      label: 'Playful & witty' }
+  ];
+  var LENGTH_OPTIONS = [
+    { value: 'short',    label: 'Short — one or two paragraphs' },
+    { value: 'medium',   label: 'Medium — thorough but not exhausting' },
+    { value: 'long',     label: 'Long — give me the full picture' },
+    { value: 'adaptive', label: 'Match the question' }
+  ];
+  var FORMAT_OPTIONS = [
+    { value: 'prose',   label: 'Mostly prose' },
+    { value: 'lists',   label: 'Bullets and lists' },
+    { value: 'mix',     label: 'Whatever fits' },
+    { value: 'minimal', label: 'Minimal formatting' }
+  ];
+  var CLAR_OPTIONS = [
+    { value: 'ask',     label: 'Ask first' },
+    { value: 'attempt', label: 'Take a best attempt, then offer to revise' },
+    { value: 'depends', label: 'Use judgment' }
+  ];
+
+  var TONE_MAP = {
+    casual: 'Casual and warm', balanced: 'Friendly but professional',
+    professional: 'Crisp and professional', direct: 'Direct, no fluff',
+    playful: 'Playful and witty'
+  };
+  var LENGTH_MAP = {
+    short: 'Short — one or two paragraphs unless I ask for more',
+    medium: 'Medium — thorough but not exhausting',
+    long: 'Long — give me the full picture',
+    adaptive: 'Match the question — short for quick asks, long for complex ones'
+  };
+  var FORMAT_MAP = {
+    prose: 'Mostly prose; minimal bullets',
+    lists: 'Bullets and lists when they help',
+    mix: 'Whatever format fits the content best',
+    minimal: 'Minimal formatting; plain text where possible'
+  };
+  var CLAR_MAP = {
+    ask: 'Ask me clarifying questions before assuming',
+    attempt: 'Take a best attempt first, then offer to revise',
+    depends: 'Use judgment — ask for big things, attempt for small'
+  };
+
+  var EXPORT_FORMATS = [
+    { id: 'markdown',     label: 'Universal markdown',     blurb: 'Portable. Paste anywhere. Save anywhere.' },
+    { id: 'chatgpt',      label: 'ChatGPT custom instructions', blurb: 'Two boxes. Character-counted.' },
+    { id: 'firstmessage', label: 'First-message paste',    blurb: 'For tools without persistent memory.' }
+  ];
+
+  // ============================================================================
+  // Utilities
+  // ============================================================================
+  function mkId() { return 'i_' + Math.random().toString(36).slice(2, 10); }
+  function escapeHtml(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
+  // ============================================================================
+  // Persistent state
+  // ============================================================================
+  var state = { data: emptyData(), stepIndex: 0 };
+  var saveTimer = null;
+  var saveStateEl = null;
+  var initializing = true;
+
+  function load() {
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      var parsed = JSON.parse(raw);
+      if (parsed && parsed.data) {
+        state.data = mergeData(emptyData(), parsed.data);
+        state.stepIndex = Number(parsed.stepIndex) || 0;
+        if (state.stepIndex >= STEPS.length) state.stepIndex = STEPS.length - 1;
+      }
+    } catch (e) { /* ignore */ }
+  }
+
+  function mergeData(base, incoming) {
+    if (!incoming || typeof incoming !== 'object') return base;
+    var out = JSON.parse(JSON.stringify(base));
+    if (incoming.identity)  Object.assign(out.identity, incoming.identity);
+    if (incoming.style)     Object.assign(out.style, incoming.style);
+    if (Array.isArray(incoming.workflows)) out.workflows = incoming.workflows;
+    if (incoming.context) {
+      if (Array.isArray(incoming.context.projects)) out.context.projects = incoming.context.projects;
+      if (Array.isArray(incoming.context.people))   out.context.people   = incoming.context.people;
+      if (Array.isArray(incoming.context.terms))    out.context.terms    = incoming.context.terms;
+    }
+    if (Array.isArray(incoming.avoid)) out.avoid = incoming.avoid;
+    if (typeof incoming.goals === 'string') out.goals = incoming.goals;
+    if (incoming.meta) Object.assign(out.meta, incoming.meta);
+    return out;
+  }
+
+  function save() {
+    if (initializing) return;
+    if (saveTimer) clearTimeout(saveTimer);
+    if (saveStateEl) { saveStateEl.textContent = '※ Saving…'; saveStateEl.className = 'savestate'; }
+    saveTimer = setTimeout(function () {
+      try {
+        state.data.meta.createdAt = state.data.meta.createdAt || new Date().toISOString();
+        state.data.meta.updatedAt = new Date().toISOString();
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ data: state.data, stepIndex: state.stepIndex }));
+        if (saveStateEl) { saveStateEl.textContent = '※ Saved locally'; saveStateEl.className = 'savestate ok'; }
+      } catch (e) {
+        if (saveStateEl) { saveStateEl.textContent = '※ Save failed'; saveStateEl.className = 'savestate'; }
+      }
+    }, 350);
+  }
+
+  function update(path, value) {
+    var keys = path.split('.');
+    var t = state.data;
+    for (var i = 0; i < keys.length - 1; i++) t = t[keys[i]];
+    t[keys[keys.length - 1]] = value;
+    save();
+  }
+
+  function setStep(i) {
+    if (i < 0) i = 0;
+    if (i >= STEPS.length) i = STEPS.length - 1;
+    state.stepIndex = i;
+    save();
+    render();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function reset() {
+    if (!window.confirm('Reset all answers? This will erase everything you\'ve entered.')) return;
+    state.data = emptyData();
+    state.stepIndex = 0;
+    save();
+    render();
+  }
+
+  function applyTemplate(id) {
+    var t = TEMPLATES.filter(function (x) { return x.id === id; })[0];
+    if (!t) return;
+    state.data = t.build();
+    state.stepIndex = 1; // skip welcome → identity
+    save();
+    render();
+  }
+
+  // ============================================================================
+  // Top-level render
+  // ============================================================================
+  function render() {
+    renderStepNav();
+    renderProgress();
+    renderStepBody();
+  }
+
+  function renderStepNav() {
+    var nav = document.getElementById('stepnav');
+    var html = '';
+    for (var i = 0; i < STEPS.length; i++) {
+      var s = STEPS[i];
+      var cls = 'stepnav-pill';
+      if (i === state.stepIndex) cls += ' active';
+      else if (i < state.stepIndex) cls += ' done';
+      html += '<button class="' + cls + '" data-action="goto" data-i="' + i + '">' +
+                '<span class="num">' + String(i + 1).padStart(2, '0') + '</span>' +
+                '<span>' + escapeHtml(s.title) + '</span>' +
+              '</button>';
+    }
+    nav.innerHTML = html;
+  }
+
+  function renderProgress() {
+    var bar = document.getElementById('progressbar');
+    var pct = (state.stepIndex / (STEPS.length - 1)) * 100;
+    bar.style.width = pct + '%';
+  }
+
+  function renderStepBody() {
+    var body = document.getElementById('stepbody');
+    var step = STEPS[state.stepIndex];
+    var html = '';
+    if      (step.id === 'welcome')   html = renderWelcome();
+    else if (step.id === 'identity')  html = renderIdentity();
+    else if (step.id === 'style')     html = renderStyle();
+    else if (step.id === 'workflows') html = renderWorkflows();
+    else if (step.id === 'context')   html = renderContext();
+    else if (step.id === 'avoid')     html = renderAvoid();
+    else if (step.id === 'goals')     html = renderGoals();
+    else if (step.id === 'review')    html = renderReview();
+    body.innerHTML = '<div class="step">' + html + (step.id === 'welcome' ? '' : renderFooterNav()) + '</div>';
+  }
+
+  function renderFooterNav() {
+    var i = state.stepIndex;
+    var prevBtn = i > 0
+      ? '<button class="btn btn-secondary" data-action="prev">← Back</button>'
+      : '<span></span>';
+    var nextBtn = i < STEPS.length - 1
+      ? '<button class="btn btn-primary" data-action="next">Continue →</button>'
+      : '<span></span>';
+    var count = '<span class="stepcount">' + String(i + 1).padStart(2, '0') + ' / ' + String(STEPS.length).padStart(2, '0') + '</span>';
+    return '<div class="footernav">' + prevBtn + count + nextBtn + '</div>';
+  }
+
+  // ============================================================================
+  // Step renderers
+  // ============================================================================
+  function renderWelcome() {
+    var hasData = countFilled(state.data) > 0;
+    var continueBtn = hasData
+      ? '<button class="btn btn-secondary" data-action="goto" data-i="' + state.stepIndex + '">Continue where you left off</button>'
+      : '';
+    var templates = TEMPLATES.map(function (t) {
+      return '<button class="template-card" data-action="template" data-id="' + t.id + '">' +
+               '<div class="name">' + escapeHtml(t.name) + '</div>' +
+               '<div class="blurb">' + escapeHtml(t.blurb) + '</div>' +
+             '</button>';
+    }).join('');
+
+    return '' +
+      '<div class="welcome">' +
+        '<span class="eyebrow">※ A portable companion for your work</span>' +
+        '<h1>Build a profile <em>that outlasts</em> the tool.</h1>' +
+        '<p class="intro">' +
+          'Answer seven short sections about who you are and how you like to work. ' +
+          'You\'ll walk away with a profile you can paste into Claude, ChatGPT, Gemini ' +
+          '— whatever comes next — to bring your context with you. Auto-saves locally as you go.' +
+        '</p>' +
+        '<div class="template-grid">' + templates + '</div>' +
+        '<div style="display:flex; gap:10px; flex-wrap:wrap;">' +
+          '<button class="btn btn-primary" data-action="next">Begin from scratch →</button>' +
+          continueBtn +
+        '</div>' +
+        '<p class="muted" style="margin-top:18px;">Takes about 8–12 minutes. You can stop anytime — your progress is saved locally in this browser.</p>' +
+      '</div>';
+  }
+
+  function renderIdentity() {
+    var d = state.data.identity;
+    return '' +
+      '<span class="eyebrow">Section 01</span>' +
+      '<h1>Who are you?</h1>' +
+      '<p class="lead">The basics. What an AI assistant should know about you the first time you meet.</p>' +
+
+      field('Name', '[[[[identity.name]]]]', d.name, 'text', 'e.g. Alex, Dr. Chen, Sam', "Your name, a nickname, however you'd like to be addressed.") +
+      field('What do you do?', '[[[[identity.role]]]]', d.role, 'text', 'e.g. Marketing director / Indie game developer / Grad student in biology', 'Your role or primary work. Keep it human, not job-title-y if you don\'t want to.') +
+      field('Field or industry', '[[[[identity.field]]]]', d.field, 'text', 'e.g. Healthcare / Fintech / Education', 'Optional.', true) +
+      field('A short paragraph about you', '[[[[identity.description]]]]', d.description, 'textarea',
+        "I'm a small-business owner running a two-person bakery. I do most of my marketing, bookkeeping, and recipe development myself. I tend to use AI for writing emails, drafting social posts, and thinking through pricing decisions…",
+        'A few sentences on what you do, what kind of help you tend to need, and anything that gives useful context. The most powerful field — be a little generous with it.', false, 6);
+  }
+
+  function renderStyle() {
+    var d = state.data.style;
+    return '' +
+      '<span class="eyebrow">Section 02</span>' +
+      '<h1>How should it talk to you?</h1>' +
+      '<p class="lead">Tone, length, format. The little things that make a conversation feel like yours.</p>' +
+      chipField('Preferred tone',     '[[[[style.tone]]]]',          d.tone,          TONE_OPTIONS) +
+      chipField('Default length',     '[[[[style.length]]]]',        d.length,        LENGTH_OPTIONS) +
+      chipField('Formatting',         '[[[[style.formatting]]]]',    d.formatting,    FORMAT_OPTIONS) +
+      chipField('Clarifying questions','[[[[style.clarification]]]]', d.clarification, CLAR_OPTIONS, 'Should it ask before assuming, or take its best shot first?') +
+      field('Anything else?', '[[[[style.extras]]]]', d.extras, 'textarea',
+        "I prefer British spelling. I work in both English and Spanish. Don't start responses with 'Great question!' or 'I'd be happy to help!' — get into it.",
+        'Quirks, pet peeves, vocabulary, languages you mix. Anything.', true, 3);
+  }
+
+  function renderWorkflows() {
+    return '' +
+      '<span class="eyebrow">Section 03</span>' +
+      '<h1>What do you use AI for?</h1>' +
+      '<p class="lead">The recurring tasks. Things you\'ve done with AI more than once — those are the workflows worth capturing.</p>' +
+      '<p class="field-hint" style="margin-bottom:18px;">A few examples: drafting client emails, summarizing meeting notes, debugging Python scripts, planning weekly meals.</p>' +
+      listEditor('workflows', state.data.workflows,
+        [{ key: 'task', placeholder: 'e.g. Drafting follow-up emails to prospects after sales calls', long: true }],
+        'Add workflow'
+      );
+  }
+
+  function renderContext() {
+    var c = state.data.context;
+    return '' +
+      '<span class="eyebrow">Section 04</span>' +
+      '<h1>Your recurring world</h1>' +
+      '<p class="lead">The projects, people, and shorthand that come up again and again. Capture these and you stop having to re-explain them every conversation.</p>' +
+
+      '<h2>Projects</h2>' +
+      '<p>Things you\'re working on. A name and a sentence of context is enough.</p>' +
+      listEditor('context.projects', c.projects,
+        [{ key: 'name', label: 'Name', placeholder: 'Project name' },
+         { key: 'description', label: 'About', placeholder: 'Short description', long: true }],
+        'Add project'
+      ) +
+
+      '<h2>Key people</h2>' +
+      '<p>Recurring names. Family, colleagues, clients. So you can say "draft an email to Maya" without re-explaining who Maya is.</p>' +
+      listEditor('context.people', c.people,
+        [{ key: 'name', label: 'Name', placeholder: 'Name' },
+         { key: 'relationship', label: 'Who', placeholder: 'Relationship or role (e.g. my business partner)' }],
+        'Add person'
+      ) +
+
+      '<h2>Terms &amp; acronyms</h2>' +
+      '<p>Industry jargon, internal acronyms, project codenames. Anything an outsider would have to ask about.</p>' +
+      listEditor('context.terms', c.terms,
+        [{ key: 'term', label: 'Term', placeholder: 'e.g. RFP' },
+         { key: 'meaning', label: 'Means', placeholder: 'e.g. Request for proposal — formal sales doc' }],
+        'Add term'
+      );
+  }
+
+  function renderAvoid() {
+    return '' +
+      '<span class="eyebrow">Section 05</span>' +
+      '<h1>Boundaries</h1>' +
+      '<p class="lead">The things you don\'t want. Topics to skip, phrases that grate, kinds of suggestions that miss for you. This is permission to be specific.</p>' +
+      '<p class="field-hint" style="margin-bottom:18px;">Examples: "Don\'t suggest I hire a consultant — I\'m doing this myself." "Don\'t open responses with sycophancy." "Avoid recommending paid software when free alternatives exist."</p>' +
+      listEditor('avoid', state.data.avoid,
+        [{ key: 'item', placeholder: 'Something you want it to avoid', long: true }],
+        'Add boundary'
+      );
+  }
+
+  function renderGoals() {
+    return '' +
+      '<span class="eyebrow">Section 06</span>' +
+      '<h1>What are you working toward?</h1>' +
+      '<p class="lead">The bigger picture. What you\'d like AI to help you accomplish over the coming year, not just this afternoon.</p>' +
+      field('Your current goals', 'goals', state.data.goals, 'textarea',
+        "I'd like to grow my freelance practice from $40k to $80k this year. I'm working on getting better at writing proposals and following up with leads. I'm also trying to spend less time on admin so I can do more creative work…",
+        'Write freely. A few sentences or a long paragraph — both work. This becomes the lens an AI can use to make smarter suggestions.', false, 8);
+  }
+
+  function renderReview() {
+    var d = state.data;
+    var sections = [
+      { name: 'Identity',   step: 1, filled: !!(d.identity.name || d.identity.role || d.identity.description) },
+      { name: 'Style',      step: 2, filled: !!(d.style.tone || d.style.length || d.style.formatting) },
+      { name: 'Workflows',  step: 3, filled: d.workflows.length > 0 },
+      { name: 'Context',    step: 4, filled: d.context.projects.length + d.context.people.length + d.context.terms.length > 0 },
+      { name: 'Boundaries', step: 5, filled: d.avoid.length > 0 },
+      { name: 'Goals',      step: 6, filled: !!(d.goals && d.goals.trim()) }
+    ];
+
+    var cards = sections.map(function (s) {
+      return '<button class="review-card" data-action="goto" data-i="' + s.step + '">' +
+               '<div class="name">' + s.name + '</div>' +
+               '<div class="' + (s.filled ? 'filled' : 'empty') + '">' + (s.filled ? '✓ filled' : '— empty') + '</div>' +
+               '<div class="edit">Edit ›</div>' +
+             '</button>';
+    }).join('');
+
+    var fmt = exportFormat;
+    var formatCards = EXPORT_FORMATS.map(function (f) {
+      return '<button class="format-card' + (f.id === fmt ? ' active' : '') + '" data-action="format" data-id="' + f.id + '">' +
+               '<div class="label">' + escapeHtml(f.label) + '</div>' +
+               '<div class="blurb">' + escapeHtml(f.blurb) + '</div>' +
+             '</button>';
+    }).join('');
+
+    var output;
+    if (fmt === 'markdown') {
+      var md = generateMarkdown(d);
+      output = '' +
+        '<div class="preview-actions">' +
+          '<button class="btn btn-primary" data-action="copy" data-text="markdown" id="copy-md">Copy</button>' +
+          '<button class="btn btn-secondary" data-action="download" data-text="markdown">Download .md</button>' +
+        '</div>' +
+        '<p class="preview-tip">Save this as a .md file. Paste it into any chat to bring your context with you. Most universal option.</p>' +
+        '<div class="preview-pre">' + escapeHtml(md) + '</div>';
+    } else if (fmt === 'chatgpt') {
+      var gpt = generateChatGPT(d);
+      output = '' +
+        '<p class="preview-tip">ChatGPT\'s Custom Instructions has two boxes. Each accepts up to ' + CHATGPT_LIMIT + ' characters.</p>' +
+        gptBox('Box 1 — What would you like ChatGPT to know about you?', gpt.aboutMe, 'gpt-about') +
+        gptBox('Box 2 — How would you like ChatGPT to respond?',         gpt.howRespond, 'gpt-respond');
+    } else {
+      var fm = generateFirstMessage(d);
+      output = '' +
+        '<div class="preview-actions">' +
+          '<button class="btn btn-primary" data-action="copy" data-text="firstmessage" id="copy-fm">Copy</button>' +
+          '<button class="btn btn-secondary" data-action="download" data-text="firstmessage">Download .md</button>' +
+        '</div>' +
+        '<p class="preview-tip">A conversational version. Paste this as your first message in any new chat to set context, then ask whatever you came to ask.</p>' +
+        '<div class="preview-pre">' + escapeHtml(fm) + '</div>';
+    }
+
+    return '' +
+      '<span class="eyebrow">Section 07</span>' +
+      '<h1>Your portable profile</h1>' +
+      '<p class="lead">Done. Pick the export format that matches where you\'re using your AI. Save the file somewhere safe.</p>' +
+      '<div class="review-grid">' + cards + '</div>' +
+      '<span class="eyebrow" style="display:block; margin-bottom:10px;">※ Choose your export format</span>' +
+      '<div class="format-grid">' + formatCards + '</div>' +
+      output +
+      '<div class="keepit">' +
+        '<strong>Keep it living</strong>' +
+        '<p>Save the universal markdown somewhere you back up — that\'s your master copy. Update it as your work changes, and bring it with you to whatever AI tool comes next.</p>' +
+      '</div>';
+  }
+
+  function gptBox(label, text, key) {
+    var count = text.length;
+    var over = count > CHATGPT_LIMIT;
+    return '<div class="gpt-box">' +
+             '<div class="gpt-box-head">' +
+               '<span class="gpt-box-label">' + escapeHtml(label) + '</span>' +
+               '<div class="gpt-box-meta">' +
+                 '<span class="gpt-box-count' + (over ? ' over' : '') + '">' + count + ' / ' + CHATGPT_LIMIT + '</span>' +
+                 '<button class="copybtn-mini" data-action="copy" data-text="' + key + '" id="copy-' + key + '">Copy</button>' +
+               '</div>' +
+             '</div>' +
+             '<div class="gpt-box-pre">' + escapeHtml(text) + '</div>' +
+             (over ? '<div class="gpt-warn">Over the ' + CHATGPT_LIMIT + '-character limit by ' + (count - CHATGPT_LIMIT) + '. Trim your profile or paste anyway and let ChatGPT truncate.</div>' : '') +
+           '</div>';
+  }
+
+  // ============================================================================
+  // Field helpers
+  // ============================================================================
+  function field(label, path, value, kind, placeholder, hint, optional, rows) {
+    // path uses [[[[…]]]] placeholders — we replace below
+    var realPath = path.replace(/\[\[\[\[/g, '').replace(/\]\]\]\]/g, '');
+    var optionalHtml = optional ? '<span class="opt">Optional</span>' : '';
+    var inputHtml;
+    if (kind === 'textarea') {
+      inputHtml = '<textarea data-bind="' + realPath + '" rows="' + (rows || 3) + '" placeholder="' + escapeHtml(placeholder) + '">' + escapeHtml(value) + '</textarea>';
+    } else {
+      inputHtml = '<input type="text" data-bind="' + realPath + '" value="' + escapeHtml(value) + '" placeholder="' + escapeHtml(placeholder) + '">';
+    }
+    var hintHtml = hint ? '<p class="field-hint">' + escapeHtml(hint) + '</p>' : '';
+    return '<div class="field">' +
+             '<label class="field-label"><span>' + escapeHtml(label) + '</span>' + optionalHtml + '</label>' +
+             inputHtml + hintHtml +
+           '</div>';
+  }
+
+  function chipField(label, path, value, options, hint) {
+    var realPath = path.replace(/\[\[\[\[/g, '').replace(/\]\]\]\]/g, '');
+    var chipsHtml = options.map(function (o) {
+      var active = value === o.value ? ' active' : '';
+      return '<button class="chip' + active + '" data-action="chip" data-path="' + realPath + '" data-value="' + escapeHtml(o.value) + '">' + escapeHtml(o.label) + '</button>';
+    }).join('');
+    var hintHtml = hint ? '<p class="field-hint">' + escapeHtml(hint) + '</p>' : '';
+    return '<div class="field">' +
+             '<label class="field-label"><span>' + escapeHtml(label) + '</span></label>' +
+             '<div class="chips">' + chipsHtml + '</div>' + hintHtml +
+           '</div>';
+  }
+
+  function listEditor(path, items, fields, addLabel) {
+    var itemsHtml = items.map(function (it, i) {
+      var bodyParts = fields.map(function (f) {
+        var val = it[f.key];
+        if (!val) return '';
+        var labelPart = (fields.length > 1 && f.label) ? '<span class="label">' + escapeHtml(f.label) + ':</span> ' : '';
+        return '<div>' + labelPart + escapeHtml(val) + '</div>';
+      }).join('');
+      return '<div class="listitem">' +
+               '<span class="listitem-num">' + String(i + 1).padStart(2, '0') + '</span>' +
+               '<div class="listitem-body">' + bodyParts + '</div>' +
+               '<button class="listitem-remove" data-action="list-remove" data-path="' + path + '" data-i="' + i + '" aria-label="Remove">×</button>' +
+             '</div>';
+    }).join('');
+
+    var fieldsHtml = fields.map(function (f) {
+      if (f.long) {
+        return '<textarea data-listfield data-key="' + f.key + '" rows="2" placeholder="' + escapeHtml(f.placeholder) + '"></textarea>';
+      }
+      return '<input type="text" data-listfield data-key="' + f.key + '" placeholder="' + escapeHtml(f.placeholder) + '">';
+    }).join('');
+
+    return '<div>' + itemsHtml +
+             '<div class="adder" data-adder data-path="' + path + '" data-keys="' + escapeHtml(fields.map(function(f){return f.key;}).join(',')) + '">' +
+               '<div class="adder-fields">' + fieldsHtml + '</div>' +
+               '<button class="adder-add" data-action="list-add">+ ' + escapeHtml(addLabel) + '</button>' +
+             '</div>' +
+           '</div>';
+  }
+
+  // ============================================================================
+  // Event handlers
+  // ============================================================================
+  var exportFormat = 'markdown';
+
+  function onClick(e) {
+    var t = e.target.closest('[data-action]');
+    if (!t) return;
+    var action = t.getAttribute('data-action');
+
+    if (action === 'next')     { setStep(state.stepIndex + 1); return; }
+    if (action === 'prev')     { setStep(state.stepIndex - 1); return; }
+    if (action === 'goto')     { setStep(parseInt(t.getAttribute('data-i'), 10)); return; }
+    if (action === 'template') { applyTemplate(t.getAttribute('data-id')); return; }
+    if (action === 'chip')     { update(t.getAttribute('data-path'), t.getAttribute('data-value')); render(); return; }
+    if (action === 'format')   { exportFormat = t.getAttribute('data-id'); render(); return; }
+    if (action === 'copy')     { handleCopy(t); return; }
+    if (action === 'download') { handleDownload(t); return; }
+
+    if (action === 'list-remove') {
+      var path = t.getAttribute('data-path');
+      var idx  = parseInt(t.getAttribute('data-i'), 10);
+      var arr  = getByPath(path);
+      arr.splice(idx, 1);
+      save();
+      render();
+      return;
+    }
+
+    if (action === 'list-add') {
+      var adder = t.closest('[data-adder]');
+      if (!adder) return;
+      var p     = adder.getAttribute('data-path');
+      var keys  = adder.getAttribute('data-keys').split(',');
+      var inputs = adder.querySelectorAll('[data-listfield]');
+      var item = { id: mkId() };
+      var hasContent = false;
+      for (var i = 0; i < inputs.length; i++) {
+        var k = inputs[i].getAttribute('data-key');
+        var v = inputs[i].value.trim();
+        item[k] = v;
+        if (v) hasContent = true;
+      }
+      if (!hasContent) return;
+      var arr2 = getByPath(p);
+      arr2.push(item);
+      save();
+      render();
+      return;
+    }
+  }
+
+  function onInput(e) {
+    var t = e.target;
+    if (t.matches('[data-bind]')) {
+      var path = t.getAttribute('data-bind');
+      update(path, t.value);
+    }
+  }
+
+  function getByPath(path) {
+    var keys = path.split('.');
+    var v = state.data;
+    for (var i = 0; i < keys.length; i++) v = v[keys[i]];
+    return v;
+  }
+
+  function handleCopy(btn) {
+    var key = btn.getAttribute('data-text');
+    var d = state.data;
+    var text;
+    if (key === 'markdown')     text = generateMarkdown(d);
+    else if (key === 'firstmessage') text = generateFirstMessage(d);
+    else if (key === 'gpt-about')    text = generateChatGPT(d).aboutMe;
+    else if (key === 'gpt-respond')  text = generateChatGPT(d).howRespond;
+    else return;
+
+    var done = function () {
+      var origText = btn.textContent;
+      btn.textContent = 'Copied ✓';
+      btn.classList.add('ok');
+      setTimeout(function () { btn.textContent = origText; btn.classList.remove('ok'); }, 1800);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done).catch(fallbackCopy);
+    } else {
+      fallbackCopy();
+    }
+    function fallbackCopy() {
+      var ta = document.createElement('textarea');
+      ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); done(); } catch (e) { /* ignore */ }
+      document.body.removeChild(ta);
+    }
+  }
+
+  function handleDownload(btn) {
+    var key = btn.getAttribute('data-text');
+    var d = state.data;
+    var text, suffix;
+    if (key === 'markdown') { text = generateMarkdown(d); suffix = ''; }
+    else if (key === 'firstmessage') { text = generateFirstMessage(d); suffix = '-first-message'; }
+    else return;
+
+    var blob = new Blob([text], { type: 'text/markdown' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    var slugBase = (d.identity.name || 'my').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'my';
+    a.href = url;
+    a.download = slugBase + '-ai-profile' + suffix + '.md';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  // ============================================================================
+  // Format generators
+  // ============================================================================
+  function countFilled(d) {
+    var n = 0;
+    if (d.identity.name) n++;
+    if (d.identity.role) n++;
+    if (d.identity.field) n++;
+    if (d.identity.description) n++;
+    if (d.style.tone) n++;
+    if (d.style.length) n++;
+    if (d.style.formatting) n++;
+    if (d.style.clarification) n++;
+    if (d.style.extras) n++;
+    n += d.workflows.length;
+    n += d.context.projects.length;
+    n += d.context.people.length;
+    n += d.context.terms.length;
+    n += d.avoid.length;
+    if (d.goals) n++;
+    return n;
+  }
+
+  function generateMarkdown(d) {
+    var lines = [];
+    var today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    lines.push('# AI Context Profile');
+    lines.push('');
+    lines.push('> Paste this at the start of any new AI conversation, or save it as a custom system prompt / project file. Last updated: ' + today + '.');
+    lines.push('');
+
+    var id = d.identity;
+    if (id.name || id.role || id.field || id.description) {
+      lines.push('## About me');
+      lines.push('');
+      if (id.name)  lines.push('**Name:** ' + id.name);
+      if (id.role)  lines.push('**Role:** ' + id.role);
+      if (id.field) lines.push('**Field:** ' + id.field);
+      if (id.name || id.role || id.field) lines.push('');
+      if (id.description) { lines.push(id.description); lines.push(''); }
+    }
+
+    var s = d.style;
+    var styleLines = [];
+    if (s.tone)          styleLines.push('- **Tone:** ' + (TONE_MAP[s.tone] || s.tone));
+    if (s.length)        styleLines.push('- **Response length:** ' + (LENGTH_MAP[s.length] || s.length));
+    if (s.formatting)    styleLines.push('- **Formatting:** ' + (FORMAT_MAP[s.formatting] || s.formatting));
+    if (s.clarification) styleLines.push('- **Clarifying questions:** ' + (CLAR_MAP[s.clarification] || s.clarification));
+    if (styleLines.length || s.extras) {
+      lines.push('## How I like to communicate');
+      lines.push('');
+      if (styleLines.length) lines.push.apply(lines, styleLines);
+      if (s.extras) {
+        if (styleLines.length) lines.push('');
+        lines.push(s.extras);
+      }
+      lines.push('');
+    }
+
+    if (d.workflows.length) {
+      lines.push('## What I commonly use AI for');
+      lines.push('');
+      d.workflows.forEach(function (w) { if (w.task && w.task.trim()) lines.push('- ' + w.task.trim()); });
+      lines.push('');
+    }
+
+    var c = d.context;
+    if (c.projects.length || c.people.length || c.terms.length) {
+      lines.push('## Recurring context');
+      lines.push('');
+      if (c.projects.length) {
+        lines.push('### Projects');
+        lines.push('');
+        c.projects.forEach(function (p) {
+          if (p.name && p.name.trim()) {
+            var desc = p.description && p.description.trim() ? ' — ' + p.description.trim() : '';
+            lines.push('- **' + p.name.trim() + '**' + desc);
+          }
+        });
+        lines.push('');
+      }
+      if (c.people.length) {
+        lines.push('### Key people');
+        lines.push('');
+        c.people.forEach(function (p) {
+          if (p.name && p.name.trim()) {
+            var rel = p.relationship && p.relationship.trim() ? ' — ' + p.relationship.trim() : '';
+            lines.push('- **' + p.name.trim() + '**' + rel);
+          }
+        });
+        lines.push('');
+      }
+      if (c.terms.length) {
+        lines.push('### Terms & acronyms');
+        lines.push('');
+        c.terms.forEach(function (t) {
+          if (t.term && t.term.trim()) {
+            var m = t.meaning && t.meaning.trim() ? ' — ' + t.meaning.trim() : '';
+            lines.push('- **' + t.term.trim() + '**' + m);
+          }
+        });
+        lines.push('');
+      }
+    }
+
+    if (d.avoid.length) {
+      lines.push('## Things to avoid');
+      lines.push('');
+      d.avoid.forEach(function (a) { if (a.item && a.item.trim()) lines.push('- ' + a.item.trim()); });
+      lines.push('');
+    }
+
+    if (d.goals && d.goals.trim()) {
+      lines.push("## What I'm working toward");
+      lines.push('');
+      lines.push(d.goals.trim());
+      lines.push('');
+    }
+
+    lines.push('---');
+    lines.push('');
+    lines.push('*This profile is portable. Update it as your work changes, and bring it with you to whatever AI tool comes next.*');
+    lines.push('');
+    return lines.join('\n');
+  }
+
+  function generateChatGPT(d) {
+    var about = [];
+    if (d.identity.name) about.push('My name is ' + d.identity.name + '.');
+    var role = [d.identity.role, d.identity.field && ('in ' + d.identity.field)].filter(Boolean).join(' ');
+    if (role) about.push("I'm a " + role + '.');
+    if (d.identity.description) about.push(d.identity.description);
+
+    if (d.workflows.length) {
+      about.push('');
+      about.push('I commonly use AI for:');
+      d.workflows.forEach(function (w) { if (w.task && w.task.trim()) about.push('- ' + w.task.trim()); });
+    }
+
+    var c = d.context;
+    var ctx = [];
+    if (c.projects.length) {
+      ctx.push('Current projects: ' + c.projects.filter(function (p) { return p.name && p.name.trim(); })
+        .map(function (p) { return p.description && p.description.trim() ? p.name + ' (' + p.description + ')' : p.name; }).join('; ') + '.');
+    }
+    if (c.people.length) {
+      ctx.push('People who come up: ' + c.people.filter(function (p) { return p.name && p.name.trim(); })
+        .map(function (p) { return p.relationship && p.relationship.trim() ? p.name + ' (' + p.relationship + ')' : p.name; }).join('; ') + '.');
+    }
+    if (c.terms.length) {
+      ctx.push('Terms I use: ' + c.terms.filter(function (t) { return t.term && t.term.trim(); })
+        .map(function (t) { return t.meaning && t.meaning.trim() ? t.term + ' = ' + t.meaning : t.term; }).join('; ') + '.');
+    }
+    if (ctx.length) { about.push(''); about.push.apply(about, ctx); }
+
+    if (d.goals && d.goals.trim()) { about.push(''); about.push("What I'm working toward: " + d.goals.trim()); }
+
+    var resp = [];
+    var s = d.style;
+    if (s.tone)          resp.push('Tone: ' + (TONE_MAP[s.tone] || s.tone) + '.');
+    if (s.length)        resp.push('Length: ' + (LENGTH_MAP[s.length] || s.length) + '.');
+    if (s.formatting)    resp.push('Formatting: ' + (FORMAT_MAP[s.formatting] || s.formatting) + '.');
+    if (s.clarification) resp.push('Clarification: ' + (CLAR_MAP[s.clarification] || s.clarification) + '.');
+    if (s.extras)        { resp.push(''); resp.push(s.extras); }
+    if (d.avoid.length) {
+      resp.push('');
+      resp.push('Please avoid:');
+      d.avoid.forEach(function (a) { if (a.item && a.item.trim()) resp.push('- ' + a.item.trim()); });
+    }
+
+    return { aboutMe: about.join('\n').trim(), howRespond: resp.join('\n').trim() };
+  }
+
+  function generateFirstMessage(d) {
+    var parts = [];
+    parts.push("Hi — before we dive in, here's some quick context about me so you can be more helpful:");
+    parts.push('');
+    var intro = [];
+    if (d.identity.name) intro.push("I'm " + d.identity.name);
+    var role = [d.identity.role, d.identity.field && ('in ' + d.identity.field)].filter(Boolean).join(' ');
+    if (role) intro.push('a ' + role);
+    if (intro.length) parts.push(intro.join(', ') + '.');
+    if (d.identity.description) parts.push(d.identity.description);
+
+    var sp = [];
+    var s = d.style;
+    if (TONE_MAP[s.tone])           sp.push(TONE_MAP[s.tone].toLowerCase());
+    if (LENGTH_MAP[s.length])       sp.push(LENGTH_MAP[s.length].toLowerCase());
+    if (FORMAT_MAP[s.formatting])   sp.push(FORMAT_MAP[s.formatting].toLowerCase());
+    if (CLAR_MAP[s.clarification])  sp.push(CLAR_MAP[s.clarification].toLowerCase());
+    if (sp.length) { parts.push(''); parts.push('How I like responses: ' + sp.join('; ') + '.'); }
+    if (s.extras) parts.push(s.extras);
+
+    if (d.workflows.length) {
+      parts.push('');
+      parts.push('I commonly use AI for: ' + d.workflows.filter(function (w) { return w.task && w.task.trim(); }).map(function (w) { return w.task.trim(); }).join('; ') + '.');
+    }
+
+    var c = d.context;
+    var ctx = [];
+    if (c.projects.length) {
+      ctx.push("Projects I'm working on: " + c.projects.filter(function (p) { return p.name && p.name.trim(); })
+        .map(function (p) { return p.description && p.description.trim() ? p.name + ' (' + p.description + ')' : p.name; }).join(', '));
+    }
+    if (c.people.length) {
+      ctx.push('People who come up: ' + c.people.filter(function (p) { return p.name && p.name.trim(); })
+        .map(function (p) { return p.relationship && p.relationship.trim() ? p.name + ' (' + p.relationship + ')' : p.name; }).join(', '));
+    }
+    if (c.terms.length) {
+      ctx.push('Terms I use: ' + c.terms.filter(function (t) { return t.term && t.term.trim(); })
+        .map(function (t) { return t.meaning && t.meaning.trim() ? t.term + ' (' + t.meaning + ')' : t.term; }).join(', '));
+    }
+    if (ctx.length) { parts.push(''); parts.push(ctx.join('. ') + '.'); }
+
+    if (d.avoid.length) {
+      parts.push('');
+      parts.push('Please avoid: ' + d.avoid.filter(function (a) { return a.item && a.item.trim(); }).map(function (a) { return a.item.trim(); }).join('; ') + '.');
+    }
+    if (d.goals && d.goals.trim()) { parts.push(''); parts.push("What I'm working toward: " + d.goals.trim()); }
+
+    parts.push('');
+    parts.push("OK, with that out of the way — here's what I wanted to ask:");
+    parts.push('');
+    parts.push('[your question here]');
+    return parts.join('\n');
+  }
+
+  // ============================================================================
+  // Init
+  // ============================================================================
+  document.addEventListener('DOMContentLoaded', function () {
+    saveStateEl = document.getElementById('savestate');
+    document.body.addEventListener('click', onClick);
+    document.body.addEventListener('input', onInput);
+    document.getElementById('resetbtn').addEventListener('click', reset);
+    load();
+    initializing = false;
+    render();
+  });
+})();
+</script>
+
+</body>
+</html>
