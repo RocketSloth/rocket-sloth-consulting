@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RocketSloth.Space | AI and BI Consulting</title>
+<meta name="description" content="RocketSloth.Space builds AI-powered CRMs, dashboards, and automation for operators. Open the live demo instantly with no login required.">
+<meta name="theme-color" content="#07111f">
+<meta property="og:title" content="RocketSloth.Space | AI and BI Consulting">
+<meta property="og:description" content="Custom AI and BI builds for operators. Open the live CRM demo instantly with no login required.">
+<meta property="og:type" content="website">
+<link rel="canonical" href="https://rocketsloth.space/consulting">
+<meta property="og:url" content="https://rocketsloth.space/consulting">
+<meta property="og:image" content="https://rocketsloth.space/assets/og-share-card.svg">
+<meta property="og:image:alt" content="RocketSloth.Space AI and BI consulting services">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://rocketsloth.space/#organization",
+      "name": "RocketSloth.Space",
+      "url": "https://rocketsloth.space/"
+    },
+    {
+      "@type": "Service",
+      "@id": "https://rocketsloth.space/#service",
+      "serviceType": "AI and BI Consulting",
+      "category": "Business Intelligence and AI Workflow Automation",
+      "provider": {
+        "@id": "https://rocketsloth.space/#organization"
+      },
+      "url": "https://rocketsloth.space/",
+      "offers": {
+        "@type": "Offer",
+        "category": "AI-powered CRM and analytics services"
+      }
+    }
+  ]
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #07111f;
+  --bg-deep: #0b1423;
+  --panel: rgba(12, 21, 35, 0.82);
+  --panel-strong: rgba(15, 26, 43, 0.94);
+  --line: rgba(150, 180, 219, 0.14);
+  --line-strong: rgba(150, 180, 219, 0.24);
+  --text: #ebf2ff;
+  --text-dim: #afbdd5;
+  --text-faint: #8192ad;
+  --brand: #f58f4c;
+  --brand-deep: #d46b2e;
+  --brand-soft: rgba(245, 143, 76, 0.12);
+  --sky: #8fc6ff;
+  --sky-soft: rgba(143, 198, 255, 0.12);
+  --mint: #84ddb9;
+  --mint-soft: rgba(132, 221, 185, 0.11);
+  --shadow: 0 28px 70px rgba(0, 0, 0, 0.28);
+  --radius-xl: 34px;
+  --radius-lg: 26px;
+  --radius-md: 18px;
+  --radius-sm: 14px;
+  --serif: "Fraunces", Georgia, serif;
+  --sans: "Manrope", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", monospace;
+}
+
+html { scroll-behavior: smooth; overflow-x: hidden; }
+
+body {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 14% 12%, rgba(143, 198, 255, 0.16), transparent 22%),
+    radial-gradient(circle at 86% 10%, rgba(245, 143, 76, 0.14), transparent 20%),
+    radial-gradient(circle at 50% 120%, rgba(132, 221, 185, 0.08), transparent 28%),
+    linear-gradient(180deg, #07111f 0%, #091423 48%, #07111f 100%);
+  color: var(--text);
+  font-family: var(--sans);
+  line-height: 1.6;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: inherit; }
+
+#starfield {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+#starfield canvas {
+  width: 100%;
+  height: 100%;
+}
+
+.shell {
+  position: relative;
+  z-index: 1;
+}
+
+.container {
+  width: min(1120px, calc(100% - 40px));
+  margin: 0 auto;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  backdrop-filter: blur(18px);
+  background: rgba(7, 17, 31, 0.68);
+  border-bottom: 1px solid rgba(150, 180, 219, 0.08);
+  transition: transform 0.28s ease;
+}
+
+.topbar.is-hidden { transform: translateY(-100%); }
+
+.topbar-inner {
+  min-height: 78px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.brandmark {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+}
+
+.brandmark-badge {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: #16100c;
+  font-size: 0.84rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  background:
+    radial-gradient(circle at 35% 35%, #ffd2b1, transparent 24%),
+    radial-gradient(circle at 35% 35%, var(--brand), var(--brand-deep));
+  box-shadow: 0 0 28px rgba(245, 143, 76, 0.22);
+}
+
+.brandmark-copy strong {
+  display: block;
+  color: var(--text);
+  font-size: 0.95rem;
+  letter-spacing: -0.02em;
+}
+
+.brandmark-copy span {
+  display: block;
+  color: var(--text-faint);
+  font-size: 0.74rem;
+  font-family: var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+}
+
+.nav a {
+  color: var(--text-dim);
+  text-decoration: none;
+  font-size: 0.92rem;
+}
+
+.nav a:hover { color: var(--text); }
+
+.nav-cta {
+  min-height: 44px;
+  padding: 0 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: rgba(245, 143, 76, 0.16);
+  color: #ffd8bf !important;
+  font-weight: 800;
+  border: 1px solid rgba(245, 143, 76, 0.22);
+}
+
+.hero {
+  padding: 84px 0 42px;
+}
+
+.hero-grid,
+.feature-band,
+.contact-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(320px, 0.82fr);
+  gap: 24px;
+  align-items: stretch;
+}
+
+.hero-panel,
+.demo-panel,
+.section-card,
+.feature-band,
+.contact-panel,
+.footer-shell {
+  background: linear-gradient(180deg, rgba(15, 24, 39, 0.84), rgba(10, 18, 30, 0.82));
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+}
+
+.hero-panel,
+.demo-panel,
+.contact-panel,
+.footer-shell {
+  border-radius: var(--radius-xl);
+}
+
+.hero-panel,
+.demo-panel,
+.feature-band,
+.contact-panel,
+.footer-shell,
+.section-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-panel {
+  padding: 54px;
+}
+
+.demo-panel,
+.contact-panel {
+  padding: 34px;
+}
+
+.feature-band {
+  padding: 34px;
+  border-radius: var(--radius-lg);
+}
+
+.section-card {
+  padding: 26px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.hero-panel::before,
+.demo-panel::before,
+.contact-panel::before {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.hero-panel::before {
+  width: 420px;
+  height: 420px;
+  right: -220px;
+  top: -180px;
+  background: radial-gradient(circle, rgba(143, 198, 255, 0.12), transparent 68%);
+  border: 1px solid rgba(143, 198, 255, 0.12);
+}
+
+.demo-panel::before,
+.contact-panel::before {
+  width: 220px;
+  height: 220px;
+  right: -60px;
+  bottom: -80px;
+  background: radial-gradient(circle, rgba(245, 143, 76, 0.14), transparent 68%);
+}
+
+.hero-panel > *,
+.demo-panel > *,
+.contact-panel > * {
+  position: relative;
+  z-index: 1;
+}
+
+.eyebrow,
+.section-kicker,
+.mini-stat span,
+.fineprint,
+.field label {
+  font-family: var(--mono);
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(143, 198, 255, 0.08);
+  border: 1px solid rgba(143, 198, 255, 0.18);
+  color: #c7dcfb;
+  font-size: 0.74rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.section-kicker {
+  display: inline-block;
+  margin-bottom: 10px;
+  color: #ffc3a7;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+h1,
+h2,
+.section-title {
+  font-family: var(--serif);
+  font-weight: 400;
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+}
+
+h1 {
+  margin: 22px 0 18px;
+  font-size: clamp(3.1rem, 7vw, 5.4rem);
+  max-width: 9ch;
+}
+
+h1 em {
+  font-style: italic;
+  background: linear-gradient(135deg, #ffe0a6, var(--brand));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-sub,
+.section-desc,
+.demo-panel p,
+.feature-list,
+.footer-shell p {
+  color: var(--text-dim);
+}
+
+.hero-sub {
+  max-width: 48ch;
+  font-size: 1.08rem;
+  margin-bottom: 30px;
+}
+
+.cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  padding: 0 22px;
+  border-radius: 999px;
+  border: 0;
+  font: inherit;
+  font-weight: 800;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.btn:hover { transform: translateY(-1px); }
+
+.btn-primary {
+  background: var(--brand);
+  color: #1d130e;
+  box-shadow: 0 12px 30px rgba(245, 143, 76, 0.22);
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text);
+  border: 1px solid var(--line);
+}
+
+.full-width { width: 100%; }
+
+.mini-grid,
+.card-grid,
+.stat-stack {
+  display: grid;
+  gap: 16px;
+}
+
+.mini-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 30px;
+}
+
+.mini-stat {
+  padding: 16px 18px;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(150, 180, 219, 0.12);
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.mini-stat strong {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--text);
+  font-size: 0.96rem;
+}
+
+.mini-stat span {
+  display: block;
+  color: var(--text-faint);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.demo-panel h2,
+.section-title {
+  font-size: clamp(2rem, 4vw, 3rem);
+}
+
+.demo-panel h2 {
+  margin-bottom: 12px;
+}
+
+.feature-list {
+  list-style: none;
+  display: grid;
+  gap: 12px;
+  margin: 18px 0 24px;
+}
+
+.field {
+  display: grid;
+  gap: 6px;
+}
+
+.field label {
+  color: var(--text-faint);
+  font-size: 0.74rem;
+  font-family: var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.field input {
+  width: 100%;
+  min-height: 52px;
+  padding: 0 15px;
+  border: 1px solid rgba(150, 180, 219, 0.14);
+  background: rgba(6, 12, 20, 0.55);
+  color: var(--text);
+  border-radius: 14px;
+  font: inherit;
+  outline: none;
+}
+
+.field textarea {
+  width: 100%;
+  min-height: 110px;
+  padding: 12px 15px;
+  border: 1px solid rgba(150, 180, 219, 0.14);
+  background: rgba(6, 12, 20, 0.55);
+  color: var(--text);
+  border-radius: 14px;
+  font: inherit;
+  resize: vertical;
+  outline: none;
+}
+
+.field input:focus {
+  border-color: rgba(255, 122, 61, 0.8);
+  box-shadow: 0 0 0 3px rgba(255, 122, 61, 0.12);
+}
+
+.field textarea:focus {
+  border-color: rgba(255, 122, 61, 0.8);
+  box-shadow: 0 0 0 3px rgba(255, 122, 61, 0.12);
+}
+
+.form-status {
+  min-height: 1.4em;
+  margin-top: 2px;
+  color: var(--text-dim);
+  font-size: 0.86rem;
+}
+
+.fineprint {
+  color: var(--text-faint);
+  font-size: 0.8rem;
+}
+
+.section {
+  padding: 42px 0;
+}
+
+.section-head {
+  max-width: 760px;
+  margin-bottom: 26px;
+}
+
+.section-title {
+  margin-bottom: 12px;
+}
+
+.card-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.card-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 16px;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  color: #ffd4bc;
+  background: var(--brand-soft);
+  border: 1px solid rgba(255, 122, 61, 0.18);
+}
+
+.card-icon.sky {
+  background: var(--sky-soft);
+  border-color: rgba(122, 199, 255, 0.18);
+  color: #d8ebff;
+}
+
+.card-icon.mint {
+  background: var(--mint-soft);
+  border-color: rgba(126, 224, 182, 0.18);
+  color: #d6fff0;
+}
+
+.section-card h3 {
+  margin-bottom: 8px;
+  color: var(--text);
+  font-size: 1.02rem;
+}
+
+.feature-band {
+  align-items: center;
+}
+
+.stat-stack {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.stat-card {
+  padding: 20px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.stat-card strong {
+  display: block;
+  color: var(--sky);
+  font-family: var(--mono);
+  font-size: 1.35rem;
+}
+
+.stat-card span {
+  display: block;
+  margin-top: 4px;
+  color: var(--text-faint);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.signup-form {
+  display: grid;
+  gap: 12px;
+}
+
+.field {
+  display: grid;
+  gap: 6px;
+}
+
+.field label {
+  color: var(--text-faint);
+  font-size: 0.74rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.field input {
+  width: 100%;
+  min-height: 52px;
+  padding: 0 15px;
+  border: 1px solid rgba(150, 180, 219, 0.14);
+  background: rgba(6, 12, 20, 0.55);
+  color: var(--text);
+  border-radius: 14px;
+  font: inherit;
+  outline: none;
+}
+
+.field input:focus {
+  border-color: rgba(255, 122, 61, 0.8);
+  box-shadow: 0 0 0 3px rgba(255, 122, 61, 0.12);
+}
+
+.form-status {
+  min-height: 1.4em;
+  color: var(--text-dim);
+  font-size: 0.86rem;
+}
+
+.form-status[data-tone="error"] { color: #ffb0a2; }
+.form-status[data-tone="success"] { color: #b7ffd7; }
+
+.footer {
+  padding: 10px 0 54px;
+}
+
+.footer-shell {
+  padding: 30px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: center;
+}
+
+.footer-shell h2 {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
+  line-height: 0.98;
+  margin-bottom: 10px;
+}
+
+.footer-copy strong {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 0.88rem;
+  letter-spacing: 0.1em;
+}
+
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.footer-links a {
+  text-decoration: none;
+  color: var(--text-dim);
+}
+
+.footer-links a:hover { color: var(--text); }
+
+.reveal {
+  opacity: 0;
+  transform: translateY(34px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+#services,
+#featured-report,
+#how,
+#pricing {
+  display: none;
+}
+
+@media (max-width: 980px) {
+  .hero-grid,
+  .feature-band,
+  .contact-panel,
+  .card-grid,
+  .mini-grid,
+  .stat-stack {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .container { width: min(1120px, calc(100% - 24px)); }
+
+  .topbar-inner,
+  .footer-shell {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .nav {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .hero {
+    padding-top: 44px;
+  }
+
+  .hero-panel,
+  .demo-panel,
+  .feature-band,
+  .contact-panel,
+  .footer-shell,
+  .section-card {
+    padding: 24px;
+  }
+
+  .hero-panel::before,
+  .demo-panel::before,
+  .contact-panel::before {
+    display: none;
+  }
+
+  h1 {
+    max-width: 100%;
+  }
+
+  .cta-row .btn,
+  .signup-form .btn {
+    width: 100%;
+  }
+}
+</style>
+</head>
+<body>
+<div id="starfield"><canvas></canvas></div>
+
+<div class="shell">
+  <div style="position:relative;z-index:25;background:rgba(132,221,185,.12);border-bottom:1px solid rgba(132,221,185,.28);text-align:center;padding:10px 14px;font:600 .85rem 'Manrope',system-ui,sans-serif;color:#d9ffe9;">
+    Now booking new AI and CRM builds for <strong>May 2026</strong>.
+  </div>
+  <header class="topbar" id="nav">
+    <div class="container topbar-inner">
+      <a class="brandmark" href="#top">
+        <span class="brandmark-badge" aria-hidden="true">RS</span>
+        <span class="brandmark-copy">
+          <strong>RocketSloth.Space</strong>
+          <span>AI and BI Consulting</span>
+        </span>
+      </a>
+
+      <nav class="nav" aria-label="Primary">
+        <a href="/">← Portable Profile</a>
+        <a href="#demo-access">Live Demo</a>
+        <a class="nav-cta" href="#contact">Book a call</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="container hero-grid">
+        <article class="hero-panel reveal">
+          <span class="eyebrow">AI + BI consulting</span>
+          <h1>Ship <em>smarter ops</em> without burying your team in more tools.</h1>
+          <p class="hero-sub">
+            We build branded CRMs, reporting layers, and workflow automation that replace spreadsheet sprawl.
+            The fastest way to understand it is to open the live demo right now. No login required.
+          </p>
+
+          <div class="cta-row">
+            <a class="btn btn-primary" href="#demo-access">See a live demo →</a>
+            <a class="btn btn-secondary" href="#contact">Book a discovery call</a>
+          </div>
+
+          <div class="mini-grid" aria-label="What you get">
+            <div class="mini-stat">
+              <strong>Public demo</strong>
+              <span>No login gate</span>
+            </div>
+            <div class="mini-stat">
+              <strong>Real workflow</strong>
+              <span>Contacts, deals, activities</span>
+            </div>
+            <div class="mini-stat">
+              <strong>AI included</strong>
+              <span>Deal summaries and next actions</span>
+            </div>
+          </div>
+        </article>
+
+        <aside class="demo-panel reveal" id="hero-demo">
+          <div>
+            <span class="section-kicker">Live Demo</span>
+            <h2>Open the workspace and look around.</h2>
+            <p>
+              The public demo is the same CRM we customize for clients. No login. Read-only.
+              Browse the pipeline, open a deal, and try the AI summary button.
+            </p>
+          </div>
+
+          <ul class="feature-list" style="margin: 18px 0 22px;">
+            <li>~30 sample contacts and ~15 deals across every pipeline stage.</li>
+            <li>Activity history, search, dashboards, and AI deal summaries.</li>
+            <li>Safe to share with your team — nothing you do affects real data.</li>
+          </ul>
+
+          <a class="btn btn-primary full-width" href="/crm?tenant=demo&public=1">Enter the workspace →</a>
+          <p class="fineprint" style="margin-top: 12px;">Prefer a guided walkthrough? <a href="#contact" style="color: var(--text); text-decoration: underline;">Book a discovery call</a>.</p>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section" id="services">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="section-kicker">What We Build</span>
+          <h2 class="section-title">A practical stack for calmer operations.</h2>
+          <p class="section-desc">
+            Every engagement is built around the same idea: one operating system for your team,
+            not five disconnected tools and a pile of manual cleanup.
+          </p>
+        </div>
+
+        <div class="card-grid">
+          <article class="section-card reveal">
+            <div class="card-icon">01</div>
+            <h3>AI-native CRM</h3>
+            <p>A branded customer workspace with contacts, pipeline, activities, search, and the internal structure your team actually needs.</p>
+          </article>
+
+          <article class="section-card reveal">
+            <div class="card-icon sky">02</div>
+            <h3>BI dashboards</h3>
+            <p>Pipeline visibility, revenue tracking, trend reporting, and plain-English questions your team can ask without waiting on analysts.</p>
+          </article>
+
+          <article class="section-card reveal">
+            <div class="card-icon mint">03</div>
+            <h3>Workflow automation</h3>
+            <p>Lead routing, enrichment, follow-up drafting, data sync, and the quiet automation that gives hours back every week.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="demo-shows">
+      <div class="container">
+        <article class="feature-band reveal">
+          <div>
+            <span class="section-kicker">What the Demo Shows</span>
+            <h2 class="section-title">Enough surface area to judge the fit in a few minutes.</h2>
+            <p class="section-desc">
+              The public demo is not a screenshot gallery. It is the actual application shell we customize for each client.
+            </p>
+
+            <ul class="feature-list">
+              <li>Browse dashboard metrics, recent activity, and the live pipeline board.</li>
+              <li>Open any deal and trigger the AI summary flow to see how the assistant thinks.</li>
+              <li>Review the overall product shape before we discuss branding, integrations, or custom fields.</li>
+            </ul>
+
+            <div class="cta-row" style="margin-top: 22px; margin-bottom: 0;">
+              <a class="btn btn-primary" href="#demo-access">Get instant demo access →</a>
+              <a class="btn btn-secondary" href="#contact">Talk to us about your build</a>
+            </div>
+          </div>
+
+          <div class="stat-stack" aria-label="Demo highlights">
+            <div class="stat-card">
+              <strong>1 codebase</strong>
+              <span>Customized per client</span>
+            </div>
+            <div class="stat-card">
+              <strong>Read-only access</strong>
+              <span>Safe to share publicly</span>
+            </div>
+            <div class="stat-card">
+              <strong>AI summaries</strong>
+              <span>Deal status and next actions</span>
+            </div>
+            <div class="stat-card">
+              <strong>Fast rollout</strong>
+              <span>Prototype to production in weeks</span>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="demo-access">
+      <div class="container">
+        <div class="contact-panel reveal">
+          <div>
+            <span class="section-kicker">Demo Access</span>
+            <h2>Enter your name and jump straight into the live CRM demo.</h2>
+            <p>
+              No password required. We’ll save your request, start a secure demo session,
+              and drop you directly into the sample workspace.
+            </p>
+          </div>
+
+          <form class="signup-form" data-signup-form data-demo-access="1" method="POST" action="/api/signup" novalidate>
+            <input type="hidden" name="company" value="RocketSloth Demo Access">
+            <input type="hidden" name="interest" value="Requested CRM demo login">
+
+            <div class="field">
+              <label for="demo-name">Your name</label>
+              <input id="demo-name" name="name" type="text" autocomplete="given-name" placeholder="Optional">
+            </div>
+
+            <div class="field">
+              <label for="demo-company">Company (optional)</label>
+              <input id="demo-company" name="company" type="text" autocomplete="organization" placeholder="Acme Inc">
+            </div>
+
+            <button class="btn btn-primary" data-submit-button type="submit">Open the live demo</button>
+            <p class="form-status" data-form-status aria-live="polite"></p>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="how">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="section-kicker">How We Work</span>
+          <h2 class="section-title">A short path from "this is messy" to "this runs smoothly."</h2>
+          <p class="section-desc">
+            We keep the process tight so you get a working system quickly and your team can adopt it without drama.
+          </p>
+        </div>
+
+        <div class="card-grid">
+          <article class="section-card reveal">
+            <div class="card-icon">01</div>
+            <h3>Map the workflow</h3>
+            <p>We identify where decisions stall, where data gets copied around, and where AI can create leverage without adding noise.</p>
+          </article>
+
+          <article class="section-card reveal">
+            <div class="card-icon sky">02</div>
+            <h3>Tailor the product</h3>
+            <p>We adapt the CRM, reporting, and automations to your process, your language, and the systems your team already uses.</p>
+          </article>
+
+          <article class="section-card reveal">
+            <div class="card-icon mint">03</div>
+            <h3>Launch and iterate</h3>
+            <p>We train the team, stay close through rollout, and keep improving the system as your workflows evolve.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="contact">
+      <div class="container">
+        <article class="contact-panel reveal">
+          <div>
+            <span class="section-kicker">Start Here</span>
+            <h2 class="section-title">Tell us what is still manual, slow, or hard to trust.</h2>
+            <p class="section-desc">
+              One form. One reply. Usually a concrete recommendation within one business day.
+            </p>
+          </div>
+
+          <form class="signup-form" data-signup-form method="POST" action="/api/signup" novalidate>
+            <input type="hidden" name="company" value="RocketSloth Discovery">
+
+            <div class="field">
+              <label for="contact-name">Your name</label>
+              <input id="contact-name" name="name" type="text" autocomplete="given-name" placeholder="Optional">
+            </div>
+
+            <div class="field">
+              <label for="contact-company">Company</label>
+              <input id="contact-company" name="company" type="text" autocomplete="organization" placeholder="Acme Inc">
+            </div>
+
+            <div class="field">
+              <label for="contact-message">What should we improve?</label>
+              <textarea id="contact-message" name="message" placeholder="Tell us one workflow that's slow, manual, or guesswork."></textarea>
+            </div>
+
+            <button class="btn btn-primary" data-submit-button type="submit">Request a discovery call</button>
+            <p class="form-status" data-form-status aria-live="polite"></p>
+            <p class="fineprint">No spam. We only use this to follow up about your workflow.</p>
+          </form>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-shell reveal">
+        <div class="footer-copy">
+          <strong>ROCKETSLOTH.SPACE</strong>
+          <h2>Smarter tools. Calmer work.</h2>
+          <p>Custom CRMs, dashboards, and automation built around how your team already works.</p>
+        </div>
+
+        <div>
+          <div class="footer-links">
+            <a href="#demo-access">Live Demo</a>
+            <a href="#contact">Book a call</a>
+            <a href="#contact">Send project details</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<script src="/assets/site.js"></script>
+</body>
+</html>
