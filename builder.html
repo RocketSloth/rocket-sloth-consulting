@@ -46,64 +46,120 @@ html { scroll-behavior: smooth; }
 body {
   min-height: 100vh;
   position: relative;
-  background: linear-gradient(180deg, #0e1a17 0%, #0a1411 48%, #0e1a17 100%);
+  background: radial-gradient(ellipse at 50% 0%, #16241f 0%, #0a1411 55%, #06100d 100%);
   color: var(--text);
   font-family: var(--sans);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
-body::before {
-  content: "";
-  position: fixed;
-  inset: -20%;
-  z-index: -2;
-  pointer-events: none;
+.cosmos { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
+.cosmos .nebula {
+  position: absolute; inset: -15%;
   background:
-    radial-gradient(ellipse at 18% 22%, rgba(108, 138, 156, 0.26), transparent 36%),
-    radial-gradient(ellipse at 84% 16%, rgba(74, 132, 116, 0.30), transparent 38%),
-    radial-gradient(ellipse at 28% 82%, rgba(109, 168, 150, 0.22), transparent 40%),
-    radial-gradient(ellipse at 78% 88%, rgba(53, 107, 91, 0.28), transparent 42%),
-    radial-gradient(circle at 50% 50%, rgba(74, 132, 116, 0.10), transparent 50%);
-  filter: blur(60px) saturate(1.1);
-  animation: nebula-drift 48s ease-in-out infinite alternate;
+    radial-gradient(ellipse 55% 45% at 18% 22%, rgba(108, 138, 156, 0.55), transparent 65%),
+    radial-gradient(ellipse 50% 40% at 84% 18%, rgba(74, 132, 116, 0.60), transparent 65%),
+    radial-gradient(ellipse 65% 55% at 28% 82%, rgba(109, 168, 150, 0.45), transparent 70%),
+    radial-gradient(ellipse 60% 50% at 78% 85%, rgba(53, 107, 91, 0.55), transparent 70%),
+    radial-gradient(ellipse 80% 70% at 50% 50%, rgba(74, 132, 116, 0.18), transparent 80%);
+  filter: blur(40px) saturate(1.35);
+  animation: nebula-drift 36s ease-in-out infinite alternate;
 }
-body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background-image:
-    radial-gradient(1px 1px at 12px 24px, rgba(255,255,255,0.85), transparent 60%),
-    radial-gradient(1px 1px at 48px 92px, rgba(255,255,255,0.55), transparent 60%),
-    radial-gradient(1.4px 1.4px at 86px 38px, rgba(255,255,255,0.95), transparent 60%),
-    radial-gradient(1px 1px at 132px 168px, rgba(165,200,184,0.7), transparent 60%),
-    radial-gradient(1px 1px at 174px 64px, rgba(255,255,255,0.6), transparent 60%),
-    radial-gradient(1.6px 1.6px at 220px 132px, rgba(255,255,255,0.9), transparent 60%),
-    radial-gradient(1px 1px at 260px 28px, rgba(108,138,156,0.8), transparent 60%),
-    radial-gradient(1px 1px at 296px 196px, rgba(255,255,255,0.65), transparent 60%),
-    radial-gradient(1.2px 1.2px at 60px 210px, rgba(255,255,255,0.8), transparent 60%),
-    radial-gradient(1px 1px at 200px 240px, rgba(165,200,184,0.6), transparent 60%);
+.cosmos .stars-far,
+.cosmos .stars-near {
+  position: absolute; inset: 0;
   background-repeat: repeat;
-  background-size: 340px 280px;
-  animation: star-twinkle 5.4s ease-in-out infinite alternate, star-drift 220s linear infinite;
-  opacity: 0.9;
+}
+.cosmos .stars-far {
+  background-image:
+    radial-gradient(0.8px 0.8px at 30px 50px, rgba(255,255,255,0.70), transparent 60%),
+    radial-gradient(0.8px 0.8px at 80px 130px, rgba(255,255,255,0.55), transparent 60%),
+    radial-gradient(0.6px 0.6px at 140px 220px, rgba(165,200,184,0.65), transparent 60%),
+    radial-gradient(0.8px 0.8px at 200px 80px, rgba(255,255,255,0.60), transparent 60%),
+    radial-gradient(0.6px 0.6px at 250px 180px, rgba(108,138,156,0.75), transparent 60%),
+    radial-gradient(0.7px 0.7px at 100px 290px, rgba(255,255,255,0.55), transparent 60%),
+    radial-gradient(0.6px 0.6px at 180px 340px, rgba(255,255,255,0.50), transparent 60%),
+    radial-gradient(0.8px 0.8px at 40px 380px, rgba(165,200,184,0.55), transparent 60%);
+  background-size: 280px 420px;
+  animation: star-drift-slow 320s linear infinite, star-twinkle 7s ease-in-out infinite alternate;
+  opacity: 0.85;
+}
+.cosmos .stars-near {
+  background-image:
+    radial-gradient(1.6px 1.6px at 60px 80px, rgba(255,255,255,0.95), transparent 55%),
+    radial-gradient(1.2px 1.2px at 150px 40px, rgba(255,255,255,0.80), transparent 60%),
+    radial-gradient(1.8px 1.8px at 230px 160px, rgba(255,255,255,1), transparent 55%),
+    radial-gradient(1.2px 1.2px at 310px 60px, rgba(165,200,184,0.85), transparent 60%),
+    radial-gradient(1.4px 1.4px at 90px 240px, rgba(255,255,255,0.90), transparent 60%),
+    radial-gradient(1.6px 1.6px at 280px 300px, rgba(255,255,255,0.95), transparent 55%),
+    radial-gradient(1.2px 1.2px at 200px 360px, rgba(108,138,156,0.90), transparent 60%),
+    radial-gradient(1.4px 1.4px at 50px 420px, rgba(255,255,255,0.85), transparent 60%);
+  background-size: 360px 480px;
+  animation: star-drift-fast 140s linear infinite, star-twinkle 4.2s ease-in-out infinite alternate;
+}
+.cosmos .glow-stars {
+  position: absolute; inset: 0;
+}
+.cosmos .glow-stars::before,
+.cosmos .glow-stars::after {
+  content: "";
+  position: absolute;
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow:
+    0 0 8px 2px rgba(255,255,255,0.85),
+    0 0 22px 6px rgba(165,200,184,0.55),
+    0 0 48px 14px rgba(74,132,116,0.35);
+  animation: glow-pulse 3.6s ease-in-out infinite alternate;
+}
+.cosmos .glow-stars::before { top: 18%; left: 14%; }
+.cosmos .glow-stars::after  { top: 62%; left: 82%; animation-delay: 1.4s; }
+.cosmos .shooting-star {
+  position: absolute; top: 18%; left: -10%;
+  width: 160px; height: 1.5px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.95), transparent);
+  filter: drop-shadow(0 0 6px rgba(255,255,255,0.85));
+  transform: rotate(18deg);
+  animation: shooting 9s ease-in infinite;
+  opacity: 0;
+}
+.cosmos .shooting-star.s2 {
+  top: 58%; left: -10%;
+  animation-duration: 13s;
+  animation-delay: 5.2s;
+  transform: rotate(14deg);
 }
 @keyframes nebula-drift {
   0%   { transform: translate3d(-3%, -2%, 0) scale(1.05) rotate(0deg); }
-  50%  { transform: translate3d(2%, 3%, 0) scale(1.14) rotate(8deg); }
-  100% { transform: translate3d(3%, -1%, 0) scale(1.08) rotate(-6deg); }
+  50%  { transform: translate3d(2%, 3%, 0) scale(1.15) rotate(7deg); }
+  100% { transform: translate3d(3%, -1%, 0) scale(1.08) rotate(-5deg); }
 }
 @keyframes star-twinkle {
   0%, 100% { opacity: 0.55; }
   50%      { opacity: 1; }
 }
-@keyframes star-drift {
-  0%   { background-position: 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0; }
-  100% { background-position: 340px -280px, 340px -280px, 340px -280px, 340px -280px, 340px -280px, 340px -280px, 340px -280px, 340px -280px, 340px -280px, 340px -280px; }
+@keyframes star-drift-slow {
+  from { background-position: 0 0; }
+  to   { background-position: -280px 420px; }
+}
+@keyframes star-drift-fast {
+  from { background-position: 0 0; }
+  to   { background-position: 360px -480px; }
+}
+@keyframes glow-pulse {
+  0%, 100% { transform: scale(0.85); opacity: 0.7; }
+  50%      { transform: scale(1.25); opacity: 1; }
+}
+@keyframes shooting {
+  0%       { transform: translate3d(0, 0, 0) rotate(18deg); opacity: 0; }
+  6%       { opacity: 1; }
+  18%      { opacity: 1; }
+  30%      { transform: translate3d(140vw, 30vh, 0) rotate(18deg); opacity: 0; }
+  100%     { transform: translate3d(140vw, 30vh, 0) rotate(18deg); opacity: 0; }
 }
 @media (prefers-reduced-motion: reduce) {
-  body::before, body::after { animation: none; }
+  .cosmos * { animation: none !important; }
 }
 a { color: inherit; }
 input, textarea, button { font-family: inherit; color: inherit; }
@@ -399,6 +455,14 @@ input[type="text"]:focus, textarea:focus {
 </style>
 </head>
 <body>
+<div class="cosmos" aria-hidden="true">
+  <div class="nebula"></div>
+  <div class="stars-far"></div>
+  <div class="stars-near"></div>
+  <div class="glow-stars"></div>
+  <div class="shooting-star"></div>
+  <div class="shooting-star s2"></div>
+</div>
 
 <header class="topbar">
   <div class="container topbar-inner">
