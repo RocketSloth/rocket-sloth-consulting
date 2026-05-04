@@ -135,7 +135,7 @@ module.exports = async function handler(req, res) {
         config: {
           branding: {
             productName: "RocketSloth Demo CRM",
-            accentColor: "#f58f4c",
+            accentColor: "#4f46e5",
             logoUrl: ""
           },
           pipeline: {

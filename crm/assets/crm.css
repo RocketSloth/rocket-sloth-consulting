@@ -167,9 +167,9 @@ html, body {
   margin: 0 auto 16px;
   padding: 12px 14px;
   border-radius: 10px;
-  border: 1px solid #fed7aa;
-  background: #fff7ed;
-  color: #9a3412;
+  border: 1px solid #c7c4f5;
+  background: #eef2ff;
+  color: #312e81;
   font-size: 14px;
 }
 .view-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px; }
@@ -240,7 +240,7 @@ html, body {
 }
 .status-pill.customer { background: #dcfce7; color: var(--success); }
 .status-pill.lead { background: #eef2ff; color: var(--accent); }
-.status-pill.prospect { background: #fef3c7; color: #92400e; }
+.status-pill.prospect { background: #e0e7ff; color: #3730a3; }
 .status-pill.archived { background: #f3f4f6; color: var(--muted); }
 
 .empty { color: var(--muted); font-size: 14px; text-align: center; padding: 24px; }
@@ -276,10 +276,10 @@ html, body {
 .ai-stub-warning {
   font-size: 11px;
   padding: 6px 8px;
-  background: #fff7ed;
-  color: #9a3412;
+  background: #eef2ff;
+  color: #312e81;
   border-radius: 6px;
-  border: 1px solid #fed7aa;
+  border: 1px solid #c7c4f5;
 }
 
 /* ---------- Mobile responsive ---------- */
