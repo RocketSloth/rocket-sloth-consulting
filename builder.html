@@ -158,8 +158,51 @@ body {
   30%      { transform: translate3d(140vw, 30vh, 0) rotate(18deg); opacity: 0; }
   100%     { transform: translate3d(140vw, 30vh, 0) rotate(18deg); opacity: 0; }
 }
+.cosmos .cursor-glow {
+  position: fixed; top: 0; left: 0;
+  width: 360px; height: 360px;
+  margin-left: -180px; margin-top: -180px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, rgba(165,200,184,0.45) 0%, rgba(74,132,116,0.25) 35%, transparent 70%);
+  filter: blur(24px);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  will-change: transform, opacity;
+}
+.cosmos.is-active .cursor-glow { opacity: 1; }
+.cosmos .tap-burst {
+  position: fixed;
+  width: 12px; height: 12px;
+  margin-left: -6px; margin-top: -6px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,255,255,0.95) 0%, rgba(165,200,184,0.7) 40%, transparent 70%);
+  box-shadow: 0 0 20px 6px rgba(255,255,255,0.6), 0 0 60px 18px rgba(74,132,116,0.4);
+  animation: tap-burst 900ms ease-out forwards;
+  pointer-events: none;
+}
+@keyframes tap-burst {
+  0%   { transform: scale(0.2); opacity: 1; }
+  60%  { opacity: 0.8; }
+  100% { transform: scale(8); opacity: 0; }
+}
+.cosmos .tap-spark {
+  position: fixed;
+  width: 3px; height: 3px;
+  margin-left: -1.5px; margin-top: -1.5px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 0 8px 2px rgba(255,255,255,0.85);
+  animation: tap-spark 800ms ease-out forwards;
+  pointer-events: none;
+}
+@keyframes tap-spark {
+  0%   { transform: translate(0,0) scale(1); opacity: 1; }
+  100% { transform: translate(var(--dx,0), var(--dy,0)) scale(0.2); opacity: 0; }
+}
 @media (prefers-reduced-motion: reduce) {
   .cosmos * { animation: none !important; }
+  .cosmos .cursor-glow, .cosmos .tap-burst, .cosmos .tap-spark { display: none; }
 }
 a { color: inherit; }
 input, textarea, button { font-family: inherit; color: inherit; }
@@ -462,7 +505,71 @@ input[type="text"]:focus, textarea:focus {
   <div class="glow-stars"></div>
   <div class="shooting-star"></div>
   <div class="shooting-star s2"></div>
+  <div class="cursor-glow"></div>
 </div>
+<script>
+(function () {
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var cosmos = document.querySelector('.cosmos');
+  var glow = cosmos && cosmos.querySelector('.cursor-glow');
+  if (!cosmos || !glow) return;
+
+  var targetX = window.innerWidth / 2;
+  var targetY = window.innerHeight / 2;
+  var x = targetX, y = targetY;
+  var rafId = null;
+
+  function tick() {
+    x += (targetX - x) * 0.18;
+    y += (targetY - y) * 0.18;
+    glow.style.transform = 'translate3d(' + x + 'px,' + y + 'px,0)';
+    rafId = requestAnimationFrame(tick);
+  }
+
+  function setTarget(px, py) {
+    targetX = px;
+    targetY = py;
+    if (!cosmos.classList.contains('is-active')) cosmos.classList.add('is-active');
+    if (!rafId) tick();
+  }
+
+  window.addEventListener('pointermove', function (e) {
+    setTarget(e.clientX, e.clientY);
+  }, { passive: true });
+
+  window.addEventListener('pointerleave', function () {
+    cosmos.classList.remove('is-active');
+  });
+
+  function spawnBurst(px, py) {
+    var burst = document.createElement('div');
+    burst.className = 'tap-burst';
+    burst.style.left = px + 'px';
+    burst.style.top = py + 'px';
+    cosmos.appendChild(burst);
+    burst.addEventListener('animationend', function () { burst.remove(); });
+
+    var sparkCount = 8;
+    for (var i = 0; i < sparkCount; i++) {
+      var spark = document.createElement('div');
+      spark.className = 'tap-spark';
+      spark.style.left = px + 'px';
+      spark.style.top = py + 'px';
+      var angle = (Math.PI * 2 * i) / sparkCount + Math.random() * 0.4;
+      var dist = 60 + Math.random() * 80;
+      spark.style.setProperty('--dx', Math.cos(angle) * dist + 'px');
+      spark.style.setProperty('--dy', Math.sin(angle) * dist + 'px');
+      cosmos.appendChild(spark);
+      spark.addEventListener('animationend', function (ev) { ev.target.remove(); });
+    }
+  }
+
+  window.addEventListener('pointerdown', function (e) {
+    spawnBurst(e.clientX, e.clientY);
+    setTarget(e.clientX, e.clientY);
+  }, { passive: true });
+})();
+</script>
 
 <header class="topbar">
   <div class="container topbar-inner">
