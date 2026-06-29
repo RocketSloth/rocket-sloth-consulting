@@ -99,10 +99,13 @@ create index if not exists companies_status_idx on public.companies(status);
 create index if not exists companies_slug_idx on public.companies(slug);
 
 -- Non-admins can edit their company profile but never self-approve or fake ratings.
+-- The rating-rollup function sets a transaction-local bypass flag so its
+-- system-driven rating updates aren't reverted (REST clients can't set this GUC).
 create or replace function public.protect_company_fields()
 returns trigger language plpgsql security definer set search_path = public as $$
 begin
-  if not public.is_admin() then
+  if not public.is_admin()
+     and coalesce(current_setting('app.bypass_company_guard', true), '') <> '1' then
     new.status := old.status;
     new.rating_avg := old.rating_avg;
     new.rating_count := old.rating_count;
@@ -201,6 +204,7 @@ create index if not exists review_evidence_review_idx
 create or replace function public.refresh_company_rating(target uuid)
 returns void language plpgsql security definer set search_path = public as $$
 begin
+  perform set_config('app.bypass_company_guard', '1', true);
   update public.companies c set
     rating_avg = coalesce(
       (select round(avg(r.rating)::numeric, 1)
@@ -210,6 +214,7 @@ begin
       select count(*) from public.reviews r
        where r.company_id = target and r.status = 'published')
   where c.id = target;
+  perform set_config('app.bypass_company_guard', '0', true);
 end; $$;
 
 create or replace function public.reviews_rating_trigger()
