@@ -1,152 +1,112 @@
-RocketSloth.Space is an AI and BI consulting site with a built-in multi-tenant
-CRM platform. That CRM doubles as both the public product demo and the base
-application that gets customized for clients.
+# RocketSloth.Space — Vetted home & trade services directory
 
-Vercel setup:
-- Static pages: `index.html` and `thank-you.html`
-- Signup endpoint: `api/signup.js`
-- Project config: `vercel.json`
+An Angie's List–style directory for local home & trade pros. Businesses **apply and
+are vetted** before they're listed, and homeowners leave **evidence-backed reviews** —
+every review requires a receipt/invoice plus before & after photos and is verified by an
+admin before it publishes.
 
-Required environment variables in Vercel:
-- `SUPABASE_URL`
-- `SUPABASE_SERVICE_ROLE_KEY`
+Built with **Next.js (App Router) + TypeScript + Tailwind CSS** and **Supabase**
+(Postgres + Auth + Storage), deployed on **Vercel**.
 
-Optional environment variables:
-- `SUPABASE_SIGNUPS_TABLE`
-- `RESEND_API_KEY`
-- `RESEND_FROM_EMAIL`
-- `LEADS_TO_EMAIL`
-- `SIGNUP_WEBHOOK_URL`
-- `DEMO_LOGIN_TENANT`
+## How it works
 
-The signup API always stores leads in Supabase first.
+- **Homeowners** browse vetted companies by category and location, read verified
+  reviews, and leave their own — but only with proof of the work.
+- **Businesses** apply with their details, categories, service area, and license; an
+  admin reviews each application before it goes public with a "vetted" badge.
+- **Admins** work two queues in `/admin`: pending applications and pending reviews
+  (with the evidence to verify).
 
-If `SIGNUP_WEBHOOK_URL` is set, the API also posts signup data there.
-If the Resend variables are set, the API also emails the lead details.
+### The two trust rules
 
-Create a Supabase table with `supabase/schema.sql`.
+1. **Vetting** — a company is `pending` until an admin approves it. Only `approved`
+   companies appear publicly.
+2. **Evidence** — a review is `pending` until an admin verifies its evidence. Only
+   `published` reviews are visible and counted toward a company's rating. Receipts stay
+   private; before/after photos may appear on the published review.
 
-## CRM Platform
+## Project structure
 
-A multi-tenant CRM lives under `/crm` and `/api/crm/*`. One deployment hosts
-many client CRMs, and each tenant gets its own login, data, branding, pipeline,
-and custom fields.
-
-### Setup
-
-1. Run `supabase/crm-schema.sql` in your Supabase project.
-2. Set `CRM_ADMIN_TOKEN` in Vercel env vars.
-3. Provision a new client CRM:
-
-   ```bash
-   curl -X POST https://your-domain/api/crm/provision \
-     -H "Authorization: Bearer $CRM_ADMIN_TOKEN" \
-     -H "Content-Type: application/json" \
-     -d @crm/config/tenant.example.json-with-creds
-   ```
-
-   Body fields: `slug`, `name`, `ownerEmail`, `ownerPassword`, `ownerName`,
-   `plan`, and `config` (see `crm/config/tenant.example.json`).
-
-4. Send the client to `https://your-domain/crm/login?tenant=<slug>`.
-
-### Per-client customization
-
-Everything a client sees is driven by the `config` JSON stored on its
-`crm_tenants` row. You can edit it in Supabase or via the provision endpoint.
-
-Fields:
-- `branding.productName` for the title and header brand
-- `branding.accentColor` for the primary UI accent
-- `branding.logoUrl` for an optional logo
-- `pipeline.stages` for the kanban board columns
-- `contactStatuses` for allowed contact states
-- `customFields.contact` and `customFields.deal` for extra JSON fields
-
-### Magic-link login (passwordless)
-
-The default login flow is passwordless:
-
-1. Customer visits `rocketsloth.space/crm/t/acme` (tenant slug in URL, no
-   typing).
-2. They enter only their email address and click "Send sign-in link."
-3. Resend delivers an email with a one-click sign-in link (30 min expiry).
-4. Clicking the link lands on `/crm/auth?token=...` which exchanges the token
-   for a session and redirects to the CRM.
-
-If `RESEND_API_KEY` + `RESEND_FROM_EMAIL` are not set, the endpoint returns the
-link directly in the JSON response for dev/testing.
-
-Password login is still available behind a "Use password instead" toggle for
-admin use.
-
-### CRM API endpoints
-
-- `POST /api/crm/magic-link` — request a magic login link (tenant + email)
-- `POST /api/crm/magic-verify` — exchange a magic token for a session
-- `POST /api/crm/login` — tenant + email + password → session token (admin fallback)
-- `GET/DELETE /api/crm/me` — current session / logout
-- `GET/POST/PATCH/DELETE /api/crm/contacts`
-- `GET/POST/PATCH/DELETE /api/crm/deals`
-- `GET/POST/PATCH/DELETE /api/crm/activities`
-- `POST /api/crm/provision` for admin-only tenant bootstrap
-- `POST /api/crm/ai-summary?deal_id=<uuid>` for AI deal status and next actions
-
-All CRM endpoints require `Authorization: Bearer <sessionToken>` except
-`login`, `magic-link`, `magic-verify`, and `provision`. All data access is
-automatically scoped to the authenticated user's tenant.
-
-### AI features
-
-The deal modal includes a "Summarize with AI" button that calls
-`/api/crm/ai-summary`. This loads the deal, linked contact, and recent
-activities and asks Claude for:
-- a 2-3 sentence status summary
-- three concrete next actions
-- a 0-100 risk score
-
-Set `ANTHROPIC_API_KEY` in Vercel env vars to enable live Claude responses.
-Without the key the endpoint returns a deterministic stub so the demo still
-works cleanly.
-
-### Live demo tenant
-
-The landing page CTA "See a live demo →" links to `/#demo-access`.
-The instant demo-access flow (`POST /api/crm/demo-view`) also auto-populates
-the demo tenant with pool-service sample contacts/deals/activities on first use.
-To populate it, run:
-
-```bash
-SUPABASE_URL=... \
-SUPABASE_SERVICE_ROLE_KEY=... \
-CRM_ADMIN_TOKEN=... \
-CRM_BASE_URL=https://rocketsloth.space \
-node scripts/seed-demo.js
+```
+app/
+  page.tsx                 home (hero search, categories, top-rated, how-it-works)
+  companies/               /companies (browse+filter), /companies/[slug] (profile, SSR)
+  categories/              /categories (index), /categories/[slug] (landing)
+  for-businesses/          marketing + apply CTA
+  how-it-works/            vetting + evidence policy
+  apply/                   company application (page + form + server action)
+  reviews/new/             write-a-review (page + form + server action)
+  account/                 customer/owner dashboard
+  admin/                   vetting dashboard (page + server actions)
+  auth/                    sign-in, sign-up, callback, sign-out action
+components/                Header, Footer, CompanyCard, RatingStars, EvidenceUploader, …
+lib/                       supabase clients, auth, queries, admin-queries, types, format
+supabase/migrations/       0001_init.sql  (tables, RLS, triggers, storage buckets)
+supabase/seed.sql          categories + sample approved companies + published reviews
+middleware.ts              Supabase auth session refresh
 ```
 
-This creates (or refreshes) tenant slug `demo` with branded config, ~30 sample
-contacts, ~15 deals across all pipeline stages, and a few activities per deal.
+## Local setup
 
-### Helper scripts
+1. Install deps:
 
-- `scripts/apply-schema.sh` pipes `supabase/crm-schema.sql` into Postgres via `psql`. Needs `SUPABASE_DB_URL`.
-- `scripts/provision-tenant.sh` provisions a new tenant. Needs `CRM_BASE_URL` and `CRM_ADMIN_TOKEN`.
-- `scripts/seed-demo.js` populates the public `demo` tenant with sample data.
+   ```bash
+   npm install
+   ```
 
-### Going live checklist
+2. Create a Supabase project, then copy `.env.example` to `.env.local` and fill in:
 
-1. Run `supabase/crm-schema.sql` in Supabase.
-2. Add `CRM_ADMIN_TOKEN` and `ANTHROPIC_API_KEY` to Vercel env vars.
-3. Redeploy.
-4. Run `node scripts/seed-demo.js` to populate the demo tenant.
-5. Submit the demo access form on the homepage and verify you land in `/crm` with seeded demo data and working AI summary button.
-6. Use `scripts/provision-tenant.sh` to onboard each real customer.
+   ```
+   NEXT_PUBLIC_SUPABASE_URL=...
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=...
+   SUPABASE_SERVICE_ROLE_KEY=...        # server-only; powers the admin queues
+   NEXT_PUBLIC_SITE_URL=http://localhost:3000
+   ```
 
+3. Apply the schema and seed in the Supabase SQL editor (or CLI), in order:
+   `supabase/migrations/0001_init.sql`, then `supabase/seed.sql`.
 
-## Portable Profile rebuild planning docs
+4. Run it:
 
-A detailed implementation blueprint and day-by-day execution checklist for the
-Portable Profile rebuild are available in:
+   ```bash
+   npm run dev
+   ```
 
-- `docs/portable-profile/IMPLEMENTATION_BLUEPRINT.md`
-- `docs/portable-profile/WEEK1_EXECUTION_CHECKLIST.md`
+> The site builds and renders without Supabase configured (categories fall back to a
+> built-in list, and DB-backed sections show empty states). Auth, applications, reviews,
+> and the admin dashboard require the env vars above.
+
+## Roles & the first admin
+
+Sign-up creates a `customer` or `company_owner` profile (never `admin`). To make
+yourself an admin after signing up, run in Supabase:
+
+```sql
+update public.profiles set role = 'admin' where email = 'you@example.com';
+```
+
+For frictionless local testing, disable email confirmation in
+**Supabase → Authentication → Providers → Email** (otherwise sign-up sends a
+confirmation link, which is handled by `/auth/callback`).
+
+## Data model
+
+`profiles` · `categories` · `companies` (+ `company_categories`) ·
+`company_applications` · `reviews` · `review_evidence`. Row-Level Security enforces the
+trust rules (public reads only `approved` companies / `published` reviews; owners and
+authors manage their own rows; only admins flip statuses). A trigger keeps each
+company's `rating_avg` / `rating_count` in sync from published reviews. Storage buckets:
+`review-photos` (public), `review-receipts` (private), `applications` (private),
+`company-media` (public).
+
+## Deploying
+
+Push to Vercel and set the same env vars in the project settings. No `vercel.json` is
+needed — Vercel auto-detects Next.js. Security headers are configured in
+`next.config.mjs`.
+
+## Roadmap (not yet built)
+
+Paid/featured listings (Stripe), quote-request messaging, email notifications,
+map/geo-radius search, company replies to reviews, public reporting/moderation, and a
+"claim your business" flow.
