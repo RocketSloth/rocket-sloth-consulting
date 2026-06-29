@@ -78,12 +78,18 @@ middleware.ts              Supabase auth session refresh
 
 ## Roles & the first admin
 
-Sign-up creates a `customer` or `company_owner` profile (never `admin`). To make
-yourself an admin after signing up, run in Supabase:
+Sign-up creates a `customer` or `company_owner` profile (never `admin`). Two ways
+to get an admin:
 
-```sql
-update public.profiles set role = 'admin' where email = 'you@example.com';
-```
+- **Allowlist (recommended):** add the email to `admin_emails` and that user is made
+  an admin automatically on signup:
+  ```sql
+  insert into public.admin_emails (email) values ('you@example.com') on conflict do nothing;
+  ```
+- **Promote an existing user:**
+  ```sql
+  update public.profiles set role = 'admin' where email = 'you@example.com';
+  ```
 
 For frictionless local testing, disable email confirmation in
 **Supabase → Authentication → Providers → Email** (otherwise sign-up sends a
