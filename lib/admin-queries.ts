@@ -74,3 +74,44 @@ export async function getAdminCounts(): Promise<{ apps: number; reviews: number 
   ]);
   return { apps: apps.count ?? 0, reviews: reviews.count ?? 0 };
 }
+
+export interface WaitlistRow {
+  id: string;
+  email: string;
+  kind: "customer" | "business";
+  name: string | null;
+  business_name: string | null;
+  category: string | null;
+  city: string | null;
+  message: string | null;
+  created_at: string;
+}
+
+export async function getWaitlist(): Promise<{
+  customers: number;
+  businesses: number;
+  recent: WaitlistRow[];
+}> {
+  if (!hasServiceRole) return { customers: 0, businesses: 0, recent: [] };
+  const supabase = createAdminSupabase();
+  const [customers, businesses, recent] = await Promise.all([
+    supabase
+      .from("waitlist_signups")
+      .select("*", { count: "exact", head: true })
+      .eq("kind", "customer"),
+    supabase
+      .from("waitlist_signups")
+      .select("*", { count: "exact", head: true })
+      .eq("kind", "business"),
+    supabase
+      .from("waitlist_signups")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(50),
+  ]);
+  return {
+    customers: customers.count ?? 0,
+    businesses: businesses.count ?? 0,
+    recent: (recent.data ?? []) as WaitlistRow[],
+  };
+}
