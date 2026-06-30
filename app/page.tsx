@@ -1,150 +1,81 @@
 import Link from "next/link";
 import { VerifiedBadge } from "@/components/Badges";
 import { CompanyCard } from "@/components/CompanyCard";
-import { SearchBar } from "@/components/SearchBar";
+import { CustomerSignupForm, BusinessSignupForm } from "@/components/WaitlistForms";
 import {
-  ArrowRightIcon,
   CameraIcon,
+  CheckIcon,
   ReceiptIcon,
   SearchIcon,
   ShieldCheckIcon,
 } from "@/components/icons";
 import { seedCategories } from "@/lib/constants";
-import { getCategories, getDirectoryStats, getTopRatedCompanies } from "@/lib/queries";
+import { getCategories, getTopRatedCompanies } from "@/lib/queries";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const [dbCategories, topRated, stats] = await Promise.all([
+  const [dbCategories, preview] = await Promise.all([
     getCategories(),
-    getTopRatedCompanies(8),
-    getDirectoryStats(),
+    getTopRatedCompanies(4),
   ]);
   const categories = dbCategories.length ? dbCategories : seedCategories();
 
   return (
     <div>
-      {/* Hero */}
+      {/* Hero — customer email capture */}
       <section className="relative overflow-hidden">
         <div className="pointer-events-none absolute inset-0 -z-10">
-          <div className="absolute left-1/2 top-[-10%] h-[420px] w-[820px] -translate-x-1/2 rounded-full bg-brand/20 blur-[120px]" />
+          <div className="absolute left-1/2 top-[-10%] h-[440px] w-[860px] -translate-x-1/2 rounded-full bg-brand/20 blur-[120px]" />
         </div>
-        <div className="container-page py-16 sm:py-24">
-          <div className="mx-auto max-w-3xl text-center">
-            <span className="badge mx-auto mb-5 border border-line-strong bg-panel text-ink-dim">
-              <ShieldCheckIcon className="text-brand" /> Vetted pros · evidence-backed reviews
-            </span>
-            <h1 className="font-display text-4xl font-extrabold leading-[1.05] sm:text-6xl">
-              Find local pros your <span className="text-brand">neighbors</span> actually
-              trust.
-            </h1>
-            <p className="mx-auto mt-5 max-w-2xl text-lg text-ink-dim">
-              Every company is screened before it's listed. Every review is backed by a
-              real receipt and before & after photos. No fake five-stars — just proof.
-            </p>
+        <div className="container-page py-16 text-center sm:py-24">
+          <span className="badge mx-auto mb-5 border border-line-strong bg-panel text-ink-dim">
+            <ShieldCheckIcon className="text-brand" /> Launching soon · join the list
+          </span>
+          <h1 className="mx-auto max-w-3xl font-display text-4xl font-extrabold leading-[1.05] sm:text-6xl">
+            Local pros your <span className="text-brand">neighbors</span> actually trust —
+            coming soon.
+          </h1>
+          <p className="mx-auto mt-5 max-w-2xl text-lg text-ink-dim">
+            We're building a vetted directory of local home &amp; trade companies, where
+            every business is screened and every review is backed by a real receipt plus
+            before &amp; after photos. Be first in line.
+          </p>
+
+          <div className="mt-9">
+            <CustomerSignupForm />
           </div>
 
-          <div className="mx-auto mt-9 max-w-4xl">
-            <SearchBar categories={categories} size="lg" />
-            <div className="mt-4 flex flex-wrap items-center justify-center gap-2 text-xs text-ink-faint">
-              <span>Popular:</span>
-              {categories.slice(0, 5).map((category) => (
-                <Link
-                  key={category.id}
-                  href={`/categories/${category.slug}`}
-                  className="chip"
-                >
-                  {category.icon} {category.name}
-                </Link>
-              ))}
-            </div>
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-ink-faint">
+            <span className="inline-flex items-center gap-1.5"><CheckIcon className="text-brand" /> Vetted businesses only</span>
+            <span className="inline-flex items-center gap-1.5"><CheckIcon className="text-brand" /> Evidence-backed reviews</span>
+            <span className="inline-flex items-center gap-1.5"><CheckIcon className="text-brand" /> Built for your area</span>
           </div>
-
-          {stats.companies > 0 || stats.reviews > 0 ? (
-            <div className="mx-auto mt-10 flex max-w-md justify-center gap-10 text-center">
-              <div>
-                <p className="font-display text-3xl font-bold text-ink">{stats.companies}</p>
-                <p className="text-xs uppercase tracking-wide text-ink-faint">Vetted pros</p>
-              </div>
-              <div>
-                <p className="font-display text-3xl font-bold text-ink">{stats.reviews}</p>
-                <p className="text-xs uppercase tracking-wide text-ink-faint">
-                  Verified reviews
-                </p>
-              </div>
-            </div>
-          ) : null}
         </div>
       </section>
-
-      {/* Categories */}
-      <section className="container-page py-12">
-        <div className="mb-6 flex items-end justify-between">
-          <h2 className="font-display text-2xl font-bold">Browse by category</h2>
-          <Link href="/categories" className="link-muted text-sm">
-            All categories →
-          </Link>
-        </div>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-          {categories.map((category) => (
-            <Link
-              key={category.id}
-              href={`/categories/${category.slug}`}
-              className="panel group flex items-center gap-3 p-4 transition-colors hover:border-brand/50"
-            >
-              <span className="grid h-11 w-11 place-items-center rounded-xl bg-brand/10 text-2xl">
-                {category.icon}
-              </span>
-              <span>
-                <span className="block font-semibold text-ink group-hover:text-brand">
-                  {category.name}
-                </span>
-                <span className="block text-xs text-ink-faint">{category.description}</span>
-              </span>
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      {/* Top rated */}
-      {topRated.length > 0 ? (
-        <section className="container-page py-12">
-          <div className="mb-6 flex items-end justify-between">
-            <h2 className="font-display text-2xl font-bold">Top-rated near the Northwest</h2>
-            <Link href="/companies" className="link-muted text-sm">
-              Browse all →
-            </Link>
-          </div>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {topRated.map((company) => (
-              <CompanyCard key={company.id} company={company} />
-            ))}
-          </div>
-        </section>
-      ) : null}
 
       {/* How it works */}
-      <section className="container-page py-16">
-        <h2 className="text-center font-display text-3xl font-bold">How it works</h2>
+      <section className="container-page py-12">
+        <h2 className="text-center font-display text-3xl font-bold">What we're building</h2>
         <p className="mx-auto mt-2 max-w-xl text-center text-ink-dim">
-          The trust comes from two simple rules we never bend.
+          A recommendations site you can actually trust, built on two simple rules.
         </p>
         <div className="mt-10 grid gap-4 md:grid-cols-3">
           {[
             {
               icon: <SearchIcon className="text-2xl text-brand" />,
-              title: "1. Search vetted pros",
-              body: "Browse companies that passed our screening — license, contact, and category all checked before they go live.",
+              title: "Find vetted pros",
+              body: "Every company is screened — license, contact, and category checked — before it's ever listed.",
             },
             {
               icon: <ShieldCheckIcon className="text-2xl text-brand" />,
-              title: "2. Hire with confidence",
-              body: "Compare ratings built only from reviews we verified. The vetted badge means we did the homework.",
+              title: "Hire with confidence",
+              body: "Ratings are built only from reviews we verified. The vetted badge means we did the homework.",
             },
             {
               icon: <ReceiptIcon className="text-2xl text-brand" />,
-              title: "3. Review with proof",
-              body: "After the job, leave a review — but only with a receipt plus before & after photos. Proof keeps it honest.",
+              title: "Reviews with proof",
+              body: "A review isn't valid without a receipt and before & after photos. Proof keeps it honest.",
             },
           ].map((step) => (
             <div key={step.title} className="panel p-6">
@@ -159,55 +90,112 @@ export default async function HomePage() {
       </section>
 
       {/* Evidence band */}
-      <section className="container-page py-12">
-        <div className="panel-strong overflow-hidden">
-          <div className="grid items-center gap-8 p-8 md:grid-cols-2 md:p-12">
-            <div>
-              <VerifiedBadge />
-              <h2 className="mt-4 font-display text-3xl font-bold">
-                Reviews you can actually believe.
-              </h2>
-              <p className="mt-3 text-ink-dim">
-                Anyone can post five stars on other sites. Here, a review isn't valid
-                until the reviewer uploads a receipt or invoice and before &amp; after
-                photos of the work. Our team verifies the proof before it ever publishes.
-              </p>
-              <div className="mt-6 flex flex-wrap gap-3">
-                <Link href="/how-it-works#evidence" className="btn-outline">
-                  Our evidence policy
-                </Link>
-                <Link href="/companies" className="btn-primary">
-                  Browse pros <ArrowRightIcon />
-                </Link>
-              </div>
+      <section className="container-page py-8">
+        <div className="panel-strong grid items-center gap-8 p-8 md:grid-cols-2 md:p-12">
+          <div>
+            <VerifiedBadge />
+            <h2 className="mt-4 font-display text-3xl font-bold">
+              Reviews you can actually believe.
+            </h2>
+            <p className="mt-3 text-ink-dim">
+              Anyone can post five stars elsewhere. Here, a review won't count until the
+              reviewer uploads a receipt or invoice and before &amp; after photos — and our
+              team verifies the proof before it publishes.
+            </p>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="panel flex flex-col items-center gap-2 p-6 text-center">
+              <ReceiptIcon className="text-3xl text-brand" />
+              <p className="font-semibold">Receipt / invoice</p>
+              <p className="text-xs text-ink-faint">Proves the job really happened.</p>
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="panel flex flex-col items-center gap-2 p-6 text-center">
-                <ReceiptIcon className="text-3xl text-brand" />
-                <p className="font-semibold">Receipt / invoice</p>
-                <p className="text-xs text-ink-faint">Proves the job really happened.</p>
-              </div>
-              <div className="panel flex flex-col items-center gap-2 p-6 text-center">
-                <CameraIcon className="text-3xl text-brand" />
-                <p className="font-semibold">Before &amp; after</p>
-                <p className="text-xs text-ink-faint">Shows the work that was done.</p>
-              </div>
+            <div className="panel flex flex-col items-center gap-2 p-6 text-center">
+              <CameraIcon className="text-3xl text-brand" />
+              <p className="font-semibold">Before &amp; after</p>
+              <p className="text-xs text-ink-faint">Shows the work that was done.</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* For businesses CTA */}
-      <section className="container-page pb-20">
+      {/* For businesses — early access */}
+      <section id="early-access" className="container-page scroll-mt-20 py-12">
+        <div className="grid gap-8 lg:grid-cols-[1fr_1.1fr] lg:items-center">
+          <div>
+            <span className="badge border border-line-strong bg-panel text-ink-dim">
+              For business owners
+            </span>
+            <h2 className="mt-4 font-display text-3xl font-bold">
+              Own a home-service business? Get in early.
+            </h2>
+            <p className="mt-3 text-ink-dim">
+              Be one of the first vetted pros homeowners see when we launch in your area.
+              Tell us about your business and we'll reach out as we open up vetting.
+            </p>
+            <ul className="mt-5 space-y-2 text-sm text-ink-dim">
+              <li className="flex gap-2"><CheckIcon className="mt-0.5 shrink-0 text-brand" /> Founding-member placement in the directory</li>
+              <li className="flex gap-2"><CheckIcon className="mt-0.5 shrink-0 text-brand" /> The vetted badge that sets you apart</li>
+              <li className="flex gap-2"><CheckIcon className="mt-0.5 shrink-0 text-brand" /> Reviews built on real proof, not fakes</li>
+            </ul>
+            <p className="mt-5 text-sm text-ink-faint">
+              Ready to complete a full application?{" "}
+              <Link href="/apply" className="text-brand hover:underline">
+                Apply to be listed →
+              </Link>
+            </p>
+          </div>
+          <div className="panel-strong p-6 sm:p-8">
+            <h3 className="mb-4 font-display text-lg font-semibold">Request early access</h3>
+            <BusinessSignupForm categories={categories} />
+          </div>
+        </div>
+      </section>
+
+      {/* Categories preview */}
+      <section className="container-page py-12">
+        <h2 className="mb-6 text-center font-display text-2xl font-bold">
+          Trades we're starting with
+        </h2>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+          {categories.map((category) => (
+            <div key={category.id} className="panel flex items-center gap-3 p-4">
+              <span className="grid h-11 w-11 place-items-center rounded-xl bg-brand/10 text-2xl">
+                {category.icon}
+              </span>
+              <span className="font-semibold text-ink">{category.name}</span>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Directory preview */}
+      {preview.length > 0 ? (
+        <section className="container-page py-12">
+          <div className="mb-6 flex items-end justify-between">
+            <div>
+              <h2 className="font-display text-2xl font-bold">An early peek</h2>
+              <p className="text-sm text-ink-faint">A preview of vetted pros joining the directory.</p>
+            </div>
+            <Link href="/companies" className="link-muted text-sm">
+              Browse the preview →
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {preview.map((company) => (
+              <CompanyCard key={company.id} company={company} />
+            ))}
+          </div>
+        </section>
+      ) : null}
+
+      {/* Final CTA */}
+      <section className="container-page pb-20 pt-4">
         <div className="panel flex flex-col items-center gap-4 p-10 text-center">
-          <h2 className="font-display text-2xl font-bold">Own a home-service business?</h2>
+          <h2 className="font-display text-2xl font-bold">Want updates as we build?</h2>
           <p className="max-w-xl text-ink-dim">
-            Get in front of homeowners who are ready to hire. Apply to be listed and earn
-            the vetted badge that sets you apart.
+            Join the list and we'll let you know the moment vetted pros go live near you.
           </p>
-          <Link href="/for-businesses" className="btn-primary">
-            List your business <ArrowRightIcon />
-          </Link>
+          <CustomerSignupForm />
         </div>
       </section>
     </div>

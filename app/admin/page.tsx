@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { StatusBadge } from "@/components/Badges";
 import { RatingStars } from "@/components/RatingStars";
 import { ReceiptIcon } from "@/components/icons";
-import { getPendingApplications, getPendingReviews } from "@/lib/admin-queries";
+import { getPendingApplications, getPendingReviews, getWaitlist } from "@/lib/admin-queries";
 import { getCurrentProfile } from "@/lib/auth";
 import { hasServiceRole } from "@/lib/env";
 import { formatCurrency, formatDate, locationLabel } from "@/lib/format";
@@ -23,9 +23,10 @@ export default async function AdminPage() {
   const profile = await getCurrentProfile();
   if (!profile || profile.role !== "admin") redirect("/");
 
-  const [applications, reviews] = await Promise.all([
+  const [applications, reviews, waitlist] = await Promise.all([
     getPendingApplications(),
     getPendingReviews(),
+    getWaitlist(),
   ]);
 
   return (
@@ -43,6 +44,55 @@ export default async function AdminPage() {
           on the vetting queues.
         </p>
       ) : null}
+
+      {/* Waitlist */}
+      <section className="mb-12">
+        <h2 className="mb-4 font-display text-xl font-semibold">Early-access signups</h2>
+        <div className="mb-4 grid grid-cols-2 gap-4 sm:max-w-md">
+          <div className="panel p-5">
+            <p className="font-display text-3xl font-bold text-ink">{waitlist.customers}</p>
+            <p className="text-xs uppercase tracking-wide text-ink-faint">Homeowners</p>
+          </div>
+          <div className="panel p-5">
+            <p className="font-display text-3xl font-bold text-ink">{waitlist.businesses}</p>
+            <p className="text-xs uppercase tracking-wide text-ink-faint">Businesses</p>
+          </div>
+        </div>
+        {waitlist.recent.length === 0 ? (
+          <p className="panel p-6 text-sm text-ink-faint">No signups yet.</p>
+        ) : (
+          <div className="panel overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead className="text-xs uppercase tracking-wide text-ink-faint">
+                <tr className="border-b border-line">
+                  <th className="px-4 py-3">Email</th>
+                  <th className="px-4 py-3">Type</th>
+                  <th className="px-4 py-3">Business / area</th>
+                  <th className="px-4 py-3">Joined</th>
+                </tr>
+              </thead>
+              <tbody>
+                {waitlist.recent.map((row) => (
+                  <tr key={row.id} className="border-b border-line/50">
+                    <td className="px-4 py-2.5 text-ink">{row.email}</td>
+                    <td className="px-4 py-2.5">
+                      <span className="badge bg-panel text-ink-dim capitalize">{row.kind}</span>
+                    </td>
+                    <td className="px-4 py-2.5 text-ink-dim">
+                      {[row.business_name, row.city].filter(Boolean).join(" · ") || "—"}
+                    </td>
+                    <td className="px-4 py-2.5 text-ink-faint">{formatDate(row.created_at)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+        <p className="mt-2 text-xs text-ink-faint">
+          Showing the latest {waitlist.recent.length}. Export the full list anytime from the
+          Supabase table editor (<code className="text-brand">waitlist_signups</code>).
+        </p>
+      </section>
 
       {/* Applications */}
       <section className="mb-12">
