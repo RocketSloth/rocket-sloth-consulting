@@ -67,7 +67,8 @@ export default async function AdminPage() {
                 <tr className="border-b border-line">
                   <th className="px-4 py-3">Email</th>
                   <th className="px-4 py-3">Type</th>
-                  <th className="px-4 py-3">Business / area</th>
+                  <th className="px-4 py-3">Business / name</th>
+                  <th className="px-4 py-3">Location</th>
                   <th className="px-4 py-3">Joined</th>
                 </tr>
               </thead>
@@ -79,7 +80,13 @@ export default async function AdminPage() {
                       <span className="badge bg-panel text-ink-dim capitalize">{row.kind}</span>
                     </td>
                     <td className="px-4 py-2.5 text-ink-dim">
-                      {[row.business_name, row.city].filter(Boolean).join(" · ") || "—"}
+                      {row.business_name || row.name || "—"}
+                      {row.phone ? (
+                        <span className="block text-xs text-ink-faint">{row.phone}</span>
+                      ) : null}
+                    </td>
+                    <td className="px-4 py-2.5 text-ink-dim">
+                      {[row.city, row.zip].filter(Boolean).join(" ") || "—"}
                     </td>
                     <td className="px-4 py-2.5 text-ink-faint">{formatDate(row.created_at)}</td>
                   </tr>
