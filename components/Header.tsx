@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { signOut } from "@/app/auth/actions";
-import { RocketIcon } from "@/components/icons";
+import { ShieldCheckIcon } from "@/components/icons";
 import { getCurrentProfile } from "@/lib/auth";
 import { LAUNCHED } from "@/lib/env";
 
@@ -15,10 +15,10 @@ function Wordmark() {
   return (
     <Link href="/" className="flex items-center gap-2 text-ink hover:text-ink">
       <span className="grid h-9 w-9 place-items-center rounded-xl bg-brand/15 text-brand">
-        <RocketIcon className="text-lg" />
+        <ShieldCheckIcon className="text-lg" />
       </span>
       <span className="font-display text-lg font-bold tracking-tight">
-        RocketSloth<span className="text-brand">.Space</span>
+        Vetted<span className="text-brand">Pages</span>
       </span>
     </Link>
   );

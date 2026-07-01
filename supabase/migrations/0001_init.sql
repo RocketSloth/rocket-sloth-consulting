@@ -1,4 +1,4 @@
--- RocketSloth.Space — vetted home & trade services directory
+-- VettedPages — vetted home & trade services directory
 -- Core schema: profiles, categories, companies (+ categories), applications,
 -- reviews, review evidence. Includes RLS, rating rollup, and storage buckets.
 

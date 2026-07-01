@@ -28,7 +28,7 @@ export async function generateMetadata({
     title: `${company.name} — reviews & ratings`,
     description:
       company.description ??
-      `Vetted ${company.name} on RocketSloth.Space with evidence-backed reviews.`,
+      `Vetted ${company.name} on VettedPages with evidence-backed reviews.`,
   };
 }
 

@@ -18,7 +18,7 @@ export default async function SignUpPage({
       <div className="panel-strong w-full max-w-md p-8">
         <h1 className="font-display text-2xl font-bold">Create your account</h1>
         <p className="mt-1 mb-6 text-sm text-ink-dim">
-          Join RocketSloth.Space to leave verified reviews or list your business.
+          Join VettedPages to leave verified reviews or list your business.
         </p>
         <SignUpForm next={safeNext} defaultRole={defaultRole} />
       </div>

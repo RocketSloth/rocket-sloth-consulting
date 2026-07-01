@@ -1,4 +1,4 @@
--- Seed data for RocketSloth.Space directory.
+-- Seed data for VettedPages directory.
 -- Safe to re-run. Seed reviews use a NULL author_id (real reviews always set one),
 -- so they are cleared and re-inserted on each run.
 --

@@ -5,14 +5,14 @@ import { CameraIcon, CheckIcon, ReceiptIcon, ShieldCheckIcon } from "@/component
 export const metadata: Metadata = {
   title: "How it works",
   description:
-    "How RocketSloth.Space vets businesses and why every review requires proof of work.",
+    "How VettedPages vets businesses and why every review requires proof of work.",
 };
 
 export default function HowItWorksPage() {
   return (
     <div className="container-page py-12">
       <header className="mx-auto max-w-2xl text-center">
-        <h1 className="font-display text-4xl font-extrabold">How RocketSloth.Space works</h1>
+        <h1 className="font-display text-4xl font-extrabold">How VettedPages works</h1>
         <p className="mt-4 text-lg text-ink-dim">
           Two promises make this directory different: every business is vetted, and every
           review is backed by evidence.
