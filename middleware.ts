@@ -2,10 +2,21 @@ import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 type CookieToSet = { name: string; value: string; options: CookieOptions };
-import { SUPABASE_ANON_KEY, SUPABASE_URL, isSupabaseConfigured } from "@/lib/env";
+import { LAUNCHED, SUPABASE_ANON_KEY, SUPABASE_URL, isSupabaseConfigured } from "@/lib/env";
 
-/** Refreshes the Supabase auth session cookie on every request. */
+/** In pre-launch mode, only the landing page, auth, and admin are reachable. */
+function isAllowedPreLaunch(pathname: string): boolean {
+  return (
+    pathname === "/" || pathname.startsWith("/auth") || pathname.startsWith("/admin")
+  );
+}
+
+/** Refreshes the Supabase auth session cookie, and gates routes pre-launch. */
 export async function middleware(request: NextRequest) {
+  if (!LAUNCHED && !isAllowedPreLaunch(request.nextUrl.pathname)) {
+    return NextResponse.redirect(new URL("/", request.url));
+  }
+
   let supabaseResponse = NextResponse.next({ request });
   if (!isSupabaseConfigured) return supabaseResponse;
 

@@ -7,6 +7,13 @@ export const SUPABASE_ANON_KEY =
 export const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY ?? "";
 export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
+/**
+ * Pre-launch flag. When not "true" the site is locked to the landing page
+ * (only `/`, auth, and the admin dashboard are reachable) so the public can
+ * only sign up for the waitlist. Set NEXT_PUBLIC_SITE_LAUNCHED=true to go live.
+ */
+export const LAUNCHED = process.env.NEXT_PUBLIC_SITE_LAUNCHED === "true";
+
 /** True when the public Supabase keys are present so the app can talk to the DB. */
 export const isSupabaseConfigured = Boolean(SUPABASE_URL && SUPABASE_ANON_KEY);
 

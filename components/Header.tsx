@@ -2,6 +2,7 @@ import Link from "next/link";
 import { signOut } from "@/app/auth/actions";
 import { RocketIcon } from "@/components/icons";
 import { getCurrentProfile } from "@/lib/auth";
+import { LAUNCHED } from "@/lib/env";
 
 const NAV_LINKS = [
   { href: "/companies", label: "Browse" },
@@ -25,6 +26,35 @@ function Wordmark() {
 
 export async function Header() {
   const profile = await getCurrentProfile();
+
+  // Pre-launch: minimal header — no public navigation, just the brand + admin access.
+  if (!LAUNCHED) {
+    return (
+      <header className="sticky top-0 z-40 border-b border-line bg-bg-deep/85 backdrop-blur">
+        <div className="container-page flex h-16 items-center justify-between gap-4">
+          <Wordmark />
+          <div className="flex items-center gap-2">
+            {profile?.role === "admin" ? (
+              <>
+                <Link href="/admin" className="btn-ghost">Admin</Link>
+                <form action={signOut}>
+                  <button type="submit" className="btn-outline">Sign out</button>
+                </form>
+              </>
+            ) : profile ? (
+              <form action={signOut}>
+                <button type="submit" className="btn-ghost">Sign out</button>
+              </form>
+            ) : (
+              <Link href="/auth/sign-in?next=/admin" className="btn-ghost text-sm">
+                Sign in
+              </Link>
+            )}
+          </div>
+        </div>
+      </header>
+    );
+  }
 
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-bg-deep/85 backdrop-blur">
