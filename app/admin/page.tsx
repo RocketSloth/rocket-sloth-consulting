@@ -84,6 +84,16 @@ export default async function AdminPage() {
                       {row.phone ? (
                         <span className="block text-xs text-ink-faint">{row.phone}</span>
                       ) : null}
+                      {row.website ? (
+                        <a
+                          href={row.website.startsWith("http") ? row.website : `https://${row.website}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="block text-xs text-brand hover:underline"
+                        >
+                          {row.website}
+                        </a>
+                      ) : null}
                     </td>
                     <td className="px-4 py-2.5 text-ink-dim">
                       {[row.city, row.zip].filter(Boolean).join(" ") || "—"}

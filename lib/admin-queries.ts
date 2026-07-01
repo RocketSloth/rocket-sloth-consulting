@@ -82,6 +82,7 @@ export interface WaitlistRow {
   name: string | null;
   business_name: string | null;
   category: string | null;
+  website: string | null;
   city: string | null;
   zip: string | null;
   phone: string | null;

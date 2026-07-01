@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { ArrowRightIcon, CheckIcon } from "@/components/icons";
 import type { Category } from "@/lib/types";
 import { joinWaitlist, type WaitlistState } from "@/app/waitlist/actions";
@@ -70,6 +70,7 @@ export function CustomerSignupForm() {
 /** Early-access interest form for business owners. */
 export function BusinessSignupForm({ categories }: { categories: Category[] }) {
   const [state, formAction, isPending] = useActionState(joinWaitlist, initial);
+  const [noWebsite, setNoWebsite] = useState(false);
 
   if (state.ok) {
     return (
@@ -107,6 +108,26 @@ export function BusinessSignupForm({ categories }: { categories: Category[] }) {
         <div>
           <label className="label" htmlFor="w_zip">ZIP code</label>
           <input id="w_zip" name="zip" inputMode="numeric" placeholder="e.g. 75034" className="input" />
+        </div>
+        <div className="sm:col-span-2">
+          <label className="label" htmlFor="w_website">Website</label>
+          <input
+            id="w_website"
+            name="website"
+            type="text"
+            placeholder="yourbusiness.com"
+            disabled={noWebsite}
+            className="input disabled:opacity-50"
+          />
+          <label className="mt-2 flex cursor-pointer items-center gap-2 text-sm text-ink-dim">
+            <input
+              type="checkbox"
+              checked={noWebsite}
+              onChange={(e) => setNoWebsite(e.target.checked)}
+              className="accent-brand"
+            />
+            I don't have a website yet
+          </label>
         </div>
         <div className="sm:col-span-2">
           <label className="label" htmlFor="w_category">Primary trade</label>
