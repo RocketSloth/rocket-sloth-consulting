@@ -1,6 +1,7 @@
 "use server";
 
-import { isSupabaseConfigured } from "@/lib/env";
+import { hasServiceRole, isSupabaseConfigured } from "@/lib/env";
+import { createAdminSupabase } from "@/lib/supabase/admin";
 import { createServerSupabase } from "@/lib/supabase/server";
 
 export type WaitlistState = { ok?: boolean; error?: string };
@@ -39,14 +40,20 @@ export async function joinWaitlist(
   };
 
   try {
-    const supabase = await createServerSupabase();
-    // ignoreDuplicates => ON CONFLICT DO NOTHING, so re-signups are a no-op success.
-    const { error } = await supabase
-      .from("waitlist_signups")
-      .upsert(row, { onConflict: "email,kind", ignoreDuplicates: true });
-    if (error) return { error: "Something went wrong. Please try again." };
+    // Write server-side with the service-role client so the insert isn't blocked
+    // by the admin-only SELECT policy when PostgREST returns the row. (This is a
+    // Server Action — the key never reaches the browser.) Falls back to the anon
+    // client only if no service-role key is configured.
+    const supabase = hasServiceRole ? createAdminSupabase() : await createServerSupabase();
+    const { error } = await supabase.from("waitlist_signups").insert(row);
+    // 23505 = unique violation (already on the list) — treat as success.
+    if (error && error.code !== "23505") {
+      console.error("Waitlist signup failed:", error.message ?? error);
+      return { error: "Something went wrong. Please try again." };
+    }
     return { ok: true };
-  } catch {
+  } catch (err) {
+    console.error("Waitlist signup exception:", err);
     return { error: "Something went wrong. Please try again." };
   }
 }
