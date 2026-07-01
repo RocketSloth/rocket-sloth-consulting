@@ -1,9 +1,7 @@
 import Link from "next/link";
-import { VerifiedBadge } from "@/components/Badges";
 import { CompanyCard } from "@/components/CompanyCard";
 import { CustomerSignupForm, BusinessSignupForm } from "@/components/WaitlistForms";
 import {
-  CameraIcon,
   CheckIcon,
   ReceiptIcon,
   SearchIcon,
@@ -87,35 +85,6 @@ export default async function HomePage() {
               <p className="mt-2 text-sm text-ink-dim">{step.body}</p>
             </div>
           ))}
-        </div>
-      </section>
-
-      {/* Evidence band */}
-      <section className="container-page py-8">
-        <div className="panel-strong grid items-center gap-8 p-8 md:grid-cols-2 md:p-12">
-          <div>
-            <VerifiedBadge />
-            <h2 className="mt-4 font-display text-3xl font-bold">
-              Reviews you can actually believe.
-            </h2>
-            <p className="mt-3 text-ink-dim">
-              Anyone can post five stars elsewhere. Here, a review won't count until the
-              reviewer uploads a receipt or invoice and before &amp; after photos — and our
-              team verifies the proof before it publishes.
-            </p>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="panel flex flex-col items-center gap-2 p-6 text-center">
-              <ReceiptIcon className="text-3xl text-brand" />
-              <p className="font-semibold">Receipt / invoice</p>
-              <p className="text-xs text-ink-faint">Proves the job really happened.</p>
-            </div>
-            <div className="panel flex flex-col items-center gap-2 p-6 text-center">
-              <CameraIcon className="text-3xl text-brand" />
-              <p className="font-semibold">Before &amp; after</p>
-              <p className="text-xs text-ink-faint">Shows the work that was done.</p>
-            </div>
-          </div>
         </div>
       </section>
 
