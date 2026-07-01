@@ -10,6 +10,7 @@ import {
   ShieldCheckIcon,
 } from "@/components/icons";
 import { seedCategories } from "@/lib/constants";
+import { LAUNCHED } from "@/lib/env";
 import { getCategories, getTopRatedCompanies } from "@/lib/queries";
 
 export const dynamic = "force-dynamic";
@@ -137,12 +138,14 @@ export default async function HomePage() {
               <li className="flex gap-2"><CheckIcon className="mt-0.5 shrink-0 text-brand" /> The vetted badge that sets you apart</li>
               <li className="flex gap-2"><CheckIcon className="mt-0.5 shrink-0 text-brand" /> Reviews built on real proof, not fakes</li>
             </ul>
-            <p className="mt-5 text-sm text-ink-faint">
-              Ready to complete a full application?{" "}
-              <Link href="/apply" className="text-brand hover:underline">
-                Apply to be listed →
-              </Link>
-            </p>
+            {LAUNCHED ? (
+              <p className="mt-5 text-sm text-ink-faint">
+                Ready to complete a full application?{" "}
+                <Link href="/apply" className="text-brand hover:underline">
+                  Apply to be listed →
+                </Link>
+              </p>
+            ) : null}
           </div>
           <div className="panel-strong p-6 sm:p-8">
             <h3 className="mb-4 font-display text-lg font-semibold">Request early access</h3>
@@ -168,8 +171,8 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Directory preview */}
-      {preview.length > 0 ? (
+      {/* Directory preview (only once launched — profiles are locked pre-launch) */}
+      {LAUNCHED && preview.length > 0 ? (
         <section className="container-page py-12">
           <div className="mb-6 flex items-end justify-between">
             <div>

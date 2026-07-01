@@ -1,7 +1,29 @@
 import Link from "next/link";
 import { RocketIcon } from "@/components/icons";
+import { LAUNCHED } from "@/lib/env";
 
 export function Footer() {
+  if (!LAUNCHED) {
+    return (
+      <footer className="mt-20 border-t border-line bg-bg-deep/60">
+        <div className="container-page flex flex-col items-center gap-2 py-10 text-center">
+          <div className="flex items-center gap-2">
+            <span className="grid h-8 w-8 place-items-center rounded-lg bg-brand/15 text-brand">
+              <RocketIcon />
+            </span>
+            <span className="font-display font-bold">RocketSloth.Space</span>
+          </div>
+          <p className="text-sm text-ink-faint">
+            A vetted directory of local home &amp; trade pros — launching soon.
+          </p>
+          <p className="text-xs text-ink-faint">
+            © {new Date().getFullYear()} RocketSloth.Space
+          </p>
+        </div>
+      </footer>
+    );
+  }
+
   return (
     <footer className="mt-20 border-t border-line bg-bg-deep/60">
       <div className="container-page grid gap-8 py-12 sm:grid-cols-2 lg:grid-cols-4">

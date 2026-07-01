@@ -111,6 +111,15 @@ Push to Vercel and set the same env vars in the project settings. No `vercel.jso
 needed — Vercel auto-detects Next.js. Security headers are configured in
 `next.config.mjs`.
 
+## Launch mode
+
+The site ships **locked to the landing page** so the public can only join the waitlist.
+While `NEXT_PUBLIC_SITE_LAUNCHED` is not `true`, `middleware.ts` redirects every route
+except `/`, `/auth/*`, and `/admin/*` back to the landing page, and the header/footer
+hide their navigation. The owner can still sign in and watch signups grow in `/admin`.
+When you have enough customers and businesses, set `NEXT_PUBLIC_SITE_LAUNCHED=true` and
+redeploy to open the full directory.
+
 ## Roadmap (not yet built)
 
 Paid/featured listings (Stripe), quote-request messaging, email notifications,
