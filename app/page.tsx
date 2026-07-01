@@ -1,13 +1,11 @@
 import Link from "next/link";
-import { VerifiedBadge } from "@/components/Badges";
 import { CompanyCard } from "@/components/CompanyCard";
 import { CustomerSignupForm, BusinessSignupForm } from "@/components/WaitlistForms";
 import {
-  CameraIcon,
   CheckIcon,
-  ReceiptIcon,
   SearchIcon,
   ShieldCheckIcon,
+  StarIcon,
 } from "@/components/icons";
 import { seedCategories } from "@/lib/constants";
 import { LAUNCHED } from "@/lib/env";
@@ -39,8 +37,8 @@ export default async function HomePage() {
           </h1>
           <p className="mx-auto mt-5 max-w-2xl text-lg text-ink-dim">
             We're building a vetted directory of local home &amp; trade companies, where
-            every business is screened and every review is backed by a real receipt plus
-            before &amp; after photos. Be first in line.
+            every business is screened before it's listed and reviews are verified — so
+            you can hire with confidence. Be first in line.
           </p>
 
           <div className="mt-9">
@@ -49,7 +47,7 @@ export default async function HomePage() {
 
           <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-ink-faint">
             <span className="inline-flex items-center gap-1.5"><CheckIcon className="text-brand" /> Vetted businesses only</span>
-            <span className="inline-flex items-center gap-1.5"><CheckIcon className="text-brand" /> Evidence-backed reviews</span>
+            <span className="inline-flex items-center gap-1.5"><CheckIcon className="text-brand" /> Verified reviews</span>
             <span className="inline-flex items-center gap-1.5"><CheckIcon className="text-brand" /> Built for your area</span>
           </div>
         </div>
@@ -59,7 +57,7 @@ export default async function HomePage() {
       <section className="container-page py-12">
         <h2 className="text-center font-display text-3xl font-bold">What we're building</h2>
         <p className="mx-auto mt-2 max-w-xl text-center text-ink-dim">
-          A recommendations site you can actually trust, built on two simple rules.
+          A recommendations site you can actually trust.
         </p>
         <div className="mt-10 grid gap-4 md:grid-cols-3">
           {[
@@ -74,9 +72,9 @@ export default async function HomePage() {
               body: "Ratings are built only from reviews we verified. The vetted badge means we did the homework.",
             },
             {
-              icon: <ReceiptIcon className="text-2xl text-brand" />,
-              title: "Reviews with proof",
-              body: "A review isn't valid without a receipt and before & after photos. Proof keeps it honest.",
+              icon: <StarIcon className="text-2xl text-brand" />,
+              title: "Verified reviews",
+              body: "Reviews are checked before they count, so ratings reflect real experiences — not fakes.",
             },
           ].map((step) => (
             <div key={step.title} className="panel p-6">
@@ -87,35 +85,6 @@ export default async function HomePage() {
               <p className="mt-2 text-sm text-ink-dim">{step.body}</p>
             </div>
           ))}
-        </div>
-      </section>
-
-      {/* Evidence band */}
-      <section className="container-page py-8">
-        <div className="panel-strong grid items-center gap-8 p-8 md:grid-cols-2 md:p-12">
-          <div>
-            <VerifiedBadge />
-            <h2 className="mt-4 font-display text-3xl font-bold">
-              Reviews you can actually believe.
-            </h2>
-            <p className="mt-3 text-ink-dim">
-              Anyone can post five stars elsewhere. Here, a review won't count until the
-              reviewer uploads a receipt or invoice and before &amp; after photos — and our
-              team verifies the proof before it publishes.
-            </p>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="panel flex flex-col items-center gap-2 p-6 text-center">
-              <ReceiptIcon className="text-3xl text-brand" />
-              <p className="font-semibold">Receipt / invoice</p>
-              <p className="text-xs text-ink-faint">Proves the job really happened.</p>
-            </div>
-            <div className="panel flex flex-col items-center gap-2 p-6 text-center">
-              <CameraIcon className="text-3xl text-brand" />
-              <p className="font-semibold">Before &amp; after</p>
-              <p className="text-xs text-ink-faint">Shows the work that was done.</p>
-            </div>
-          </div>
         </div>
       </section>
 
@@ -136,7 +105,7 @@ export default async function HomePage() {
             <ul className="mt-5 space-y-2 text-sm text-ink-dim">
               <li className="flex gap-2"><CheckIcon className="mt-0.5 shrink-0 text-brand" /> Founding-member placement in the directory</li>
               <li className="flex gap-2"><CheckIcon className="mt-0.5 shrink-0 text-brand" /> The vetted badge that sets you apart</li>
-              <li className="flex gap-2"><CheckIcon className="mt-0.5 shrink-0 text-brand" /> Reviews built on real proof, not fakes</li>
+              <li className="flex gap-2"><CheckIcon className="mt-0.5 shrink-0 text-brand" /> Verified reviews you can trust, not fakes</li>
             </ul>
             {LAUNCHED ? (
               <p className="mt-5 text-sm text-ink-faint">
