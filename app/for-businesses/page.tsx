@@ -5,7 +5,7 @@ import { ArrowRightIcon, CheckIcon, ShieldCheckIcon } from "@/components/icons";
 export const metadata: Metadata = {
   title: "List your business",
   description:
-    "Apply to be a vetted pro on RocketSloth.Space and reach homeowners ready to hire.",
+    "Apply to be a vetted pro on VettedPages and reach homeowners ready to hire.",
 };
 
 const STEPS = [
@@ -36,7 +36,7 @@ export default function ForBusinessesPage() {
             Get found by homeowners who are ready to hire.
           </h1>
           <p className="mx-auto mt-5 max-w-2xl text-lg text-ink-dim">
-            RocketSloth.Space lists only vetted pros. Apply once, pass our screening, and
+            VettedPages lists only vetted pros. Apply once, pass our screening, and
             let evidence-backed reviews do the selling.
           </p>
           <div className="mt-8 flex justify-center gap-3">

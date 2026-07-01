@@ -1,4 +1,4 @@
-# RocketSloth.Space — Vetted home & trade services directory
+# VettedPages — Vetted home & trade services directory
 
 An Angie's List–style directory for local home & trade pros. Businesses **apply and
 are vetted** before they're listed, and homeowners leave **evidence-backed reviews** —

@@ -7,13 +7,13 @@ import { SITE_URL } from "@/lib/env";
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "RocketSloth.Space — Vetted local home & trade pros",
-    template: "%s · RocketSloth.Space",
+    default: "VettedPages — Vetted local home & trade pros",
+    template: "%s · VettedPages",
   },
   description:
     "Find vetted local home & trade companies, with reviews backed by real proof of work. Every business is screened and every review requires a receipt plus before & after photos.",
   openGraph: {
-    title: "RocketSloth.Space — Vetted local home & trade pros",
+    title: "VettedPages — Vetted local home & trade pros",
     description:
       "A directory of screened local pros, with reviews you can actually trust.",
     type: "website",
