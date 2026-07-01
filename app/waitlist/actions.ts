@@ -33,6 +33,8 @@ export async function joinWaitlist(
     business_name: clean(formData.get("business_name"), 160) || null,
     category: clean(formData.get("category"), 60) || null,
     city: clean(formData.get("city"), 120) || null,
+    zip: clean(formData.get("zip"), 20) || null,
+    phone: clean(formData.get("phone"), 40) || null,
     message: clean(formData.get("message"), 1000) || null,
   };
 

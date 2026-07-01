@@ -18,7 +18,7 @@ function SuccessNote({ children }: { children: React.ReactNode }) {
   );
 }
 
-/** Compact email capture for homeowners who want launch updates. */
+/** Email + ZIP capture for homeowners who want launch updates. */
 export function CustomerSignupForm() {
   const [state, formAction, isPending] = useActionState(joinWaitlist, initial);
 
@@ -31,7 +31,7 @@ export function CustomerSignupForm() {
   }
 
   return (
-    <form action={formAction} className="mx-auto w-full max-w-md">
+    <form action={formAction} className="mx-auto w-full max-w-lg">
       <input type="hidden" name="kind" value="customer" />
       <div className="panel-strong flex flex-col gap-2 p-2 sm:flex-row">
         <input
@@ -42,8 +42,17 @@ export function CustomerSignupForm() {
           aria-label="Email address"
           className="input flex-1"
         />
+        <input
+          type="text"
+          name="zip"
+          required
+          inputMode="numeric"
+          placeholder="ZIP code"
+          aria-label="ZIP code"
+          className="input sm:w-32"
+        />
         <button type="submit" disabled={isPending} className="btn-primary shrink-0">
-          {isPending ? "Joining…" : "Notify me at launch"}
+          {isPending ? "Joining…" : "Notify me"}
           {!isPending && <ArrowRightIcon />}
         </button>
       </div>
@@ -51,7 +60,7 @@ export function CustomerSignupForm() {
         <p className="mt-2 text-sm text-red-300">{state.error}</p>
       ) : (
         <p className="mt-2 text-center text-xs text-ink-faint">
-          No spam — just a heads-up when we launch. Unsubscribe anytime.
+          Your ZIP helps us launch in the busiest areas first. No spam — unsubscribe anytime.
         </p>
       )}
     </form>
@@ -88,8 +97,16 @@ export function BusinessSignupForm({ categories }: { categories: Category[] }) {
           <input id="w_email" name="email" type="email" required className="input" />
         </div>
         <div>
-          <label className="label" htmlFor="w_city">City / area</label>
-          <input id="w_city" name="city" placeholder="e.g. Frisco, TX" className="input" />
+          <label className="label" htmlFor="w_phone">Phone</label>
+          <input id="w_phone" name="phone" type="tel" className="input" />
+        </div>
+        <div>
+          <label className="label" htmlFor="w_city">City</label>
+          <input id="w_city" name="city" placeholder="e.g. Frisco" className="input" />
+        </div>
+        <div>
+          <label className="label" htmlFor="w_zip">ZIP code</label>
+          <input id="w_zip" name="zip" inputMode="numeric" placeholder="e.g. 75034" className="input" />
         </div>
         <div className="sm:col-span-2">
           <label className="label" htmlFor="w_category">Primary trade</label>
