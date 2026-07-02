@@ -2,7 +2,7 @@
 
 import { useActionState, useState } from "react";
 import { ArrowRightIcon, CheckIcon } from "@/components/icons";
-import type { Category } from "@/lib/types";
+import { BUSINESS_TYPE_GROUPS } from "@/lib/constants";
 import { joinWaitlist, type WaitlistState } from "@/app/waitlist/actions";
 
 const initial: WaitlistState = {};
@@ -67,8 +67,8 @@ export function CustomerSignupForm() {
   );
 }
 
-/** Early-access interest form for business owners. */
-export function BusinessSignupForm({ categories }: { categories: Category[] }) {
+/** Early-access interest form for business owners. All fields are required. */
+export function BusinessSignupForm() {
   const [state, formAction, isPending] = useActionState(joinWaitlist, initial);
   const [noWebsite, setNoWebsite] = useState(false);
 
@@ -90,55 +90,71 @@ export function BusinessSignupForm({ categories }: { categories: Category[] }) {
           <input id="w_business" name="business_name" required className="input" />
         </div>
         <div>
-          <label className="label" htmlFor="w_name">Your name</label>
-          <input id="w_name" name="name" className="input" />
+          <label className="label" htmlFor="w_name">Your name *</label>
+          <input id="w_name" name="name" required className="input" />
         </div>
         <div>
           <label className="label" htmlFor="w_email">Email *</label>
           <input id="w_email" name="email" type="email" required className="input" />
         </div>
         <div>
-          <label className="label" htmlFor="w_phone">Phone</label>
-          <input id="w_phone" name="phone" type="tel" className="input" />
+          <label className="label" htmlFor="w_phone">Phone *</label>
+          <input id="w_phone" name="phone" type="tel" required className="input" />
         </div>
         <div>
-          <label className="label" htmlFor="w_city">City</label>
-          <input id="w_city" name="city" placeholder="e.g. Frisco" className="input" />
+          <label className="label" htmlFor="w_city">City *</label>
+          <input id="w_city" name="city" required placeholder="e.g. Frisco" className="input" />
         </div>
         <div>
-          <label className="label" htmlFor="w_zip">ZIP code</label>
-          <input id="w_zip" name="zip" inputMode="numeric" placeholder="e.g. 75034" className="input" />
+          <label className="label" htmlFor="w_zip">ZIP code *</label>
+          <input
+            id="w_zip"
+            name="zip"
+            required
+            inputMode="numeric"
+            placeholder="e.g. 75034"
+            className="input"
+          />
         </div>
         <div className="sm:col-span-2">
-          <label className="label" htmlFor="w_website">Website</label>
+          <label className="label" htmlFor="w_category">Type of business *</label>
+          <select id="w_category" name="category" required defaultValue="" className="select">
+            <option value="" disabled>
+              Select your business type
+            </option>
+            {BUSINESS_TYPE_GROUPS.map((group) => (
+              <optgroup key={group.group} label={group.group}>
+                {group.types.map((type) => (
+                  <option key={type} value={type}>
+                    {type}
+                  </option>
+                ))}
+              </optgroup>
+            ))}
+          </select>
+        </div>
+        <div className="sm:col-span-2">
+          <label className="label" htmlFor="w_website">Website *</label>
           <input
             id="w_website"
             name="website"
             type="text"
             placeholder="yourbusiness.com"
+            required={!noWebsite}
             disabled={noWebsite}
             className="input disabled:opacity-50"
           />
           <label className="mt-2 flex cursor-pointer items-center gap-2 text-sm text-ink-dim">
             <input
               type="checkbox"
+              name="no_website"
+              value="1"
               checked={noWebsite}
               onChange={(e) => setNoWebsite(e.target.checked)}
               className="accent-brand"
             />
             I don't have a website yet
           </label>
-        </div>
-        <div className="sm:col-span-2">
-          <label className="label" htmlFor="w_category">Primary trade</label>
-          <select id="w_category" name="category" defaultValue="" className="select">
-            <option value="">Select a category</option>
-            {categories.map((c) => (
-              <option key={c.id} value={c.slug}>
-                {c.name}
-              </option>
-            ))}
-          </select>
         </div>
         <div className="sm:col-span-2">
           <label className="label" htmlFor="w_message">Anything else? (optional)</label>
