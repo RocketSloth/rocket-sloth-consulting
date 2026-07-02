@@ -96,6 +96,40 @@ enforced server-side in `app/waitlist/actions.ts` (returns "Please fill in: …"
 Customer form requires email + ZIP (client and server). Business type is stored as
 the display string (e.g. "Photography") in `waitlist_signups.category`.
 
+## Launch campaign (implemented on the site)
+
+Owner's strategy: treat this as **local trust infrastructure**, not "another
+directory" — "help us build the local list of businesses your neighbors can
+actually trust." First milestone: 500 residents + 25 vetted businesses across 5
+categories, then monetize. Site-side pieces built:
+
+- **Launch focus**: `LAUNCH_AREA` ("Frisco, Little Elm & the Denton County area")
+  and `LAUNCH_CATEGORIES` (Roofing, Plumbing, HVAC, Lawn Care & Landscaping, House
+  Cleaning, Handyman) in `lib/constants.ts`. Landing hero, launch-categories grid,
+  and business copy ("limited founding businesses per category per area") use them.
+- **Resident signup** captures email + ZIP + **"What service do you need most?"**
+  (launch categories + "Something else", stored in `waitlist_signups.category`).
+  CTA is "Join the local list" (community framing, not "Notify me").
+- **Referral loop**: after joining, residents see "Know a business your neighbors
+  should trust?" (`RecommendBusinessForm`) → `business_recommendations` table
+  (migration 0008; public insert, admin read/update, status workflow
+  new→contacted→invited→listed/dismissed). Owner invites these businesses:
+  "A local homeowner recommended your business…".
+- **Admin growth insights**: resident/business/recommendation counts, **top
+  requested services**, **top ZIP codes**, and the recommendations queue — this is
+  what decides which ZIPs/categories open first.
+
+Off-site (owner's to-do, not code): Nextdoor community-style posts, FB/Nextdoor
+business pages, manual founding-business outreach (~10 per launch category), $10–20/
+day Meta lead ads (separate resident + business campaigns), progress-update posts.
+
+Also built: **Vercel Analytics** (`@vercel/analytics`, `<Analytics />` in
+`app/layout.tsx` — owner must enable Web Analytics in the Vercel project dashboard)
+and a **live progress ticker** in the landing hero ("N neighbors have joined · top
+requested: X · N businesses applied") via `getLaunchProgress()` in
+`lib/admin-queries.ts` (aggregate counts only; hidden until ≥5 residents,
+`TICKER_MIN_RESIDENTS` in `app/page.tsx`).
+
 ## Owner's remaining manual steps (Vercel/DNS/Supabase dashboards)
 
 1. Merge PR #39, redeploy `main`.
