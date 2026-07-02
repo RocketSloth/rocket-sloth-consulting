@@ -60,6 +60,94 @@ export const CATEGORY_SEED = [
   { slug: "appliance-repair", name: "Appliance Repair", icon: "🧰", description: "Washers, dryers, fridges, ovens." },
 ] as const;
 
+/**
+ * Comprehensive business-type list for the early-access signup dropdown.
+ * Broader than the directory's home-service categories — any local business can join.
+ */
+export const BUSINESS_TYPE_GROUPS: { group: string; types: string[] }[] = [
+  {
+    group: "Home & Trade Services",
+    types: [
+      "Plumbing", "Electrical", "Heating & Cooling (HVAC)", "Roofing",
+      "Landscaping & Lawn Care", "House Cleaning", "Painting", "General Contracting",
+      "Home Remodeling", "Flooring", "Pest Control", "Handyman", "Appliance Repair",
+      "Pool Service", "Window Cleaning", "Carpet Cleaning", "Pressure Washing",
+      "Tree Service", "Fencing", "Concrete & Masonry", "Garage Doors", "Solar",
+      "Locksmith", "Moving & Storage", "Junk Removal", "Interior Design",
+    ],
+  },
+  {
+    group: "Automotive",
+    types: [
+      "Auto Repair / Mechanic", "Auto Detailing", "Auto Body & Collision",
+      "Tires & Wheels", "Towing", "Car Wash", "Auto Sales",
+    ],
+  },
+  {
+    group: "Health & Medical",
+    types: [
+      "Dental", "Medical / Clinic", "Chiropractor", "Optometry", "Physical Therapy",
+      "Mental Health / Therapy", "Home Health Care", "Senior Care", "Veterinary",
+    ],
+  },
+  {
+    group: "Beauty & Personal Care",
+    types: [
+      "Hair Salon", "Barber", "Nail Salon", "Spa & Massage", "Skincare / Esthetics",
+      "Makeup Artist", "Tattoo & Piercing",
+    ],
+  },
+  {
+    group: "Fitness & Wellness",
+    types: [
+      "Gym", "Personal Training", "Yoga & Pilates", "Martial Arts", "Dance Studio",
+      "Nutrition & Wellness Coaching",
+    ],
+  },
+  {
+    group: "Food & Drink",
+    types: [
+      "Restaurant", "Cafe / Coffee Shop", "Bakery", "Catering", "Food Truck",
+      "Bar / Brewery", "Personal Chef",
+    ],
+  },
+  {
+    group: "Creative & Media",
+    types: [
+      "Photography", "Videography", "Graphic Design", "Web Design & Development",
+      "Marketing & Advertising", "Printing & Signs", "DJ & Entertainment",
+    ],
+  },
+  {
+    group: "Professional Services",
+    types: [
+      "Accounting & Tax", "Bookkeeping", "Financial Advisor", "Insurance",
+      "Legal / Attorney", "Real Estate Agent", "Mortgage / Lending", "Consulting",
+      "IT Services / Computer Repair", "Notary",
+    ],
+  },
+  {
+    group: "Pets",
+    types: ["Pet Grooming", "Dog Walking / Pet Sitting", "Pet Boarding & Daycare", "Dog Training"],
+  },
+  {
+    group: "Events & Lifestyle",
+    types: [
+      "Event Planning", "Florist", "Wedding Services", "Travel Agency",
+      "Tailoring & Alterations", "Dry Cleaning & Laundry",
+    ],
+  },
+  {
+    group: "Education & Childcare",
+    types: ["Childcare / Daycare", "Tutoring", "Music Lessons", "Test Prep & Coaching"],
+  },
+  {
+    group: "Retail & Shops",
+    types: ["Retail Shop", "Boutique / Clothing", "Jewelry", "Furniture"],
+  },
+  { group: "Other", types: ["Other"] },
+];
+
 /** Seed categories shaped as full Category objects, for UI fallback before the DB is seeded. */
 export function seedCategories(): Category[] {
   return CATEGORY_SEED.map((c, i) => ({
