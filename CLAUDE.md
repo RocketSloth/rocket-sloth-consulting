@@ -83,20 +83,18 @@ waitlist RLS fix, VettedPages rebrand, business website field + "no website yet"
 checkbox, evidence band removed from landing, evidence copy softened. Owner must
 **merge + redeploy** for these to go live.
 
-## IN PROGRESS (interrupted mid-task)
+## Waitlist form rules (implemented — keep intact)
 
-Owner request: business-type dropdown must cover **all** business types
-(Photography, Cleaning, Fitness, etc.), and the business early-access form must
-require **every field** filled to join the waitlist.
-
-- DONE: `BUSINESS_TYPE_GROUPS` (grouped, comprehensive list incl. "Other") added to
-  `lib/constants.ts`.
-- TODO: use it in `components/WaitlistForms.tsx` BusinessSignupForm as a grouped
-  `<select>` (replacing the directory-category dropdown); make all business fields
-  required (name, business name, email, phone, city, ZIP, category; website required
-  unless "I don't have a website yet" checked — keep that checkbox); enforce the
-  same server-side in `app/waitlist/actions.ts`; keep customer form email+ZIP
-  required. Then build, commit, push (PR #39).
+Business early-access form (`components/WaitlistForms.tsx` BusinessSignupForm):
+**every field required** — business name, your name, email, phone, city, ZIP, and
+business type from `BUSINESS_TYPE_GROUPS` (grouped `<optgroup>` select covering all
+business types: home & trade, automotive, health, beauty, fitness, food, creative/
+photography, professional, pets, events, education, retail, "Other"); website
+required unless the "I don't have a website yet" checkbox (`no_website`) is checked
+(then website saves as null); free-text message stays optional. The same rules are
+enforced server-side in `app/waitlist/actions.ts` (returns "Please fill in: …").
+Customer form requires email + ZIP (client and server). Business type is stored as
+the display string (e.g. "Photography") in `waitlist_signups.category`.
 
 ## Owner's remaining manual steps (Vercel/DNS/Supabase dashboards)
 

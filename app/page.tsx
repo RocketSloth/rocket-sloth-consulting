@@ -118,7 +118,7 @@ export default async function HomePage() {
           </div>
           <div className="panel-strong p-6 sm:p-8">
             <h3 className="mb-4 font-display text-lg font-semibold">Request early access</h3>
-            <BusinessSignupForm categories={categories} />
+            <BusinessSignupForm />
           </div>
         </div>
       </section>
