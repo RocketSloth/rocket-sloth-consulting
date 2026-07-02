@@ -161,6 +161,47 @@ export async function getWaitlist(): Promise<{
   };
 }
 
+/**
+ * Public launch-progress numbers for the landing-page ticker. Read with the
+ * service-role client (waitlist is admin-read-only) but exposes only aggregate
+ * counts — never emails or rows.
+ */
+export async function getLaunchProgress(): Promise<{
+  residents: number;
+  businesses: number;
+  topService: string | null;
+}> {
+  if (!hasServiceRole) return { residents: 0, businesses: 0, topService: null };
+  try {
+    const supabase = createAdminSupabase();
+    const [residents, businesses, demand] = await Promise.all([
+      supabase
+        .from("waitlist_signups")
+        .select("*", { count: "exact", head: true })
+        .eq("kind", "customer"),
+      supabase
+        .from("waitlist_signups")
+        .select("*", { count: "exact", head: true })
+        .eq("kind", "business"),
+      supabase
+        .from("waitlist_signups")
+        .select("category")
+        .eq("kind", "customer")
+        .limit(2000),
+    ]);
+    const categories = ((demand.data ?? []) as Array<{ category: string | null }>)
+      .map((r) => r.category)
+      .filter((c): c is string => Boolean(c) && c !== "Something else");
+    return {
+      residents: residents.count ?? 0,
+      businesses: businesses.count ?? 0,
+      topService: topCounts(categories, 1)[0]?.label ?? null,
+    };
+  } catch {
+    return { residents: 0, businesses: 0, topService: null };
+  }
+}
+
 export async function getRecommendations(): Promise<{
   total: number;
   recent: RecommendationRow[];

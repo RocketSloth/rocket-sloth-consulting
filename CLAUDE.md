@@ -123,6 +123,13 @@ Off-site (owner's to-do, not code): Nextdoor community-style posts, FB/Nextdoor
 business pages, manual founding-business outreach (~10 per launch category), $10–20/
 day Meta lead ads (separate resident + business campaigns), progress-update posts.
 
+Also built: **Vercel Analytics** (`@vercel/analytics`, `<Analytics />` in
+`app/layout.tsx` — owner must enable Web Analytics in the Vercel project dashboard)
+and a **live progress ticker** in the landing hero ("N neighbors have joined · top
+requested: X · N businesses applied") via `getLaunchProgress()` in
+`lib/admin-queries.ts` (aggregate counts only; hidden until ≥5 residents,
+`TICKER_MIN_RESIDENTS` in `app/page.tsx`).
+
 ## Owner's remaining manual steps (Vercel/DNS/Supabase dashboards)
 
 1. Merge PR #39, redeploy `main`.
