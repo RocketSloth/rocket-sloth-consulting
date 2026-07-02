@@ -4,7 +4,12 @@ import { redirect } from "next/navigation";
 import { StatusBadge } from "@/components/Badges";
 import { RatingStars } from "@/components/RatingStars";
 import { ReceiptIcon } from "@/components/icons";
-import { getPendingApplications, getPendingReviews, getWaitlist } from "@/lib/admin-queries";
+import {
+  getPendingApplications,
+  getPendingReviews,
+  getRecommendations,
+  getWaitlist,
+} from "@/lib/admin-queries";
 import { getCurrentProfile } from "@/lib/auth";
 import { hasServiceRole } from "@/lib/env";
 import { formatCurrency, formatDate, locationLabel } from "@/lib/format";
@@ -23,10 +28,11 @@ export default async function AdminPage() {
   const profile = await getCurrentProfile();
   if (!profile || profile.role !== "admin") redirect("/");
 
-  const [applications, reviews, waitlist] = await Promise.all([
+  const [applications, reviews, waitlist, recommendations] = await Promise.all([
     getPendingApplications(),
     getPendingReviews(),
     getWaitlist(),
+    getRecommendations(),
   ]);
 
   return (
@@ -48,16 +54,45 @@ export default async function AdminPage() {
       {/* Waitlist */}
       <section className="mb-12">
         <h2 className="mb-4 font-display text-xl font-semibold">Early-access signups</h2>
-        <div className="mb-4 grid grid-cols-2 gap-4 sm:max-w-md">
+        <div className="mb-4 grid grid-cols-3 gap-4 sm:max-w-xl">
           <div className="panel p-5">
             <p className="font-display text-3xl font-bold text-ink">{waitlist.customers}</p>
-            <p className="text-xs uppercase tracking-wide text-ink-faint">Homeowners</p>
+            <p className="text-xs uppercase tracking-wide text-ink-faint">Residents</p>
           </div>
           <div className="panel p-5">
             <p className="font-display text-3xl font-bold text-ink">{waitlist.businesses}</p>
             <p className="text-xs uppercase tracking-wide text-ink-faint">Businesses</p>
           </div>
+          <div className="panel p-5">
+            <p className="font-display text-3xl font-bold text-ink">{recommendations.total}</p>
+            <p className="text-xs uppercase tracking-wide text-ink-faint">Recommendations</p>
+          </div>
         </div>
+
+        {waitlist.topServices.length > 0 || waitlist.topZips.length > 0 ? (
+          <div className="mb-4 grid gap-4 md:grid-cols-2">
+            <div className="panel p-5">
+              <p className="label mb-2">Top requested services</p>
+              <div className="flex flex-wrap gap-1.5">
+                {waitlist.topServices.map((s) => (
+                  <span key={s.label} className="chip">
+                    {s.label} <strong className="text-brand">{s.count}</strong>
+                  </span>
+                ))}
+              </div>
+            </div>
+            <div className="panel p-5">
+              <p className="label mb-2">Top ZIP codes</p>
+              <div className="flex flex-wrap gap-1.5">
+                {waitlist.topZips.map((z) => (
+                  <span key={z.label} className="chip">
+                    {z.label} <strong className="text-brand">{z.count}</strong>
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        ) : null}
         {waitlist.recent.length === 0 ? (
           <p className="panel p-6 text-sm text-ink-faint">No signups yet.</p>
         ) : (
@@ -108,6 +143,59 @@ export default async function AdminPage() {
         <p className="mt-2 text-xs text-ink-faint">
           Showing the latest {waitlist.recent.length}. Export the full list anytime from the
           Supabase table editor (<code className="text-brand">waitlist_signups</code>).
+        </p>
+      </section>
+
+      {/* Neighbor recommendations */}
+      <section className="mb-12">
+        <h2 className="mb-4 font-display text-xl font-semibold">
+          Neighbor recommendations ({recommendations.total})
+        </h2>
+        {recommendations.recent.length === 0 ? (
+          <p className="panel p-6 text-sm text-ink-faint">
+            No recommendations yet. Residents are asked for one right after they join
+            the list.
+          </p>
+        ) : (
+          <div className="panel overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead className="text-xs uppercase tracking-wide text-ink-faint">
+                <tr className="border-b border-line">
+                  <th className="px-4 py-3">Business</th>
+                  <th className="px-4 py-3">Category / city</th>
+                  <th className="px-4 py-3">Why</th>
+                  <th className="px-4 py-3">Recommended by</th>
+                  <th className="px-4 py-3">When</th>
+                </tr>
+              </thead>
+              <tbody>
+                {recommendations.recent.map((rec) => (
+                  <tr key={rec.id} className="border-b border-line/50 align-top">
+                    <td className="px-4 py-2.5 text-ink">
+                      {rec.business_name}
+                      {rec.contact_info ? (
+                        <span className="block text-xs text-ink-faint">{rec.contact_info}</span>
+                      ) : null}
+                    </td>
+                    <td className="px-4 py-2.5 text-ink-dim">
+                      {[rec.category, rec.city].filter(Boolean).join(" · ") || "—"}
+                    </td>
+                    <td className="max-w-xs px-4 py-2.5 text-xs text-ink-dim">
+                      {rec.reason || "—"}
+                    </td>
+                    <td className="px-4 py-2.5 text-ink-faint">
+                      {rec.recommender_email || "anonymous"}
+                    </td>
+                    <td className="px-4 py-2.5 text-ink-faint">{formatDate(rec.created_at)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+        <p className="mt-2 text-xs text-ink-faint">
+          Invite these businesses with: “A local homeowner recommended your business for
+          VettedPages — founding businesses can apply before launch.”
         </p>
       </section>
 

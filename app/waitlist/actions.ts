@@ -81,3 +81,46 @@ export async function joinWaitlist(
     return { error: "Something went wrong. Please try again." };
   }
 }
+
+/** Referral loop: a resident recommends a business their neighbors trust. */
+export async function recommendBusiness(
+  _prev: WaitlistState,
+  formData: FormData
+): Promise<WaitlistState> {
+  const businessName = clean(formData.get("business_name"), 160);
+  const category = clean(formData.get("category"), 60);
+  const city = clean(formData.get("city"), 120);
+
+  const missing: string[] = [];
+  if (!businessName) missing.push("business name");
+  if (!category) missing.push("category");
+  if (!city) missing.push("city");
+  if (missing.length > 0) return { error: `Please fill in: ${missing.join(", ")}.` };
+
+  if (!isSupabaseConfigured) {
+    return { error: "We can't save that right now — please try again shortly." };
+  }
+
+  const recommenderEmail = clean(formData.get("recommender_email"), 200).toLowerCase();
+  const row = {
+    recommender_email: EMAIL_RE.test(recommenderEmail) ? recommenderEmail : null,
+    business_name: businessName,
+    category,
+    city,
+    reason: clean(formData.get("reason"), 1000) || null,
+    contact_info: clean(formData.get("contact_info"), 300) || null,
+  };
+
+  try {
+    const supabase = hasServiceRole ? createAdminSupabase() : await createServerSupabase();
+    const { error } = await supabase.from("business_recommendations").insert(row);
+    if (error) {
+      console.error("Recommendation failed:", error.message ?? error);
+      return { error: "Something went wrong. Please try again." };
+    }
+    return { ok: true };
+  } catch (err) {
+    console.error("Recommendation exception:", err);
+    return { error: "Something went wrong. Please try again." };
+  }
+}

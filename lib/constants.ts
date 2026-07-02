@@ -61,6 +61,21 @@ export const CATEGORY_SEED = [
 ] as const;
 
 /**
+ * Launch focus: one tight area and a handful of categories first; expand once
+ * they're filled. Referenced by the landing page and the resident signup form.
+ */
+export const LAUNCH_AREA = "Frisco, Little Elm & the Denton County area";
+
+export const LAUNCH_CATEGORIES = [
+  { slug: "roofing", name: "Roofing", icon: "🏠" },
+  { slug: "plumbing", name: "Plumbing", icon: "🔧" },
+  { slug: "hvac", name: "Heating & Cooling", icon: "🌡️" },
+  { slug: "landscaping", name: "Lawn Care & Landscaping", icon: "🌿" },
+  { slug: "cleaning", name: "House Cleaning", icon: "🧽" },
+  { slug: "handyman", name: "Handyman", icon: "🛠️" },
+] as const;
+
+/**
  * Comprehensive business-type list for the early-access signup dropdown.
  * Broader than the directory's home-service categories — any local business can join.
  */

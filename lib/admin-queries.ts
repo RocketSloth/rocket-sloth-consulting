@@ -90,14 +90,48 @@ export interface WaitlistRow {
   created_at: string;
 }
 
+export interface TopCount {
+  label: string;
+  count: number;
+}
+
+export interface RecommendationRow {
+  id: string;
+  recommender_email: string | null;
+  business_name: string;
+  category: string | null;
+  city: string | null;
+  reason: string | null;
+  contact_info: string | null;
+  status: string;
+  created_at: string;
+}
+
+function topCounts(values: Array<string | null>, limit = 8): TopCount[] {
+  const counts = new Map<string, number>();
+  for (const value of values) {
+    const label = (value ?? "").trim();
+    if (!label) continue;
+    counts.set(label, (counts.get(label) ?? 0) + 1);
+  }
+  return [...counts.entries()]
+    .map(([label, count]) => ({ label, count }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, limit);
+}
+
 export async function getWaitlist(): Promise<{
   customers: number;
   businesses: number;
   recent: WaitlistRow[];
+  topServices: TopCount[];
+  topZips: TopCount[];
 }> {
-  if (!hasServiceRole) return { customers: 0, businesses: 0, recent: [] };
+  if (!hasServiceRole) {
+    return { customers: 0, businesses: 0, recent: [], topServices: [], topZips: [] };
+  }
   const supabase = createAdminSupabase();
-  const [customers, businesses, recent] = await Promise.all([
+  const [customers, businesses, recent, demand] = await Promise.all([
     supabase
       .from("waitlist_signups")
       .select("*", { count: "exact", head: true })
@@ -111,10 +145,32 @@ export async function getWaitlist(): Promise<{
       .select("*")
       .order("created_at", { ascending: false })
       .limit(50),
+    supabase
+      .from("waitlist_signups")
+      .select("category, zip")
+      .eq("kind", "customer")
+      .limit(2000),
   ]);
+  const demandRows = (demand.data ?? []) as Array<{ category: string | null; zip: string | null }>;
   return {
     customers: customers.count ?? 0,
     businesses: businesses.count ?? 0,
     recent: (recent.data ?? []) as WaitlistRow[],
+    topServices: topCounts(demandRows.map((r) => r.category)),
+    topZips: topCounts(demandRows.map((r) => r.zip)),
   };
+}
+
+export async function getRecommendations(): Promise<{
+  total: number;
+  recent: RecommendationRow[];
+}> {
+  if (!hasServiceRole) return { total: 0, recent: [] };
+  const supabase = createAdminSupabase();
+  const { data, count } = await supabase
+    .from("business_recommendations")
+    .select("*", { count: "exact" })
+    .order("created_at", { ascending: false })
+    .limit(50);
+  return { total: count ?? 0, recent: (data ?? []) as RecommendationRow[] };
 }

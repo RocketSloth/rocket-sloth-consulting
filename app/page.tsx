@@ -3,22 +3,19 @@ import { CompanyCard } from "@/components/CompanyCard";
 import { CustomerSignupForm, BusinessSignupForm } from "@/components/WaitlistForms";
 import {
   CheckIcon,
+  MapPinIcon,
   SearchIcon,
   ShieldCheckIcon,
   StarIcon,
 } from "@/components/icons";
-import { seedCategories } from "@/lib/constants";
+import { LAUNCH_AREA, LAUNCH_CATEGORIES } from "@/lib/constants";
 import { LAUNCHED } from "@/lib/env";
-import { getCategories, getTopRatedCompanies } from "@/lib/queries";
+import { getTopRatedCompanies } from "@/lib/queries";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const [dbCategories, preview] = await Promise.all([
-    getCategories(),
-    getTopRatedCompanies(4),
-  ]);
-  const categories = dbCategories.length ? dbCategories : seedCategories();
+  const preview = await getTopRatedCompanies(4);
 
   return (
     <div>
@@ -29,16 +26,17 @@ export default async function HomePage() {
         </div>
         <div className="container-page py-16 text-center sm:py-24">
           <span className="badge mx-auto mb-5 border border-line-strong bg-panel text-ink-dim">
-            <ShieldCheckIcon className="text-brand" /> Launching soon · join the list
+            <MapPinIcon className="text-brand" /> Now building: {LAUNCH_AREA}
           </span>
           <h1 className="mx-auto max-w-3xl font-display text-4xl font-extrabold leading-[1.05] sm:text-6xl">
-            Local pros your <span className="text-brand">neighbors</span> actually trust —
-            coming soon.
+            Help us build the list of local pros your{" "}
+            <span className="text-brand">neighbors</span> actually trust.
           </h1>
           <p className="mx-auto mt-5 max-w-2xl text-lg text-ink-dim">
-            We're building a vetted directory of local home &amp; trade companies, where
-            every business is screened before it's listed and reviews are verified — so
-            you can hire with confidence. Be first in line.
+            Tired of asking the neighborhood group for a good roofer, plumber, or lawn
+            guy? VettedPages is one local list — every business screened before it's
+            listed, every review verified. Your ZIP and most-needed service tell us
+            where to open first.
           </p>
 
           <div className="mt-9">
@@ -96,11 +94,12 @@ export default async function HomePage() {
               For business owners
             </span>
             <h2 className="mt-4 font-display text-3xl font-bold">
-              Own a home-service business? Get in early.
+              Own a local business? Become a founding vetted business.
             </h2>
             <p className="mt-3 text-ink-dim">
-              Be one of the first vetted pros homeowners see when we launch in your area.
-              Tell us about your business and we'll reach out as we open up vetting.
+              We're accepting a limited number of founding businesses per category per
+              area. Tell us about your business and we'll reach out as we open up
+              vetting — launch categories in {LAUNCH_AREA} go first.
             </p>
             <ul className="mt-5 space-y-2 text-sm text-ink-dim">
               <li className="flex gap-2"><CheckIcon className="mt-0.5 shrink-0 text-brand" /> Founding-member placement in the directory</li>
@@ -123,14 +122,18 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Categories preview */}
+      {/* Launch categories */}
       <section className="container-page py-12">
-        <h2 className="mb-6 text-center font-display text-2xl font-bold">
-          Trades we're starting with
+        <h2 className="text-center font-display text-2xl font-bold">
+          Launch categories
         </h2>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-          {categories.map((category) => (
-            <div key={category.id} className="panel flex items-center gap-3 p-4">
+        <p className="mx-auto mt-2 max-w-xl text-center text-sm text-ink-dim">
+          We're opening with the services neighbors ask about most in {LAUNCH_AREA} —
+          then expanding as each category fills.
+        </p>
+        <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
+          {LAUNCH_CATEGORIES.map((category) => (
+            <div key={category.slug} className="panel flex items-center gap-3 p-4">
               <span className="grid h-11 w-11 place-items-center rounded-xl bg-brand/10 text-2xl">
                 {category.icon}
               </span>
@@ -138,6 +141,10 @@ export default async function HomePage() {
             </div>
           ))}
         </div>
+        <p className="mt-4 text-center text-xs text-ink-faint">
+          Every kind of local business can still request early access below — launch
+          categories just go live first.
+        </p>
       </section>
 
       {/* Directory preview (only once launched — profiles are locked pre-launch) */}
@@ -163,9 +170,12 @@ export default async function HomePage() {
       {/* Final CTA */}
       <section className="container-page pb-20 pt-4">
         <div className="panel flex flex-col items-center gap-4 p-10 text-center">
-          <h2 className="font-display text-2xl font-bold">Want updates as we build?</h2>
+          <h2 className="font-display text-2xl font-bold">
+            Help build the vetted list for your neighborhood.
+          </h2>
           <p className="max-w-xl text-ink-dim">
-            Join the list and we'll let you know the moment vetted pros go live near you.
+            Join the list, tell us what you need, and we'll let you know the moment
+            vetted pros go live near you.
           </p>
           <CustomerSignupForm />
         </div>
