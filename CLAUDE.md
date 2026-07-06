@@ -76,12 +76,25 @@ palette, shield-check logo, wordmark **Vetted**Pages (two-tone).
 4. Vercel needed `vercel.json` `{"framework":"nextjs"}` (old project settings
    expected a static site).
 
-## Open PR / pending merge
+## PR history / current state
 
-**PR #39** (draft) on branch `claude/pensive-tesla-ht3h38` contains, not yet in main:
-waitlist RLS fix, VettedPages rebrand, business website field + "no website yet"
-checkbox, evidence band removed from landing, evidence copy softened. Owner must
-**merge + redeploy** for these to go live.
+PRs #33–#44 are **merged** (owner merges fast — often within minutes). That covers:
+full directory rebuild, admin allowlist + Frisco seed, rebrand to VettedPages,
+waitlist + RLS fix, required business fields + `BUSINESS_TYPE_GROUPS`, launch
+campaign (LAUNCH_AREA/CATEGORIES, referral loop, admin insights), Vercel Analytics
++ live progress ticker. One open PR at a time on the working branch; when a PR
+merges, restart the branch from origin/main (`git checkout -B <branch>
+origin/main`) before new work.
+
+Latest polish pass (this PR): site metadata rewritten to campaign positioning
+(old meta description still sold the receipt/before-after mechanic — removed),
+generated OG share image (`app/opengraph-image.tsx`, next/og ImageResponse —
+critical for Nextdoor/FB link previews; use inline SVGs, NOT ✓/emoji glyphs,
+satori's default font lacks them), `app/robots.ts` + `app/sitemap.ts` (sitemap
+lists only `/` pre-launch), ZIP format validation client (`pattern`) + server
+(`ZIP_RE`), and middleware now allows `/robots.txt`, `/sitemap.xml`,
+`/opengraph-image` through the pre-launch gate (they previously 307'd to `/`,
+which would have broken crawlers and social previews).
 
 ## Waitlist form rules (implemented — keep intact)
 
@@ -132,11 +145,15 @@ requested: X · N businesses applied") via `getLaunchProgress()` in
 
 ## Owner's remaining manual steps (Vercel/DNS/Supabase dashboards)
 
-1. Merge PR #39, redeploy `main`.
+1. Merge the open PR, redeploy `main`.
 2. Add domains `www.vettedpages.com` + `vettedpages.com` in Vercel, point DNS.
-3. Set `NEXT_PUBLIC_SITE_URL=https://www.vettedpages.com`, redeploy.
+3. Set `NEXT_PUBLIC_SITE_URL=https://www.vettedpages.com`, redeploy (baked at
+   build — canonical/OG URLs say localhost until then).
 4. Supabase Auth → URL config: site URL + redirect `https://www.vettedpages.com/auth/callback`.
-5. Sign up with kbbb2003@gmail.com → auto-admin → `/admin` shows waitlist.
+5. Enable **Web Analytics** in the Vercel project dashboard (Analytics tab) so
+   `<Analytics />` starts collecting.
+6. Sign up with kbbb2003@gmail.com → auto-admin → `/admin` shows waitlist,
+   growth insights, and the recommendations queue.
 
 ## Roadmap (explicitly deferred)
 

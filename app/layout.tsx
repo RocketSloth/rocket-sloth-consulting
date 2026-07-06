@@ -3,22 +3,27 @@ import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
+import { LAUNCH_AREA } from "@/lib/constants";
 import { SITE_URL } from "@/lib/env";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "VettedPages — Vetted local home & trade pros",
+    default: "VettedPages — Local pros your neighbors actually trust",
     template: "%s · VettedPages",
   },
-  description:
-    "Find vetted local home & trade companies, with reviews backed by real proof of work. Every business is screened and every review requires a receipt plus before & after photos.",
+  description: `VettedPages is building the vetted list of local pros for ${LAUNCH_AREA} — every business screened before it's listed, every review verified. Join the local list.`,
   openGraph: {
-    title: "VettedPages — Vetted local home & trade pros",
-    description:
-      "A directory of screened local pros, with reviews you can actually trust.",
+    title: "VettedPages — Local pros your neighbors actually trust",
+    description: `One vetted local list of roofers, plumbers, HVAC, lawn care, cleaners & handymen for ${LAUNCH_AREA}. Every business screened, every review verified.`,
     type: "website",
     url: SITE_URL,
+    siteName: "VettedPages",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "VettedPages — Local pros your neighbors actually trust",
+    description: `Help us build the vetted list of local pros for ${LAUNCH_AREA}.`,
   },
 };
 
