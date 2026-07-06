@@ -4,10 +4,18 @@ import { NextResponse, type NextRequest } from "next/server";
 type CookieToSet = { name: string; value: string; options: CookieOptions };
 import { LAUNCHED, SUPABASE_ANON_KEY, SUPABASE_URL, isSupabaseConfigured } from "@/lib/env";
 
-/** In pre-launch mode, only the landing page, auth, and admin are reachable. */
+/**
+ * In pre-launch mode, only the landing page, auth, and admin are reachable —
+ * plus SEO/share machinery (robots, sitemap, OG image) that crawlers need.
+ */
 function isAllowedPreLaunch(pathname: string): boolean {
   return (
-    pathname === "/" || pathname.startsWith("/auth") || pathname.startsWith("/admin")
+    pathname === "/" ||
+    pathname === "/robots.txt" ||
+    pathname === "/sitemap.xml" ||
+    pathname.startsWith("/opengraph-image") ||
+    pathname.startsWith("/auth") ||
+    pathname.startsWith("/admin")
   );
 }
 

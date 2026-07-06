@@ -11,6 +11,7 @@ function clean(value: FormDataEntryValue | null, max = 500): string {
 }
 
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+const ZIP_RE = /^\d{5}(-\d{4})?$/;
 
 export async function joinWaitlist(
   _prev: WaitlistState,
@@ -27,6 +28,10 @@ export async function joinWaitlist(
 
   if (kind === "customer" && !zip) {
     return { error: "Please add your ZIP code." };
+  }
+  // ZIP quality matters — it decides which areas open first.
+  if (zip && !ZIP_RE.test(zip)) {
+    return { error: "Please enter a valid 5-digit ZIP code." };
   }
 
   if (kind === "business") {

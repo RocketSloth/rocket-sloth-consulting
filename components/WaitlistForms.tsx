@@ -135,6 +135,8 @@ export function CustomerSignupForm() {
           name="zip"
           required
           inputMode="numeric"
+          pattern="\d{5}(-\d{4})?"
+          title="5-digit ZIP code"
           placeholder="ZIP code"
           aria-label="ZIP code"
           className="input"
@@ -218,6 +220,8 @@ export function BusinessSignupForm() {
             name="zip"
             required
             inputMode="numeric"
+            pattern="\d{5}(-\d{4})?"
+            title="5-digit ZIP code"
             placeholder="e.g. 75034"
             className="input"
           />
