@@ -31,6 +31,29 @@ export const viewport: Viewport = {
   themeColor: "#0e1a17",
 };
 
+/** Organization + WebSite structured data so search engines connect the brand to the domain. */
+const JSON_LD = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": `${SITE_URL}/#organization`,
+      name: "VettedPages",
+      url: SITE_URL,
+      logo: `${SITE_URL}/icon.svg`,
+      description: `A vetted directory of local businesses for ${LAUNCH_AREA} — every business screened before it's listed, every review verified.`,
+      areaServed: LAUNCH_AREA,
+    },
+    {
+      "@type": "WebSite",
+      "@id": `${SITE_URL}/#website`,
+      name: "VettedPages",
+      url: SITE_URL,
+      publisher: { "@id": `${SITE_URL}/#organization` },
+    },
+  ],
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
@@ -45,6 +68,10 @@ export default function RootLayout({
         />
       </head>
       <body>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }}
+        />
         <Header />
         <main className="min-h-[60vh]">{children}</main>
         <Footer />
