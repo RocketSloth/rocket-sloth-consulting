@@ -6,11 +6,14 @@ import { LAUNCHED, SUPABASE_ANON_KEY, SUPABASE_URL, isSupabaseConfigured } from 
 
 /**
  * In pre-launch mode, only the landing page, auth, and admin are reachable —
- * plus SEO/share machinery (robots, sitemap, OG image) that crawlers need.
+ * plus SEO/share machinery (robots, sitemap, OG image) that crawlers need,
+ * and the legal pages (Meta lead ads require a public privacy policy URL).
  */
 function isAllowedPreLaunch(pathname: string): boolean {
   return (
     pathname === "/" ||
+    pathname === "/privacy" ||
+    pathname === "/terms" ||
     pathname === "/robots.txt" ||
     pathname === "/sitemap.xml" ||
     pathname.startsWith("/opengraph-image") ||

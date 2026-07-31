@@ -25,7 +25,9 @@ export function Footer() {
             A vetted directory of local home &amp; trade pros — launching soon.
           </p>
           <p className="text-xs text-ink-faint">
-            © {new Date().getFullYear()} VettedPages
+            © {new Date().getFullYear()} VettedPages ·{" "}
+            <Link href="/privacy" className="link-muted">Privacy</Link> ·{" "}
+            <Link href="/terms" className="link-muted">Terms</Link>
           </p>
         </div>
       </footer>
@@ -65,7 +67,9 @@ export function Footer() {
       </div>
       <div className="border-t border-line py-6">
         <p className="container-page text-xs text-ink-faint">
-          © {new Date().getFullYear()} VettedPages — recommendations you can trust.
+          © {new Date().getFullYear()} VettedPages — recommendations you can trust. ·{" "}
+          <Link href="/privacy" className="link-muted">Privacy</Link> ·{" "}
+          <Link href="/terms" className="link-muted">Terms</Link>
         </p>
       </div>
     </footer>

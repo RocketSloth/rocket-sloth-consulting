@@ -5,8 +5,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
   const entries: MetadataRoute.Sitemap = [
     { url: SITE_URL, lastModified: now, priority: 1 },
+    { url: `${SITE_URL}/privacy`, lastModified: now, priority: 0.3 },
+    { url: `${SITE_URL}/terms`, lastModified: now, priority: 0.3 },
   ];
-  // Pre-launch, everything else redirects to the landing page — only list it.
+  // Pre-launch, everything else redirects to the landing page — only list these.
   if (!LAUNCHED) return entries;
 
   for (const path of ["companies", "categories", "how-it-works", "for-businesses"]) {

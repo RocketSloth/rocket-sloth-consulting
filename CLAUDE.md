@@ -17,7 +17,8 @@ Formerly RocketSloth.Space (AI consulting site + CRM) — fully replaced and reb
 ## Current mode: PRE-LAUNCH (waitlist only)
 
 - `NEXT_PUBLIC_SITE_LAUNCHED` unset/false → `middleware.ts` redirects everything
-  except `/`, `/auth/*`, `/admin/*` to `/`. Header/footer hide public nav.
+  except `/`, `/privacy`, `/terms`, `/auth/*`, `/admin/*` (plus robots/sitemap/
+  opengraph-image for crawlers) to `/`. Header/footer hide public nav.
 - The public sees only the landing page: customer signup (email + ZIP, required) and
   business "request early access" form.
 - Signups land in `waitlist_signups` (public insert, admin-only read). Owner watches
@@ -31,31 +32,48 @@ Formerly RocketSloth.Space (AI consulting site + CRM) — fully replaced and reb
 Next.js 15 App Router + TypeScript + Tailwind, Supabase (Postgres/Auth/Storage),
 Vercel. Key paths: `app/` routes (+ server actions in `app/**/actions.ts`),
 `components/`, `lib/` (env, types, constants, supabase clients, queries,
-admin-queries), `supabase/migrations/0001..0007` + `seed.sql`. Brand: evergreen/PNW
+admin-queries), `supabase/migrations/0001..0009` + `seed.sql`. Brand: evergreen/PNW
 palette, shield-check logo, wordmark **Vetted**Pages (two-tone).
 
 ## Live infrastructure
 
 - **Supabase project:** `slocfkpnvizlxhsdcbhe` ("RocketSloth's Project"),
-  https://slocfkpnvizlxhsdcbhe.supabase.co — ALL migrations 0001–0007 are applied
+  https://slocfkpnvizlxhsdcbhe.supabase.co — ALL migrations 0001–0009 are applied
   live (via Supabase MCP), seed loaded (14 approved companies incl. 8 Frisco TX, 22
-  published reviews). Legacy `crm_*` tables dropped. RLS on everywhere.
-- **Admin allowlist:** `admin_emails` contains `kbbb2003@gmail.com` (owner). Signup
-  with that email auto-grants role `admin`. Owner had NOT yet created the account.
+  published reviews). RLS on everywhere. Migration 0009 (2026-07-09) dropped the 15
+  legacy *unprefixed* CRM tables that 0003 missed (`customers`, `projects`,
+  `change_orders`, `signups`, `app_users`, `notifications`, `settings`, …— all were
+  empty but had `USING (true)` write policies for any authenticated user) plus the
+  legacy helper functions, and revoked anon/authenticated EXECUTE on internal
+  trigger functions. Remaining security-advisor warnings are intentional: public
+  INSERT on `waitlist_signups`/`business_recommendations` (by design), `is_admin()`
+  executable (RLS policies need it), citext in public schema (not worth moving).
+  One real one left: **leaked-password protection is off** (owner dashboard toggle).
+- **Admin account: LIVE.** Owner signed up 2026-06-30 with `kbbb2003@gmail.com` →
+  auto-granted `admin` via the `admin_emails` allowlist. (A second account,
+  `bkbwashing@gmail.com`, exists with role `customer`.)
 - **Vercel:** team `rocketsloths-projects`, project `rocket-sloth-consulting`
   (`prj_SVvCHPOYc24QjuRvuChmaLpCkRta`). Production deploys from `main`. Domains
-  still rocketsloth.space + vercel.app; **vettedpages.com not yet added**.
+  `www.vettedpages.com` + `vettedpages.com` are **added and serving** (old
+  rocketsloth.space + vercel.app domains still attached too).
 - Env vars set by owner in Vercel: `NEXT_PUBLIC_SUPABASE_URL`,
   `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (code accepts this name or legacy
   `NEXT_PUBLIC_SUPABASE_ANON_KEY`), `SUPABASE_SERVICE_ROLE_KEY`.
-  `NEXT_PUBLIC_SITE_URL` should be set to https://www.vettedpages.com (pending).
 - **Gotcha:** `NEXT_PUBLIC_*` is baked at build time — env changes need a redeploy.
+  `NEXT_PUBLIC_SITE_URL` is currently **https://rocketsloth.space** (verified on the
+  live page: og:url and the OG image URL point at the old domain), so share links
+  and canonicals are wrong until the owner sets it to https://www.vettedpages.com
+  and redeploys.
+- **Traction snapshot (2026-07-09):** 17 waitlist signups (12 residents / 5
+  businesses), 1 company application, 0 business recommendations yet.
 
 ## Workflow (important)
 
-- Develop on branch `claude/pensive-tesla-ht3h38`, push, open **draft PR** to `main`.
-  The owner merges via GitHub UI (PRs #33–#38 merged so far), Vercel auto-deploys
-  `main` to production.
+- Develop on the session's designated `claude/*` branch (this session:
+  `claude/site-updates-mcp-notes-89tpdd`; earlier sessions used
+  `claude/pensive-tesla-ht3h38`), push, open **draft PR** to `main`. The owner
+  merges via GitHub UI (fast — often within minutes), Vercel auto-deploys `main`
+  to production.
 - DB changes: write a numbered file in `supabase/migrations/` AND apply live via
   Supabase MCP (`apply_migration`), then verify with `execute_sql`.
 - Verify changes end-to-end where possible (RLS tested by `set local role anon /
@@ -75,26 +93,35 @@ palette, shield-check logo, wordmark **Vetted**Pages (two-tone).
    so review deletes/publishes update `rating_avg`/`rating_count`. (0001 + 0004)
 4. Vercel needed `vercel.json` `{"framework":"nextjs"}` (old project settings
    expected a static site).
+5. **Function grants (0009)**: internal trigger functions have no anon/authenticated
+   EXECUTE anymore. If app code ever calls a DB function via `.rpc()`, grant EXECUTE
+   to the calling role explicitly. `is_admin()` must stay executable by
+   anon/authenticated — RLS policies evaluate it as the querying role.
 
 ## PR history / current state
 
-PRs #33–#44 are **merged** (owner merges fast — often within minutes). That covers:
-full directory rebuild, admin allowlist + Frisco seed, rebrand to VettedPages,
-waitlist + RLS fix, required business fields + `BUSINESS_TYPE_GROUPS`, launch
-campaign (LAUNCH_AREA/CATEGORIES, referral loop, admin insights), Vercel Analytics
-+ live progress ticker. One open PR at a time on the working branch; when a PR
-merges, restart the branch from origin/main (`git checkout -B <branch>
-origin/main`) before new work.
+PRs #33–#45 are **merged**. That covers: full directory rebuild, admin allowlist +
+Frisco seed, rebrand to VettedPages, waitlist + RLS fix, required business fields +
+`BUSINESS_TYPE_GROUPS`, launch campaign (LAUNCH_AREA/CATEGORIES, referral loop,
+admin insights), Vercel Analytics + live progress ticker, and the share/SEO polish
+pass (campaign metadata, generated OG image via `app/opengraph-image.tsx` — use
+inline SVGs, NOT ✓/emoji glyphs, satori's default font lacks them — robots/sitemap,
+ZIP validation, pre-launch gate allowances for crawler routes). One open PR at a
+time on the working branch; when a PR merges, restart the branch from origin/main
+(`git checkout -B <branch> origin/main`) before new work.
 
-Latest polish pass (this PR): site metadata rewritten to campaign positioning
-(old meta description still sold the receipt/before-after mechanic — removed),
-generated OG share image (`app/opengraph-image.tsx`, next/og ImageResponse —
-critical for Nextdoor/FB link previews; use inline SVGs, NOT ✓/emoji glyphs,
-satori's default font lacks them), `app/robots.ts` + `app/sitemap.ts` (sitemap
-lists only `/` pre-launch), ZIP format validation client (`pattern`) + server
-(`ZIP_RE`), and middleware now allows `/robots.txt`, `/sitemap.xml`,
-`/opengraph-image` through the pre-launch gate (they previously 307'd to `/`,
-which would have broken crawlers and social previews).
+This PR (legal pages + DB cleanup + notes refresh):
+
+- **`/privacy` + `/terms` pages** (`app/privacy/page.tsx`, `app/terms/page.tsx`) —
+  plain-English, static. Needed because we collect PII, and **Meta lead ads require
+  a public privacy-policy URL** (blocks the planned ad campaigns otherwise). Allowed
+  through the pre-launch gate in `middleware.ts`, linked from both footer variants,
+  listed in `app/sitemap.ts`. The contact line says "reply to any email from
+  VettedPages" — swap in a real address (e.g. hello@vettedpages.com) once one exists.
+- **Organization + WebSite JSON-LD** in `app/layout.tsx` (uses SITE_URL/LAUNCH_AREA).
+- **Migration 0009** — legacy CRM table/function drop + EXECUTE hardening (details
+  under Live infrastructure), applied live and verified (triggers intact, anon still
+  sees exactly the 14 approved companies, `on_auth_user_created` still present).
 
 ## Waitlist form rules (implemented — keep intact)
 
@@ -136,6 +163,22 @@ Off-site (owner's to-do, not code): Nextdoor community-style posts, FB/Nextdoor
 business pages, manual founding-business outreach (~10 per launch category), $10–20/
 day Meta lead ads (separate resident + business campaigns), progress-update posts.
 
+### Meta Ads via MCP (new option for the ads to-do)
+
+Meta launched official **Ads AI Connectors** in open beta on 2026-04-29: a
+first-party hosted MCP server at **https://mcp.facebook.com/ads** (plus a CLI),
+~29 tools covering reporting/insights, campaign management, catalog ops, account
+diagnostics, and dataset ops. Auth is **Meta Business OAuth** — no developer app or
+API tokens. Claude is supported: add it as a connector in claude.ai settings, or in
+Claude Code via `claude mcp add --transport http meta-ads https://mcp.facebook.com/ads`.
+Everything it creates lands **PAUSED** by default, so review in Ads Manager before
+spend starts. This is the sane way to run the planned $10–20/day resident +
+business lead campaigns conversationally. Notes: needs a Meta Business
+account/Page + ad account; lead ads require a privacy-policy URL — `/privacy`
+(this PR) satisfies that. This repo's remote coding environment does NOT have the
+Meta MCP connected (only Supabase/Vercel/GitHub/Stripe) — connect it in the
+claude.ai app or Claude Desktop where the ads work will happen.
+
 Also built: **Vercel Analytics** (`@vercel/analytics`, `<Analytics />` in
 `app/layout.tsx` — owner must enable Web Analytics in the Vercel project dashboard)
 and a **live progress ticker** in the landing hero ("N neighbors have joined · top
@@ -143,21 +186,27 @@ requested: X · N businesses applied") via `getLaunchProgress()` in
 `lib/admin-queries.ts` (aggregate counts only; hidden until ≥5 residents,
 `TICKER_MIN_RESIDENTS` in `app/page.tsx`).
 
-## Owner's remaining manual steps (Vercel/DNS/Supabase dashboards)
+## Owner's remaining manual steps (Vercel/Supabase dashboards)
+
+Done already: domains added & serving, DNS pointed, admin account created.
 
 1. Merge the open PR, redeploy `main`.
-2. Add domains `www.vettedpages.com` + `vettedpages.com` in Vercel, point DNS.
-3. Set `NEXT_PUBLIC_SITE_URL=https://www.vettedpages.com`, redeploy (baked at
-   build — canonical/OG URLs say localhost until then).
-4. Supabase Auth → URL config: site URL + redirect `https://www.vettedpages.com/auth/callback`.
+2. Set `NEXT_PUBLIC_SITE_URL=https://www.vettedpages.com` in Vercel, redeploy —
+   it's currently `https://rocketsloth.space`, so og:url/canonical/OG-image links
+   on the live site point at the old domain (bad for FB/Nextdoor shares).
+3. Supabase Auth → URL config: site URL `https://www.vettedpages.com` + redirect
+   `https://www.vettedpages.com/auth/callback`.
+4. Supabase Auth → enable **leaked password protection** (last real
+   security-advisor warning).
 5. Enable **Web Analytics** in the Vercel project dashboard (Analytics tab) so
-   `<Analytics />` starts collecting.
-6. Sign up with kbbb2003@gmail.com → auto-admin → `/admin` shows waitlist,
-   growth insights, and the recommendations queue.
+   `<Analytics />` starts collecting — if not done yet.
+6. Optional, for the ad campaigns: connect the **Meta Ads MCP** (see section above)
+   in claude.ai/Claude Desktop.
 
 ## Roadmap (explicitly deferred)
 
 Email broadcasts to the waitlist (Resend), Stripe paid listings, quote-request
-messaging, geo/map search, company replies to reviews, claim-your-business, and the
+messaging, geo/map search, company replies to reviews, claim-your-business, a real
+contact email (hello@vettedpages.com — then update `/privacy` + `/terms`), and the
 rethought review-evidence mechanic. Site launch when the owner has "enough people
 and businesses."
